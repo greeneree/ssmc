@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zoom 계정 매핑 시나리오 비교</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
+
+  :root {
+    --bg: #f8fafc;
+    --surface: #ffffff;
+    --surface2: #f1f5f9;
+    --border: #e2e8f0;
+    --s1: #2563eb;
+    --s1-light: #eff6ff;
+    --s1-mid: #bfdbfe;
+    --s2: #7c3aed;
+    --s2-light: #f5f3ff;
+    --s2-mid: #ddd6fe;
+    --good: #059669;
+    --good-light: #ecfdf5;
+    --bad: #dc2626;
+    --bad-light: #fef2f2;
+    --warn: #d97706;
+    --warn-light: #fffbeb;
+    --text: #0f172a;
+    --text-muted: #64748b;
+    --text-dim: #94a3b8;
+    --mono: 'JetBrains Mono', monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans KR', sans-serif;
+    padding: 48px 24px 80px;
+    line-height: 1.6;
+  }
+
+  .wrap { max-width: 1000px; margin: 0 auto; }
+
+  /* Header */
+  .header {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+  .header-tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+  }
+  .header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 8px;
+  }
+  .header p {
+    font-size: 14px;
+    color: var(--text-muted);
+  }
+
+  /* Section title */
+  .section-title {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .s-badge {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 99px;
+  }
+  .s1-badge { background: var(--s1); color: white; }
+  .s2-badge { background: var(--s2); color: white; }
+
+  /* Two col layout */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-bottom: 48px;
+  }
+  @media (max-width: 700px) { .two-col { grid-template-columns: 1fr; } }
+
+  /* Card */
+  .card {
+    background: var(--surface);
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+  .card-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .card-header h3 { font-size: 15px; font-weight: 700; }
+  .card-body { padding: 20px; }
+
+  /* Flowchart */
+  .flow { display: flex; flex-direction: column; align-items: stretch; gap: 0; }
+
+  .f-node {
+    border-radius: 10px;
+    padding: 11px 14px;
+    font-size: 13px;
+    font-weight: 500;
+    position: relative;
+    border: 1.5px solid transparent;
+  }
+  .f-node-title {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin-bottom: 3px;
+    opacity: 0.6;
+  }
+  .f-node-body { font-size: 12px; line-height: 1.5; }
+  .f-node code {
+    font-family: var(--mono);
+    font-size: 10px;
+    background: rgba(0,0,0,0.07);
+    border-radius: 3px;
+    padding: 1px 5px;
+  }
+
+  .node-s1 { background: var(--s1-light); border-color: var(--s1-mid); }
+  .node-s2 { background: var(--s2-light); border-color: var(--s2-mid); }
+  .node-db { background: #f0fdf4; border-color: #bbf7d0; }
+  .node-api { background: #fefce8; border-color: #fde68a; }
+  .node-zoom { background: #e0f2fe; border-color: #7dd3fc; }
+  .node-ok  { background: var(--good-light); border-color: #6ee7b7; }
+  .node-warn { background: var(--warn-light); border-color: #fcd34d; }
+  .node-err { background: var(--bad-light); border-color: #fca5a5; }
+
+  .f-arrow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 3px 0;
+  }
+  .f-arrow-line { width: 2px; height: 16px; background: var(--border); }
+  .f-arrow-head {
+    width: 0; height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 7px solid var(--border);
+  }
+  .f-arrow-label {
+    font-size: 10px;
+    font-family: var(--mono);
+    color: var(--text-muted);
+    background: var(--bg);
+    padding: 0 6px;
+    border-radius: 4px;
+    margin: 2px 0;
+  }
+
+  .f-branch {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin: 4px 0;
+  }
+  .f-branch-item { display: flex; flex-direction: column; gap: 4px; }
+  .f-branch-label {
+    font-size: 10px;
+    font-family: var(--mono);
+    color: var(--text-muted);
+    text-align: center;
+  }
+
+  /* Pros/Cons */
+  .pros-cons { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
+  .pros, .cons {
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 12px;
+  }
+  .pros { background: var(--good-light); border: 1px solid #6ee7b7; }
+  .cons { background: var(--bad-light); border: 1px solid #fca5a5; }
+  .pros-title, .cons-title {
+    font-weight: 700;
+    font-size: 11px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .pros-title { color: var(--good); }
+  .cons-title { color: var(--bad); }
+  .pc-item {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 5px;
+    line-height: 1.5;
+    color: #374151;
+  }
+  .pc-icon { flex-shrink: 0; }
+
+  /* Comparison table */
+  .compare-section { margin-bottom: 48px; }
+  .compare-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    font-size: 13px;
+  }
+  .compare-table th {
+    padding: 12px 16px;
+    font-weight: 700;
+    font-size: 12px;
+    text-align: left;
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+  }
+  .compare-table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  .compare-table tr:last-child td { border-bottom: none; }
+  .compare-table td:nth-child(1) {
+    font-weight: 600;
+    font-size: 12px;
+    color: var(--text-muted);
+    background: var(--surface2);
+    white-space: nowrap;
+    width: 160px;
+  }
+  .compare-table td:nth-child(2) { background: var(--s1-light); }
+  .compare-table td:nth-child(3) { background: var(--s2-light); }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: 99px;
+    font-size: 11px;
+    font-weight: 600;
+    font-family: var(--mono);
+  }
+  .chip-good { background: var(--good-light); color: var(--good); border: 1px solid #6ee7b7; }
+  .chip-bad  { background: var(--bad-light); color: var(--bad); border: 1px solid #fca5a5; }
+  .chip-mid  { background: var(--warn-light); color: var(--warn); border: 1px solid #fcd34d; }
+
+  /* Recommendation */
+  .recommend {
+    background: linear-gradient(135deg, #eff6ff 0%, #f5f3ff 100%);
+    border: 1px solid #bfdbfe;
+    border-radius: 16px;
+    padding: 28px 32px;
+    margin-bottom: 48px;
+  }
+  .recommend h3 {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .recommend-body { font-size: 13px; color: #374151; line-height: 1.8; }
+  .recommend-body strong { color: var(--text); }
+
+  /* Risk matrix */
+  .risk-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-top: 16px;
+  }
+  .risk-item {
+    border-radius: 10px;
+    padding: 14px;
+    font-size: 12px;
+  }
+  .risk-title { font-weight: 700; font-size: 12px; margin-bottom: 6px; }
+  .risk-s1 { background: var(--s1-light); border: 1px solid var(--s1-mid); }
+  .risk-s2 { background: var(--s2-light); border: 1px solid var(--s2-mid); }
+  .risk-both { background: var(--surface2); border: 1px solid var(--border); }
+
+  .footer {
+    text-align: center;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-dim);
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-tag">Zoom × AI Studio — Account Strategy</div>
+    <h1>Zoom 계정 매핑 시나리오 비교</h1>
+    <p>시나리오 1 (1:1 고정) vs 시나리오 2 (동적 매핑) — 플로우차트 · 기능 구조 · 의사결정 근거</p>
+  </div>
+
+  <!-- Flowcharts -->
+  <div class="two-col">
+
+    <!-- Scenario 1 -->
+    <div class="card">
+      <div class="card-header">
+        <span class="s-badge s1-badge">S1</span>
+        <h3>1:1 고정 매핑</h3>
+      </div>
+      <div class="card-body">
+        <div class="flow">
+
+          <div class="f-node node-s1">
+            <div class="f-node-title">TRIGGER</div>
+            <div class="f-node-body">강의 개설 요청 (강사/운영자)</div>
+          </div>
+          <div class="f-arrow"><div class="f-arrow-line"></div><div class="f-arrow-head"></div></div>
+
+          <div class="f-node node-db">
+            <div class="f-node-title">DB LOOKUP</div>
+            <div class="f-node-body">
+              과정 ID로 <strong>고정 배정된</strong> Zoom 계정 조회<br>
+              <code>WHERE course_id = {id}</code>
+            </div>
+          </div>
+          <div class="f-arrow"><div class="f-arrow-line"></div><div class="f-arrow-head"></div></div>
+
+          <div class="f-node node-api">
+            <div class="f-node-title">ZOOM OAUTH</div>
+            <div class="f-node-body">
+              Access Token 발급<br>
+              <code>grant_type=account_credentials</code>
+            </div>
+          </div>
+          <div class="f-arrow"><div class="f-arrow-line"></div><div class="f-arrow-head"></div></div>
+
+          <div class="f-node node-zoom">
+            <div class="f-node-title">ZOOM API</div>
+            <div class="f-node-body">
+              미팅 생성<br>
+              <code>POST /v2/users/{고정계정}/meetings</code>
+            </div>
+          </div>
+          <div class="f-arrow"><div class="f-arrow-line"></div><div class="f-arrow-head"></div></div>
+
+          <div class="f-node node-db">
+            <div class="f-node-title">DB SAVE</div>
+            <div class="f-node-body">
+              meeting_id, join_url, start_url<br>
+              course_id, lecture_id 저장
+            </div>
+          </div>
+          <div class="f-arrow"><div class="f-arrow-line"></div><div class="f-arrow-head"></div></div>
+
+          <div class="f-node node-ok">
+            <div class="f-node-title">DONE</div>
+            <div class="f-node-body">✅ 강의 개설 완료 — 단일 경로, 실패 분기 없음</div>
+          </div>
+
+        </div>
+
+        <div class="pros-cons">
+          <div class="pros">
+            <div class="pros-title">✅ 장점</div>
+            <div class="pc-item"><span class="pc-icon">·</span>계정 격리 완벽</div>
+            <div class="pc-item"><span class="pc-icon">·</span>레코딩 귀속 명확</div>
+            <div class="pc-item"><span class="pc-icon">·</span>구현 단순</div>
+            <div class="pc-item"><span class="pc-icon">·</span>즉흥 과정 대응 가능</div>
+            <div class="pc-item"><span class="pc-icon">·</span>운영 예측 가능</div>
+          </div>
+          <div class="cons">
+            <div class="cons-title">❌ 단점</div>
+            <div class="pc-item"><span class="pc-icon">·</span>과정 수 = 계정 수 (비용 선형)</div>
+            <div class="pc-item"><span class="pc-icon">·</span>유휴 기간에도 비용 발생</div>
+            <div class="pc-item"><span class="pc-icon">·</span>계정 추가 시 OAuth 수동 동의</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scenario 2 -->
+    <div class="card">
+      <div class="card-header">
+        <span class="s-badge s2-badge">S2</span>
+        <h3>동적 매핑 (풀 운용)</h3>
+      </div>
+      <div class="card-body">
+        <div class="flow">
+
+          <div class="f-node node-s2">
+            <div class="f-node-title">TRIGGER</div>
+            <div class="f-node-body">강의 개설 요청 (강사/운영자)</div>
+          </div>
+          <div class="f-arrow"><div class="f-arrow-line"></div><div class="f-arrow-head"></div></div>
+
+          <div class="f-node node-db">
+            <div class="f-node-title">DB LOOKUP — 배정 가능 계정 탐색</div>
+            <div class="f-node-body">
+              <code>assigned_course_id IS NULL</code> 조회<br>
+              <code>assigned_until</code> 만료 여부 체크
+            </div>
+          </div>
+          <div class="f-arrow"><div class="f-arrow-line"></div><div class="f-arrow-head"></div></div>
+
+          <div class="f-branch">
+            <div class="f-branch-item">
+              <div class="f-branch-label">✅ 가용 계정 있음</div>
+              <div class="f-node node-ok" style="font-size:12px;">
+                계정 Lock 처리<br>
+                <code>assigned_course_id = {id}</code><br>
+                <code>assigned_until = 종료일</code>
+              </div>
+            </div>
+            <div class="f-branch-item">
+              <div class="f-branch-label">❌ 가용 계정 없음</div>
+              <div class="f-node node-err" style="font-size:12px;">
+                배정 실패<br>
+                운영자 알림 발송<br>
+                강의 개설 보류
+              </div>
+            </div>
+          </div>
+
+          <div class="f-arrow"><div class="f-arrow-line"></div><div class="f-arrow-head"></div></div>
+
+          <div class="f-node node-zoom">
+            <div class="f-node-title">ZOOM API — 중복 체크 (보조)</div>
+            <div class="f-node-body">
+              <code>GET /v2/users/{userId}/meetings?type=live</code><br>
+              현재 live 미팅 유무 확인 (보조)<br>
+              <span style="font-size:11px;color:#92400e">※ upcoming으로 판단 불가 — Zoom 미팅 생성 수 제한 없음</span>
+            </div>
+          </div>
+          <div class="f-arrow"><div class="f-arrow-line"></div><div class="f-arrow-head"></div></div>
+
+          <div class="f-node node-api">
+            <div class="f-node-title">ZOOM OAUTH</div>
+            <div class="f-node-body">
+              배정된 계정의 Token 조회/갱신<br>
+              <code>만료 시 Refresh Token으로 재발급</code>
+            </div>
+          </div>
+          <div class="f-arrow"><div class="f-arrow-line"></div><div class="f-arrow-head"></div></div>
+
+          <div class="f-node node-zoom">
+            <div class="f-node-title">ZOOM API</div>
+            <div class="f-node-body">
+              미팅 생성<br>
+              <code>POST /v2/users/{동적배정계정}/meetings</code>
+            </div>
+          </div>
+          <div class="f-arrow"><div class="f-arrow-line"></div><div class="f-arrow-head"></div></div>
+
+          <div class="f-node node-db">
+            <div class="f-node-title">DB SAVE + 과정 종료 후 반납 스케줄</div>
+            <div class="f-node-body">
+              meeting_id, join_url, start_url 저장<br>
+              <code>assigned_until</code> 자동 체크 → 풀 반납 처리
+            </div>
+          </div>
+
+        </div>
+
+        <div class="pros-cons">
+          <div class="pros">
+            <div class="pros-title">✅ 장점</div>
+            <div class="pc-item"><span class="pc-icon">·</span>계정 수 절감 (비용 효율)</div>
+            <div class="pc-item"><span class="pc-icon">·</span>과정 증가 시 계정 추가 불필요</div>
+            <div class="pc-item"><span class="pc-icon">·</span>유휴 비용 최소화</div>
+          </div>
+          <div class="cons">
+            <div class="cons-title">❌ 단점</div>
+            <div class="pc-item"><span class="pc-icon">·</span>동시 몰림 시 배정 실패 가능</div>
+            <div class="pc-item"><span class="pc-icon">·</span>레코딩 귀속 추적 복잡</div>
+            <div class="pc-item"><span class="pc-icon">·</span>반납 타이밍 오류 → 중복 배정 위험</div>
+            <div class="pc-item"><span class="pc-icon">·</span>구현 복잡도 높음</div>
+            <div class="pc-item"><span class="pc-icon">·</span>즉흥형 과정 "바로 시작" 불가</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Comparison Table -->
+  <div class="compare-section">
+    <div class="section-title">📊 항목별 비교</div>
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th>비교 항목</th>
+          <th><span class="s-badge s1-badge" style="font-size:10px;">S1</span> 1:1 고정 매핑</th>
+          <th><span class="s-badge s2-badge" style="font-size:10px;">S2</span> 동적 매핑</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>계정 수</td>
+          <td>과정 수 = 계정 수 (1:1)</td>
+          <td>동시 강의 수 기준으로 절감 가능</td>
+        </tr>
+        <tr>
+          <td>라이선스 비용</td>
+          <td><span class="chip chip-mid">보통</span> 유휴 기간도 비용 발생</td>
+          <td><span class="chip chip-good">절감</span> 동시 사용 수만큼만</td>
+        </tr>
+        <tr>
+          <td>구현 복잡도</td>
+          <td><span class="chip chip-good">낮음</span> 단일 경로, 분기 없음</td>
+          <td><span class="chip chip-bad">높음</span> 배정/반납/Lock/스케줄러</td>
+        </tr>
+        <tr>
+          <td>운영 안정성</td>
+          <td><span class="chip chip-good">높음</span> 배정 실패 없음</td>
+          <td><span class="chip chip-bad">리스크</span> 동시 몰림 시 배정 불가</td>
+        </tr>
+        <tr>
+          <td>레코딩 귀속</td>
+          <td><span class="chip chip-good">명확</span> 계정 = 과정 1:1</td>
+          <td><span class="chip chip-mid">복잡</span> course_id/lecture_id 추적 필수</td>
+        </tr>
+        <tr>
+          <td>즉흥형 과정</td>
+          <td><span class="chip chip-good">즉시 가능</span></td>
+          <td><span class="chip chip-bad">불가</span> 가용 계정 없으면 보류</td>
+        </tr>
+        <tr>
+          <td>계정 추가 시</td>
+          <td>OAuth 수동 동의 필요 (1회)</td>
+          <td>OAuth 수동 동의 + 풀 로직 수정</td>
+        </tr>
+        <tr>
+          <td>장애 영향 범위</td>
+          <td>해당 과정 1개만 영향</td>
+          <td>풀 전체 로직 오류 시 전체 영향</td>
+        </tr>
+        <tr>
+          <td>스케줄러 필요</td>
+          <td>불필요</td>
+          <td>필요 (계정 반납 자동화)</td>
+        </tr>
+        <tr>
+          <td>추가 구현 항목</td>
+          <td>없음</td>
+          <td>Lock 처리, 반납 스케줄러, 알림, 충돌 감지</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Recommendation -->
+  <div class="recommend">
+    <h3>🎯 권장 방향 — 시나리오 1 + 예비 계정</h3>
+    <div class="recommend-body">
+      <strong>시나리오 1이 권장입니다.</strong> 단, 유연성을 위해 예비 계정 1~2개를 풀로 운용하는 변형을 제안합니다.<br><br>
+      <strong>핵심 근거:</strong> 시나리오 2의 "배정 실패" 상황은 기술 문제가 아니라 <strong>운영 사고</strong>입니다. 강의 시작 직전 배정 불가 알림이 뜨는 상황에서 대응 프로세스를 만들어야 하고, 그 비용이 라이선스 절감액보다 높습니다.<br><br>
+      <strong>예비 계정 구조:</strong>
+      <br>· 과정 N개 → 유료 계정 N개 (고정 매핑)
+      <br>· 예비 계정 1~2개 → 긴급 과정 추가, 계정 장애 시 즉시 교체
+      <br>· 동적 배정 로직 없이 <strong>운영자가 수동으로 매핑만 변경</strong>
+      <br><br>
+      <strong>Zoom Pro 계정 기준 월 ~$15/계정.</strong> 예비 1개 추가 비용 $15로 동적 배정 로직 전체 구현·유지보수 비용을 대체합니다.
+    </div>
+  </div>
+
+  <!-- Risk -->
+  <div class="compare-section">
+    <div class="section-title">⚠️ 시나리오별 주요 리스크</div>
+    <div class="risk-grid">
+      <div class="risk-item risk-s1">
+        <div class="risk-title" style="color:var(--s1)">S1 전용 리스크</div>
+        과정 급증 시 계정 비용 선형 증가<br><br>
+        계정 추가 시마다 관리자 OAuth 수동 동의 필요 (자동화 불가)
+      </div>
+      <div class="risk-item risk-s2">
+        <div class="risk-title" style="color:var(--s2)">S2 전용 리스크</div>
+        동시 몰림 → 배정 실패 → 강의 보류 (운영 사고)<br><br>
+        계정 반납 타이밍 오류 → 중복 배정<br><br>
+        레코딩 혼재 → 귀속 추적 누락 시 데이터 오염
+      </div>
+      <div class="risk-item risk-both">
+        <div class="risk-title" style="color:var(--text-muted)">공통 리스크</div>
+        Zoom Access Token 1시간 만료<br>→ 강의 시작 전 재발급 로직 필수<br><br>
+        OAuth 최초 동의는 공통적으로 수동
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    Zoom × AI Studio — Account Scenario v1.0 · 2026.03
+  </div>
+
+</div>
+</body>
+</html>

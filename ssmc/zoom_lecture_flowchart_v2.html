@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zoom × AI Studio — 강의 개설 플로우 v2</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
+
+  :root {
+    --bg: #0a0e1a;
+    --surface: #111827;
+    --surface2: #1a2235;
+    --border: #1e2d47;
+    --accent: #2563eb;
+    --accent2: #06b6d4;
+    --accent3: #10b981;
+    --warn: #f59e0b;
+    --danger: #ef4444;
+    --text: #e2e8f0;
+    --text-muted: #64748b;
+    --text-dim: #94a3b8;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans KR', sans-serif;
+    min-height: 100vh;
+    padding: 40px 20px 80px;
+  }
+
+  /* bg grid */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(37,99,235,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(37,99,235,0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .wrap {
+    position: relative;
+    z-index: 1;
+    max-width: 860px;
+    margin: 0 auto;
+  }
+
+  /* header */
+  .header {
+    margin-bottom: 48px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+  }
+  .header-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--accent2);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .header h1 {
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 6px;
+  }
+  .header h1 span { color: var(--accent2); }
+  .header-sub {
+    font-size: 13px;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 2px 10px;
+    border-radius: 99px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+  }
+  .badge-new { background: rgba(16,185,129,0.15); color: var(--accent3); border: 1px solid rgba(16,185,129,0.3); }
+  .badge-fix { background: rgba(245,158,11,0.12); color: var(--warn); border: 1px solid rgba(245,158,11,0.25); }
+
+  /* legend */
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 36px;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 12px;
+    color: var(--text-dim);
+  }
+  .legend-dot {
+    width: 12px; height: 12px;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+
+  /* flow */
+  .flow { display: flex; flex-direction: column; gap: 0; }
+
+  /* connector */
+  .connector {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    padding: 6px 0;
+  }
+  .conn-line {
+    width: 2px;
+    height: 24px;
+    background: linear-gradient(to bottom, var(--border), var(--accent));
+    opacity: 0.5;
+  }
+  .conn-arrow {
+    width: 0; height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 8px solid var(--accent);
+    opacity: 0.5;
+  }
+
+  /* step card */
+  .step {
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    overflow: hidden;
+    transition: box-shadow 0.2s;
+  }
+  .step:hover {
+    box-shadow: 0 0 0 1px rgba(37,99,235,0.3), 0 8px 32px rgba(0,0,0,0.4);
+  }
+
+  .step-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .step-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--accent2);
+    background: rgba(6,182,212,0.1);
+    border: 1px solid rgba(6,182,212,0.2);
+    border-radius: 6px;
+    padding: 3px 8px;
+    white-space: nowrap;
+  }
+  .step-title {
+    font-size: 15px;
+    font-weight: 700;
+    flex: 1;
+  }
+  .step-actor {
+    font-size: 11px;
+    color: var(--text-muted);
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 3px 10px;
+    white-space: nowrap;
+  }
+
+  .step-body { padding: 18px 20px; display: flex; flex-direction: column; gap: 12px; }
+
+  /* api block */
+  .api-block {
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+  .api-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    padding: 5px 12px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .method {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .method-get { background: rgba(16,185,129,0.2); color: var(--accent3); }
+  .method-post { background: rgba(37,99,235,0.2); color: #60a5fa; }
+  .api-url {
+    color: var(--text-dim);
+    font-size: 12px;
+  }
+  .api-body {
+    background: #0d1526;
+    padding: 12px 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    line-height: 1.7;
+    color: var(--text-dim);
+  }
+  .api-body .key { color: #93c5fd; }
+  .api-body .val { color: #86efac; }
+  .api-body .val-str { color: #fcd34d; }
+  .api-body .comment { color: var(--text-muted); font-style: italic; }
+  .api-body .new-field {
+    background: rgba(16,185,129,0.08);
+    border-left: 2px solid var(--accent3);
+    padding-left: 6px;
+    margin-left: -6px;
+  }
+
+  /* info row */
+  .info-row {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .info-icon {
+    font-size: 14px;
+    margin-top: 1px;
+    flex-shrink: 0;
+  }
+  .info-text {
+    font-size: 13px;
+    color: var(--text-dim);
+    line-height: 1.6;
+  }
+  .info-text strong { color: var(--text); font-weight: 600; }
+  .info-text code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1px 6px;
+    color: #a5f3fc;
+  }
+
+  /* sub flow (branch) */
+  .branch {
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    overflow: hidden;
+  }
+  .branch-title {
+    padding: 8px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .branch-body { padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+  .branch-row {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    font-size: 12px;
+    color: var(--text-dim);
+    line-height: 1.6;
+  }
+  .branch-icon { flex-shrink: 0; margin-top: 1px; }
+
+  /* highlight box */
+  .highlight {
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-size: 12px;
+    line-height: 1.7;
+    color: var(--text-dim);
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .highlight-warn { background: rgba(245,158,11,0.07); border: 1px solid rgba(245,158,11,0.2); }
+  .highlight-new  { background: rgba(16,185,129,0.07); border: 1px solid rgba(16,185,129,0.2); }
+  .highlight-info { background: rgba(37,99,235,0.07);  border: 1px solid rgba(37,99,235,0.2); }
+  .highlight-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+  .highlight-content { flex: 1; }
+  .highlight-content strong { color: var(--text); }
+
+  /* changed indicator */
+  .changed-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 1px 8px;
+    border-radius: 99px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+  .tag-new { background: rgba(16,185,129,0.15); color: var(--accent3); }
+  .tag-fix { background: rgba(245,158,11,0.12); color: var(--warn); }
+  .tag-same { background: rgba(100,116,139,0.15); color: var(--text-muted); }
+
+  /* divider */
+  .divider {
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--border), transparent);
+    margin: 4px 0;
+  }
+
+  /* footer */
+  .footer {
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-tag">Zoom × AI Studio — Flow Spec</div>
+    <h1>강의 개설 플로우 <span>v2</span></h1>
+    <div class="header-sub">
+      <span>Step 02 구조 변경 반영 · start_url 추가 · 레코딩 귀속 추적 필드 추가</span>
+      <span class="badge badge-new">● NEW</span>
+      <span class="badge badge-fix">▲ FIX</span>
+    </div>
+  </div>
+
+  <!-- Legend -->
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:#10b981"></div> 신규 추가 항목</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#f59e0b"></div> 수정된 항목</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#2563eb"></div> 변경 없음</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#64748b"></div> DB 필수 항목</div>
+  </div>
+
+  <!-- Flow -->
+  <div class="flow">
+
+    <!-- STEP 1 -->
+    <div class="step">
+      <div class="step-header">
+        <span class="step-num">STEP 01</span>
+        <span class="step-title">강의 개설 요청</span>
+        <span class="changed-tag tag-same">변경 없음</span>
+        <span class="step-actor">강사 / 운영자</span>
+      </div>
+      <div class="step-body">
+        <div class="info-row">
+          <span class="info-icon">📝</span>
+          <span class="info-text">플랫폼 UI에서 강의명, 시작일시, 수강생 목록 입력 후 개설 요청</span>
+        </div>
+        <div class="highlight highlight-info">
+          <span class="highlight-icon">💡</span>
+          <span class="highlight-content">이 시점에 <strong>Zoom 계정은 미배정 상태</strong>. 다음 단계에서 DB 조회 후 배정.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="connector"><div class="conn-line"></div><div class="conn-arrow"></div></div>
+
+    <!-- STEP 2 -->
+    <div class="step">
+      <div class="step-header">
+        <span class="step-num">STEP 02</span>
+        <span class="step-title">Zoom 계정 조회 / 배정</span>
+        <span class="changed-tag tag-fix">▲ 구조 변경</span>
+        <span class="step-actor">Server (Backend)</span>
+      </div>
+      <div class="step-body">
+
+        <div class="branch">
+          <div class="branch-title">① Primary — DB 조회 (필수)</div>
+          <div class="branch-body">
+            <div class="branch-row">
+              <span class="branch-icon">🗄️</span>
+              <span>해당 과정에 <strong>배정된 zoom 계정</strong> 조회<br>
+              <code>zoom_accounts.assigned_course_id = {courseId}</code></span>
+            </div>
+            <div class="branch-row">
+              <span class="branch-icon">🔒</span>
+              <span>중복 배정 방지: <code>assigned_until</code> 체크 → 과정 기간 내 다른 과정에 재배정 불가</span>
+            </div>
+            <div class="branch-row">
+              <span class="branch-icon">🔄</span>
+              <span>미배정 계정(<code>assigned_course_id IS NULL</code>) 중 풀(pool) 대기 계정 자동 선택</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="branch">
+          <div class="branch-title">② Secondary — Zoom API 보조 체크</div>
+          <div class="branch-body">
+            <div class="api-block">
+              <div class="api-label">
+                <span class="method method-get">GET</span>
+                <span class="api-url">/v2/users/{userId}/meetings?type=live</span>
+              </div>
+              <div class="api-body">
+                <span class="comment">// 현재 live 미팅 유무로 사용 중 여부 보조 확인</span><br>
+                <span class="comment">// Zoom은 미팅 생성 수 제한 없음 → upcoming으로 판단 불가</span><br>
+                <span class="comment">// DB 배정이 Primary — API는 double-check 용도</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="highlight highlight-warn">
+          <span class="highlight-icon">⚠️</span>
+          <div class="highlight-content">
+            <strong>Zoom API 단독으로 배정 판단 금지.</strong> Zoom은 미팅 생성 수 제한 없음 → upcoming 수로 사용 여부 판단 불가. live 체크는 보조 참고용.<br>
+            과정-계정 매핑은 반드시 <strong>DB가 Source of Truth</strong>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="connector"><div class="conn-line"></div><div class="conn-arrow"></div></div>
+
+    <!-- STEP 3 -->
+    <div class="step">
+      <div class="step-header">
+        <span class="step-num">STEP 03</span>
+        <span class="step-title">Access Token 발급</span>
+        <span class="changed-tag tag-same">변경 없음</span>
+        <span class="step-actor">Server → Zoom OAuth</span>
+      </div>
+      <div class="step-body">
+        <div class="api-block">
+          <div class="api-label">
+            <span class="method method-post">POST</span>
+            <span class="api-url">zoom.us/oauth/token</span>
+          </div>
+          <div class="api-body">
+            <span class="key">grant_type</span>=<span class="val-str">account_credentials</span><br>
+            <span class="key">account_id</span>=<span class="val-str">{단일 Account ID}</span>
+            <span class="comment">  // .env — 앱 1벌</span>
+          </div>
+        </div>
+        <div class="info-row">
+          <span class="info-icon">🔑</span>
+          <span class="info-text">발급된 <code>access_token</code>은 <strong>1시간 유효</strong>. 강의 시작 시 재발급 로직 필요.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="connector"><div class="conn-line"></div><div class="conn-arrow"></div></div>
+
+    <!-- STEP 4 -->
+    <div class="step">
+      <div class="step-header">
+        <span class="step-num">STEP 04</span>
+        <span class="step-title">미팅 생성</span>
+        <span class="changed-tag tag-same">변경 없음</span>
+        <span class="step-actor">Server → Zoom API</span>
+      </div>
+      <div class="step-body">
+        <div class="api-block">
+          <div class="api-label">
+            <span class="method method-post">POST</span>
+            <span class="api-url">/v2/users/{zoom계정 email}/meetings</span>
+          </div>
+          <div class="api-body">
+            <span class="key">Authorization</span>: <span class="val-str">Bearer {access_token}</span><br><br>
+            <span class="key">type</span>: <span class="val">2</span>
+            <span class="comment">  // 예약 미팅</span><br>
+            <span class="key">topic</span>: <span class="val-str">"{강의명}"</span><br>
+            <span class="key">start_time</span>: <span class="val-str">"{시작일시 ISO8601}"</span><br>
+            <span class="key">duration</span>: <span class="val">{분}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="connector"><div class="conn-line"></div><div class="conn-arrow"></div></div>
+
+    <!-- STEP 5 -->
+    <div class="step">
+      <div class="step-header">
+        <span class="step-num">STEP 05</span>
+        <span class="step-title">응답값 DB 저장</span>
+        <span class="changed-tag tag-fix">▲ 필드 추가</span>
+        <span class="step-actor">Server → DB</span>
+      </div>
+      <div class="step-body">
+
+        <div class="api-block">
+          <div class="api-label">
+            <span style="color:#94a3b8; font-size:11px;">Zoom API 응답 → DB 저장 필드</span>
+          </div>
+          <div class="api-body">
+            <span class="comment">// ── 기존 필드 ──────────────────</span><br>
+            <span class="key">meeting_id</span>: <span class="val-str">"85746523198"</span><br>
+            <span class="key">join_url</span>: <span class="val-str">"https://zoom.us/j/..."</span><br>
+            <span class="key">password</span>: <span class="val-str">"abc123"</span><br><br>
+            <span class="comment">// ── 신규 추가 필드 ──────────────</span><br>
+            <div class="new-field"><span class="key">start_url</span>: <span class="val-str">"https://zoom.us/s/...?zak=..."</span>
+            <span class="comment">  // ★ 호스트 입장 필수</span></div>
+            <div class="new-field"><span class="key">course_id</span>: <span class="val-str">"{과정ID}"</span>
+            <span class="comment">  // 레코딩 귀속 추적</span></div>
+            <div class="new-field"><span class="key">lecture_id</span>: <span class="val-str">"{강의ID}"</span>
+            <span class="comment">  // 레코딩 귀속 추적</span></div>
+          </div>
+        </div>
+
+        <div class="highlight highlight-new">
+          <span class="highlight-icon">✅</span>
+          <div class="highlight-content">
+            <strong>start_url</strong>은 ZAK 포함된 호스트 전용 URL. 미팅 시작 시 만료되므로<br>
+            강의 시작 버튼 클릭 시점에 아래 API로 <strong>재조회 권장</strong> (방안 A)
+          </div>
+        </div>
+
+        <div class="branch">
+          <div class="branch-title">방안 A — 강의 시작 시점 start_url 재발급</div>
+          <div class="branch-body">
+            <div class="api-block">
+              <div class="api-label">
+                <span class="method method-get">GET</span>
+                <span class="api-url">/v2/meetings/{meetingId}</span>
+              </div>
+              <div class="api-body">
+                <span class="comment">// 강사가 "강의 시작" 버튼 클릭 시 호출</span><br>
+                <span class="comment">// 응답의 start_url을 딥링크 파라미터로 전달</span><br>
+                <span class="comment">// → zoomus:// 실행</span>
+              </div>
+            </div>
+            <div class="branch-row">
+              <span class="branch-icon">⚡</span>
+              <span>DB에 저장된 <code>start_url</code>은 <strong>백업/디버그용</strong>으로만 사용.<br>실제 입장에는 항상 재조회값 사용 권장.</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="connector"><div class="conn-line"></div><div class="conn-arrow"></div></div>
+
+    <!-- STEP 6 — Webhook -->
+    <div class="step">
+      <div class="step-header">
+        <span class="step-num">STEP 06</span>
+        <span class="step-title">녹화 완료 Webhook 처리</span>
+        <span class="changed-tag tag-fix">▲ 귀속 추적 추가</span>
+        <span class="step-actor">Zoom → Server Webhook</span>
+      </div>
+      <div class="step-body">
+        <div class="branch">
+          <div class="branch-title">Webhook Event: recording.completed</div>
+          <div class="branch-body">
+            <div class="branch-row">
+              <span class="branch-icon">🔐</span>
+              <span>Secret Token 검증 → 유효하지 않으면 <strong>즉시 reject</strong></span>
+            </div>
+            <div class="branch-row">
+              <span class="branch-icon">🔍</span>
+              <span>payload의 <code>meeting_id</code> → DB에서 <code>course_id</code>, <code>lecture_id</code> 매핑 조회</span>
+            </div>
+            <div class="branch-row">
+              <span class="branch-icon">💾</span>
+              <span><code>share_url</code>, <code>recording_files</code> → DB 저장 (S3 이관 없음 — 확정)</span>
+            </div>
+          </div>
+        </div>
+        <div class="highlight highlight-new">
+          <span class="highlight-icon">🎯</span>
+          <div class="highlight-content">
+            <code>course_id</code> / <code>lecture_id</code> 저장(STEP 05)이 없으면<br>
+            <strong>어느 강의 녹화인지 추적 불가</strong>. 두 필드는 STEP 05에서 반드시 저장.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /flow -->
+
+  <!-- Footer -->
+  <div class="footer">
+    <span>Zoom × AI Studio — Flowchart v2.0</span>
+    <span>Updated: 2026.03 · start_url 추가 · 레코딩 귀속 추적 · DB Primary 원칙 반영</span>
+  </div>
+
+</div>
+</body>
+</html>
