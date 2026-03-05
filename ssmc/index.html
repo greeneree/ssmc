@@ -99,7 +99,7 @@
   </div>
 
   <div class="status-strip">
-    <div class="status-item"><div class="status-num">5</div><div class="status-label">산출물 문서</div></div>
+    <div class="status-item"><div class="status-num">6</div><div class="status-label">산출물 문서</div></div>
     <div class="status-item"><div class="status-num">28</div><div class="status-label">화면 설계</div></div>
     <div class="status-item"><div class="status-num">5</div><div class="status-label">미결 사항</div></div>
     <div class="status-item"><div class="status-num">v3</div><div class="status-label">플로우차트 최신</div></div>
@@ -141,11 +141,19 @@
       <div class="card-tag tag-updated">⚡ 수정됨</div>
     </a>
 
+    <a href="zoom_mps_flowchart_v3.html" class="card card-teal" style="--card-accent:#00d4aa;--card-icon-bg:rgba(0,212,170,0.12);--card-icon-border:rgba(0,212,170,0.25);">
+      <div class="card-icon">🗺️</div>
+      <div class="card-version">Latest · v3</div>
+      <div class="card-title">전체 플로우차트</div>
+      <div class="card-desc">원본 레인 양식 기반. ZAK 별도 발급 제거, type=live 수정, 레인 간 화살표 추가.</div>
+      <div class="card-tag tag-latest">✦ 최신</div>
+    </a>
+
     <a href="zoom_mps_flowchart.html" class="card card-yellow">
       <div class="card-icon">📊</div>
       <div class="card-version">v1 · 구버전</div>
-      <div class="card-title">전체 플로우차트</div>
-      <div class="card-desc">초기 전체 흐름도. 최신은 강의 개설 플로우차트 v3 참고.</div>
+      <div class="card-title">전체 플로우차트 (구)</div>
+      <div class="card-desc">초기 전체 흐름도. 최신은 전체 플로우차트 v3 참고.</div>
       <div class="card-tag tag-v1">참고용</div>
     </a>
 
@@ -155,6 +163,23 @@
   <div class="section-head"><h2>변경 이력 아카이브</h2></div>
   <div class="changelog-archive">
     <div class="ca-header"><h3>Changelog</h3></div>
+
+    <div class="ca-entry">
+      <div class="ca-date">2026-03-05</div>
+      <div>
+        <div class="ca-title">
+          <span class="ct ct-y">전체 플로우차트 v3</span>
+          원본 레인 양식 기반 플로우차트 업데이트
+        </div>
+        <div class="ca-items">
+          · 기존 zoom_mps_flowchart 양식(레인 구조) 그대로 유지하며 v3 수정사항 반영<br>
+          · ZAK 별도 발급 단계(GET /v2/users/me/token?type=zak) 취소선 처리 및 제거<br>
+          · type=upcoming → type=live 수정, 이유 명시<br>
+          · 레인 간 화살표(→/←)로 프론트↔백엔드↔Zoom 통신 흐름 시각화<br>
+          · start_url ZAK 포함 구조 예시 추가
+        </div>
+      </div>
+    </div>
 
     <div class="ca-entry">
       <div class="ca-date">2026-03-05</div>
@@ -199,7 +224,7 @@
         </div>
         <div class="ca-items">
           · Server-to-Server OAuth 인증 방식 확정<br>
-          · 마스터 계정 aistudio.service@multicampus.com 등록 완료<br>
+          · 마스터 계정 <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="bedfd7cdcacbdad7d190cddbccc8d7dddbfed3cbd2cad7dddfd3cecbcd90ddd1d3">[email&#160;protected]</a> 등록 완료<br>
           · 계정 풀 3가지 시나리오 정리 (시나리오 1 권장)<br>
           · 화면 목록 v1, 기능 명세서 v1, 전체 플로우차트 v1 생성<br>
           · 용어 통일 (MPS Server → 어드민, 강사 미러링 → 실시간 강의 등)
@@ -231,6 +256,4 @@
   </div>
 
 </div>
-<footer>Zoom × AI Studio 기술 문서 허브 &nbsp;·&nbsp; 멀티캠퍼스 × AI Studio &nbsp;·&nbsp; 스레드 인수인계 v3 기준</footer>
-</body>
-</html>
+<footer>Zoom × AI Studio 기

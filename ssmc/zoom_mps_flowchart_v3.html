@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zoom × AI Studio — 전체 플로우차트 v3</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Noto+Sans+KR:wght@400;500;700&display=swap');
+
+:root {
+  --bg: #090d13;
+  --lane-bg: #0d1119;
+  --lane-border: #1a2030;
+  --card: #131926;
+  --card-border: #1e2a3a;
+  --text: #cbd5e1;
+  --text-dim: #64748b;
+  --text-bright: #f1f5f9;
+  --mono: 'IBM Plex Mono', monospace;
+  --sans: 'Noto Sans KR', sans-serif;
+  --admin: #f59e0b;
+  --frontend: #4f9cf9;
+  --backend: #a78bfa;
+  --zoom: #34d399;
+  --warn: #f87171;
+  --new: #fb923c;
+  --changed: #f0c040;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  min-height: 100vh;
+  padding: 0 0 80px;
+}
+
+/* ── HEADER ── */
+.header {
+  padding: 36px 48px 28px;
+  border-bottom: 1px solid var(--lane-border);
+  background: linear-gradient(160deg, #0d1119 0%, #0a0f1a 100%);
+  position: relative;
+  overflow: hidden;
+}
+.header::after {
+  content: '';
+  position: absolute;
+  top: -80px; right: -80px;
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(52,211,153,0.05) 0%, transparent 65%);
+  pointer-events: none;
+}
+.header-badge {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  color: var(--zoom);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.header h1 {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-bright);
+  letter-spacing: -0.3px;
+  margin-bottom: 6px;
+}
+.header-sub {
+  font-size: 12px;
+  color: var(--text-dim);
+  font-family: var(--mono);
+}
+.update-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(251,146,60,0.12);
+  border: 1px solid rgba(251,146,60,0.3);
+  color: var(--new);
+  font-size: 10px;
+  font-family: var(--mono);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  padding: 3px 9px;
+  border-radius: 4px;
+  margin-top: 10px;
+  margin-right: 8px;
+}
+.nav-link-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(79,156,249,0.10);
+  border: 1px solid rgba(79,156,249,0.25);
+  color: var(--frontend);
+  font-size: 10px;
+  font-family: var(--mono);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  padding: 3px 9px;
+  border-radius: 4px;
+  margin-top: 10px;
+  text-decoration: none;
+}
+
+/* ── CHANGELOG STRIP ── */
+.changelog-strip {
+  background: rgba(240,192,64,0.04);
+  border-bottom: 1px solid rgba(240,192,64,0.15);
+  padding: 12px 48px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  align-items: flex-start;
+}
+.cl-title {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--changed);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  padding-top: 2px;
+}
+.cl-items {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-dim);
+  line-height: 1.8;
+}
+.cl-items .old { color: var(--warn); text-decoration: line-through; }
+.cl-items .new { color: var(--zoom); }
+.cl-items .label { color: var(--changed); font-weight: 700; }
+
+/* ── LANE HEADERS ── */
+.lane-headers {
+  display: grid;
+  grid-template-columns: 48px 1fr 1fr 1fr 1fr;
+  border-bottom: 2px solid var(--lane-border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: #0b0f18;
+}
+.lane-header {
+  padding: 12px 16px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  font-family: var(--mono);
+  text-transform: uppercase;
+  border-right: 1px solid var(--lane-border);
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.lane-header:last-child { border-right: none; }
+.lane-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+/* ── STEP ROW ── */
+.step-row {
+  display: grid;
+  grid-template-columns: 48px 1fr 1fr 1fr 1fr;
+  border-bottom: 2px solid var(--lane-border);
+  position: relative;
+}
+
+/* ── TITLE BAR ── */
+.step-title-bar {
+  grid-column: 1 / -1;
+  background: #0b0f18;
+  border-bottom: 1px solid var(--lane-border);
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.step-title-num {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-dim);
+  letter-spacing: 0.1em;
+}
+.step-title-text {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-bright);
+}
+.step-title-sub {
+  font-size: 11px;
+  font-family: var(--mono);
+  color: var(--text-dim);
+  margin-left: auto;
+}
+
+/* ── STEP ID COL ── */
+.step-id-col {
+  background: #0b0f18;
+  border-right: 1px solid var(--lane-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.step-id-col span {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: #334155;
+  writing-mode: vertical-rl;
+  letter-spacing: 0.1em;
+}
+
+/* ── LANE CELL ── */
+.lane-cell {
+  padding: 24px 18px;
+  border-right: 1px solid var(--lane-border);
+  position: relative;
+  vertical-align: top;
+}
+.lane-cell:last-child { border-right: none; }
+.lane-empty {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.lane-empty span {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: #1e2a3a;
+}
+
+/* ── NODES ── */
+.node {
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-bottom: 10px;
+  position: relative;
+}
+.node:last-child { margin-bottom: 0; }
+.node-title {
+  font-size: 12px;
+  font-weight: 700;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  line-height: 1.3;
+  flex-wrap: wrap;
+}
+.node-body {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-dim);
+  line-height: 1.7;
+}
+.node-body .key { color: #7dd3fc; }
+.node-body .val { color: #86efac; }
+.node-body .comment { color: #475569; font-style: italic; }
+.node-body .strike { text-decoration: line-through; color: var(--warn); }
+
+.node.admin   { border-left: 3px solid var(--admin); }
+.node.front   { border-left: 3px solid var(--frontend); }
+.node.back    { border-left: 3px solid var(--backend); }
+.node.zoom-n  { border-left: 3px solid var(--zoom); }
+.node.warn    { border-left: 3px solid var(--warn); background: rgba(248,113,113,0.04); }
+.node.success { border-left: 3px solid var(--zoom); background: rgba(52,211,153,0.04); }
+.node.start   { border: 1px solid var(--admin); background: rgba(245,158,11,0.06); }
+.node.updated { border-left: 3px solid var(--new); background: rgba(251,146,60,0.05); }
+.node.changed { border-left: 3px solid var(--changed); background: rgba(240,192,64,0.04); }
+
+/* ARROWS */
+.arrow {
+  text-align: center;
+  font-size: 16px;
+  color: var(--text-dim);
+  margin: 4px 0;
+  line-height: 1;
+}
+.arrow-label {
+  font-size: 9px;
+  font-family: var(--mono);
+  color: var(--text-dim);
+  text-align: center;
+  margin-bottom: 2px;
+}
+
+/* CROSS-LANE ARROWS — SVG overlay per step */
+.step-svg-wrap {
+  position: relative;
+}
+
+/* DB BADGE */
+.db-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(167,139,250,0.08);
+  border: 1px solid rgba(167,139,250,0.2);
+  border-radius: 5px;
+  padding: 6px 10px;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: #c4b5fd;
+  margin-bottom: 8px;
+  width: 100%;
+  line-height: 1.7;
+}
+
+/* STATUS PILLS */
+.status-row { display: flex; gap: 8px; margin-top: 8px; }
+.status-pill {
+  flex: 1;
+  border-radius: 6px;
+  padding: 7px 10px;
+  font-size: 10px;
+  font-family: var(--mono);
+  text-align: center;
+  line-height: 1.5;
+}
+.status-green { background: rgba(52,211,153,0.08); border: 1px solid rgba(52,211,153,0.2); color: var(--zoom); }
+.status-yellow { background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.2); color: var(--admin); }
+.status-red { background: rgba(248,113,113,0.08); border: 1px solid rgba(248,113,113,0.2); color: var(--warn); }
+
+/* BRANCH BOX */
+.branch-box {
+  border: 1px solid #1e3a5f;
+  border-radius: 8px;
+  background: rgba(15,25,50,0.4);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.branch-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--frontend);
+  letter-spacing: 0.08em;
+  margin-bottom: 8px;
+}
+.branch-case { display: flex; gap: 8px; margin-bottom: 8px; }
+.branch-case:last-child { margin-bottom: 0; }
+.case-badge {
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  white-space: nowrap;
+  align-self: flex-start;
+  margin-top: 1px;
+}
+.case-green { background: rgba(52,211,153,0.12); color: var(--zoom); border: 1px solid rgba(52,211,153,0.25); }
+.case-red { background: rgba(248,113,113,0.12); color: var(--warn); border: 1px solid rgba(248,113,113,0.25); }
+.case-yellow { background: rgba(245,158,11,0.12); color: var(--admin); border: 1px solid rgba(245,158,11,0.25); }
+.case-text { font-size: 11px; color: var(--text-dim); line-height: 1.6; }
+.case-text strong { color: var(--text); }
+.case-divider { height: 1px; background: #1e2a3a; margin: 8px 0; }
+
+/* WEBHOOK TAG */
+.webhook-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--zoom);
+  background: rgba(52,211,153,0.08);
+  border: 1px solid rgba(52,211,153,0.2);
+  padding: 2px 7px;
+  border-radius: 4px;
+  margin-bottom: 6px;
+}
+
+/* TAGS */
+.tag-new {
+  font-family: var(--mono); font-size: 9px; font-weight: 700; letter-spacing: 0.08em;
+  background: rgba(251,146,60,0.15); color: var(--new); border: 1px solid rgba(251,146,60,0.3);
+  padding: 1px 5px; border-radius: 3px; margin-left: auto; flex-shrink: 0;
+}
+.tag-fixed {
+  font-family: var(--mono); font-size: 9px; font-weight: 700; letter-spacing: 0.08em;
+  background: rgba(52,211,153,0.12); color: var(--zoom); border: 1px solid rgba(52,211,153,0.25);
+  padding: 1px 5px; border-radius: 3px; flex-shrink: 0;
+}
+.tag-changed {
+  font-family: var(--mono); font-size: 9px; font-weight: 700; letter-spacing: 0.08em;
+  background: rgba(240,192,64,0.15); color: var(--changed); border: 1px solid rgba(240,192,64,0.3);
+  padding: 1px 5px; border-radius: 3px; flex-shrink: 0;
+}
+
+/* CROSS-LANE CONNECTOR */
+.connector {
+  position: absolute;
+  pointer-events: none;
+  z-index: 10;
+  top: 0; left: 0; width: 100%; height: 100%;
+}
+
+/* LEGEND */
+.legend {
+  padding: 24px 48px;
+  border-top: 1px solid var(--lane-border);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+  background: #0b0f18;
+}
+.legend-item {
+  display: flex; align-items: center; gap: 7px;
+  font-size: 11px; color: var(--text-dim); font-family: var(--mono);
+}
+.legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-badge">▸ Samsung Multicampus × Zoom SDK · Server-to-Server OAuth</div>
+  <h1>Zoom × AI Studio 전체 플로우차트 v3</h1>
+  <div class="header-sub">강의 인증 · 개설 · 입장 · 녹화 전 과정</div>
+  <div style="margin-top:10px; display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+    <span class="update-badge">🔄 UPDATED · v3 · 2026.03.05</span>
+    <a href="index.html" class="nav-link-btn">← 문서 허브</a>
+  </div>
+</div>
+
+<!-- CHANGELOG STRIP -->
+<div class="changelog-strip">
+  <div class="cl-title">v3 변경</div>
+  <div class="cl-items">
+    <span class="label">1. ZAK 발급 단계 제거</span> — POST /meetings 응답의 start_url에 ZAK 포함됨 확인.
+    <span class="old">GET /v2/users/me/token?type=zak 별도 호출</span> →
+    <span class="new">start_url 그대로 사용 (zak= 파라미터 포함)</span>
+  </div>
+  <div class="cl-items">
+    <span class="label">2. 계정 가용성 판단</span> — Zoom 미팅 생성 수 제한 없음 →
+    <span class="old">type=upcoming 으로 가용 판단 불가</span> →
+    <span class="new">DB가 최종 판단 · API type=live 는 보조 참고용</span>
+  </div>
+</div>
+
+<!-- LANE HEADERS -->
+<div class="lane-headers">
+  <div class="lane-header" style="justify-content:center; padding:12px 0;">#</div>
+  <div class="lane-header"><div class="lane-dot" style="background:var(--admin);"></div>🔑 관리자 Admin</div>
+  <div class="lane-header"><div class="lane-dot" style="background:var(--frontend);"></div>🖥 프론트엔드 Frontend</div>
+  <div class="lane-header"><div class="lane-dot" style="background:var(--backend);"></div>⚙️ 백엔드 Backend</div>
+  <div class="lane-header"><div class="lane-dot" style="background:var(--zoom);"></div>☁️ Zoom API / SDK</div>
+</div>
+
+<!-- ═══ STEP 01 ═══ -->
+<div class="step-row">
+  <div class="step-title-bar">
+    <span class="step-title-num">01</span>
+    <span class="step-title-text">관리자 자격증명 등록</span>
+    <span class="step-title-sub">Server-to-Server OAuth · 마스터 계정 1개 등록 ✅ 완료</span>
+  </div>
+
+  <div class="step-id-col"><span>SETUP</span></div>
+
+  <!-- ADMIN -->
+  <div class="lane-cell">
+    <div class="node start">
+      <div class="node-title" style="color:var(--admin);">🟡 시작 — 관리자 로그인</div>
+    </div>
+    <div class="arrow">↓</div>
+    <div class="node admin">
+      <div class="node-title" style="color:var(--admin);">Zoom Marketplace 앱 등록</div>
+      <div class="node-body">
+        Server-to-Server OAuth 앱 생성<br>
+        <span class="comment">계정: aistudio.service@multicampus.com</span><br>
+        <span class="comment">※ 마스터 계정 1개 — 강사별 등록 아님</span><br>
+        <span class="comment">✅ 실제 등록 완료 · 개발팀 전달</span><br><br>
+        <span class="key">Account ID</span> 발급 완료<br>
+        <span class="key">Client ID</span> 발급 완료<br>
+        <span class="key">Client Secret</span> 발급 완료<br><br>
+        Scope:<br>
+        <span class="val">meeting</span> 전체 권한<br>
+        <span class="val">user</span> 전체 권한
+      </div>
+    </div>
+    <div class="arrow" style="color:var(--admin);">↓ ─────────────────────→</div>
+    <div class="arrow-label" style="color:var(--text-dim); text-align:left; font-size:9px; font-family:var(--mono);">자격증명 전달</div>
+    <div class="node admin">
+      <div class="node-title" style="color:var(--admin);">어드민 A-01 설정 화면</div>
+      <div class="node-body">
+        마스터 계정 3가지 키 입력 후 저장
+      </div>
+    </div>
+  </div>
+
+  <!-- FRONTEND -->
+  <div class="lane-cell">
+    <div class="lane-empty"><span>—</span></div>
+  </div>
+
+  <!-- BACKEND -->
+  <div class="lane-cell">
+    <div style="height:60px;"></div>
+    <div style="margin-bottom:8px; font-family:var(--mono); font-size:9px; color:var(--text-dim); display:flex; align-items:center; gap:6px;">
+      <span style="color:var(--admin);">←</span> 관리자로부터 수신
+    </div>
+    <div class="db-badge" style="background:rgba(52,211,153,0.06); border-color:rgba(52,211,153,0.2); color:#6ee7b7;">
+      📄 .env 저장 (서버 환경변수)<br>
+      <span style="color:#7dd3fc;">ZOOM_ACCOUNT_ID<br>ZOOM_CLIENT_ID<br>ZOOM_CLIENT_SECRET</span><br>
+      <span style="color:#475569;">※ DB 저장 아님</span>
+    </div>
+  </div>
+
+  <!-- ZOOM -->
+  <div class="lane-cell">
+    <div class="lane-empty"><span>—</span></div>
+  </div>
+</div>
+
+<!-- ═══ STEP 02 ═══ -->
+<div class="step-row">
+  <div class="step-title-bar">
+    <span class="step-title-num">02</span>
+    <span class="step-title-text">강사 강의 개설</span>
+    <div style="display:flex; align-items:center; gap:6px; margin-left:12px;">
+      <span style="background:rgba(251,146,60,0.12); border:1px solid rgba(251,146,60,0.3); color:var(--new); font-family:var(--mono); font-size:9px; font-weight:700; padding:2px 7px; border-radius:3px;">🔄 UPDATED v3</span>
+      <span style="font-size:10px; font-family:var(--mono); color:var(--new);">type=upcoming 제거 · start_url + course_id + lecture_id DB 저장 추가</span>
+    </div>
+    <span class="step-title-sub">DB 조회 → Access Token → Meeting 생성 → DB 저장</span>
+  </div>
+
+  <div class="step-id-col"><span>CREATE</span></div>
+
+  <!-- ADMIN -->
+  <div class="lane-cell">
+    <div class="lane-empty"><span>—</span></div>
+  </div>
+
+  <!-- FRONTEND -->
+  <div class="lane-cell">
+    <div class="node front">
+      <div class="node-title" style="color:var(--frontend);">👩‍🏫 [강의 개설] 클릭</div>
+      <div class="node-body">
+        강사가 강의명·일시 입력<br>
+        → 백엔드 API 호출
+      </div>
+    </div>
+    <div class="arrow" style="color:var(--frontend);">↓ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; →</div>
+    <div class="arrow-label" style="color:var(--text-dim); font-size:9px; font-family:var(--mono);">강의 개설 요청</div>
+    <div style="height: 200px;"></div>
+    <div class="arrow" style="color:var(--backend);">← &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+    <div class="arrow-label" style="color:var(--text-dim); font-size:9px; font-family:var(--mono);">meeting_id · join_url 반환</div>
+    <div class="node front">
+      <div class="node-title" style="color:var(--frontend);">✅ 강의 개설 완료</div>
+      <div class="node-body">
+        강의 상세 화면으로 이동<br>
+        배정된 Zoom 계정 표시
+      </div>
+    </div>
+  </div>
+
+  <!-- BACKEND -->
+  <div class="lane-cell">
+    <div class="node changed">
+      <div class="node-title" style="color:var(--changed);">① 계정 가용성 조회 <span class="tag-changed">v3</span></div>
+      <div class="node-body">
+        <strong style="color:var(--text-bright);">DB = Source of Truth</strong><br><br>
+        <span class="comment">-- 1차 판단: DB</span><br>
+        <span class="key">SELECT</span> * <span class="key">FROM</span> zoom_accounts<br>
+        <span class="key">WHERE</span> assigned_course_id <span class="key">IS NULL</span><br><br>
+        <span class="comment">-- 2차 참고: Zoom API</span><br>
+        <span class="key">GET</span> /v2/users/{userId}/meetings<br>
+        &nbsp;&nbsp;?<span class="val">type=live</span> &nbsp;<span style="color:var(--zoom);">← v3 수정</span><br>
+        <span class="strike">?type=upcoming &nbsp;&lt;-- 사용 금지</span><br>
+        <span class="comment">※ Zoom 미팅 생성 수 제한 없음<br>upcoming으로 판단 불가</span>
+      </div>
+    </div>
+    <div class="arrow">↓</div>
+    <div class="node back">
+      <div class="node-title" style="color:var(--backend);">② Access Token 발급</div>
+      <div class="node-body">
+        <span class="key">POST</span> <span class="val">zoom.us/oauth/token</span><br>
+        grant_type=<span class="val">account_credentials</span><br>
+        account_id=<span class="val">{ACCOUNT_ID}</span><br>
+        <span class="comment">credentials: .env</span><br>
+        → <span class="key">access_token</span> <span class="comment">(유효 1시간)</span>
+      </div>
+    </div>
+    <div class="arrow" style="color:var(--backend);">↓ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; →</div>
+    <div class="arrow-label" style="color:var(--text-dim); font-size:9px; font-family:var(--mono);">미팅 생성 요청</div>
+    <div style="height: 20px;"></div>
+    <div class="arrow" style="color:var(--zoom);">← &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+    <div class="arrow-label" style="color:var(--text-dim); font-size:9px; font-family:var(--mono);">meeting 응답 수신</div>
+    <div class="node changed">
+      <div class="node-title" style="color:var(--changed);">③ DB 저장 <span class="tag-changed">v3 추가</span></div>
+      <div class="node-body">
+        <span class="key">meeting_id</span> &nbsp;&nbsp;&nbsp;<span class="comment">기존</span><br>
+        <span class="key">join_url</span> &nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">기존</span><br>
+        <span class="key">password</span> &nbsp;&nbsp;&nbsp;<span class="comment">기존</span><br>
+        <span class="val">start_url</span> &nbsp;&nbsp;&nbsp;<span style="color:var(--zoom);">★ v3 추가</span><br>
+        <span class="val">course_id</span> &nbsp;&nbsp;<span style="color:var(--zoom);">★ v3 추가</span><br>
+        <span class="val">lecture_id</span> &nbsp;<span style="color:var(--zoom);">★ v3 추가</span><br>
+        <span class="comment">※ start_url = 호스트 전용 (노출 금지)</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ZOOM -->
+  <div class="lane-cell">
+    <div style="height: 120px;"></div>
+    <div class="node zoom-n">
+      <div class="node-title" style="color:var(--zoom);">
+        Zoom Meeting 생성
+        <span class="tag-changed">v3</span>
+      </div>
+      <div class="node-body">
+        <span class="key">POST</span> <span class="val">/v2/users/{userId}/meetings</span><br>
+        <span class="comment">userId = 배정된 유료 계정 email</span><br>
+        Bearer <span class="key">access_token</span><br>
+        type=<span class="val">2</span> <span class="comment">(예약 미팅)</span><br>
+        auto_recording=<span class="val">"cloud"</span><br><br>
+        응답:<br>
+        → <span class="key">meeting_id</span><br>
+        → <span class="key">join_url</span><br>
+        → <span class="key">password</span><br>
+        → <span style="color:var(--changed); font-weight:600;">start_url</span> <span style="color:var(--zoom);">★ ZAK 포함</span><br>
+        <span class="comment">&nbsp;&nbsp;"start_url": "https://zoom.us/s/<br>&nbsp;&nbsp;{id}?zak=eyJ0eXAi..."</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ STEP 03 ═══ -->
+<div class="step-row">
+  <div class="step-title-bar">
+    <span class="step-title-num">03</span>
+    <span class="step-title-text">강사 강의 입장</span>
+    <div style="display:flex; align-items:center; gap:6px; margin-left:12px;">
+      <span style="background:rgba(251,146,60,0.12); border:1px solid rgba(251,146,60,0.3); color:var(--new); font-family:var(--mono); font-size:9px; font-weight:700; padding:2px 7px; border-radius:3px;">🔄 UPDATED v3</span>
+      <span style="font-size:10px; font-family:var(--mono); color:var(--new);">ZAK 별도 발급 제거 · start_url 직접 사용</span>
+    </div>
+    <span class="step-title-sub">start_url (ZAK 포함) → 웹/앱 모두 접속 가능</span>
+  </div>
+
+  <div class="step-id-col"><span>HOST</span></div>
+
+  <!-- ADMIN -->
+  <div class="lane-cell">
+    <div class="lane-empty"><span>—</span></div>
+  </div>
+
+  <!-- FRONTEND -->
+  <div class="lane-cell">
+    <div class="node front">
+      <div class="node-title" style="color:var(--frontend);">👩‍🏫 [강의 시작하기] 클릭</div>
+      <div class="node-body">
+        백엔드에 <span class="key">start_url</span> 요청<br>
+        <span class="comment">(강의 시작 직전 재조회 — ZAK 만료 대비)</span>
+      </div>
+    </div>
+    <div class="arrow" style="color:var(--frontend);">↓ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; →</div>
+    <div class="arrow-label" style="color:var(--text-dim); font-size:9px; font-family:var(--mono);">start_url 재조회 요청</div>
+    <div style="height:80px;"></div>
+    <div class="arrow" style="color:var(--backend);">← &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+    <div class="arrow-label" style="color:var(--text-dim); font-size:9px; font-family:var(--mono);">start_url (ZAK 포함) 반환</div>
+    <div class="node changed">
+      <div class="node-title" style="color:var(--changed);">🔗 start_url 오픈 <span class="tag-changed">v3</span></div>
+      <div class="node-body">
+        <span class="val">window.open(start_url, '_blank')</span><br><br>
+        <span style="color:var(--zoom);">✅ 별도 ZAK 발급 불필요</span><br>
+        <span class="comment">start_url에 ?zak= 포함됨</span><br><br>
+        웹 브라우저 → Zoom Web Client<br>
+        Zoom 앱 설치 시 → 앱 자동 실행<br>
+        <span class="comment">※ 웹/앱 모두 접속 가능</span>
+      </div>
+    </div>
+    <div class="arrow">↓</div>
+
+    <div class="branch-box">
+      <div class="branch-label">🔀 앱 설치 여부 분기</div>
+      <div class="branch-case">
+        <span class="case-badge case-green">앱 있음</span>
+        <div class="case-text">
+          start_url 클릭 → OS가 Zoom 앱 자동 실행<br>
+          → 호스트 권한으로 강의 바로 시작
+        </div>
+      </div>
+      <div class="case-divider"></div>
+      <div class="branch-case">
+        <span class="case-badge case-red">앱 없음</span>
+        <div class="case-text">
+          Zoom Web Client 자동 진입 (기본)<br>
+          <strong>또는</strong> 설치 안내 모달 표시<br>
+          → 다운로드 → [다시 시도]
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow">↓</div>
+    <div class="node success">
+      <div class="node-title" style="color:var(--zoom);">🟢 강의 실행 완료</div>
+      <div class="node-body">
+        호스트 권한 자동 부여 (ZAK 기반)<br>
+        → 강의 상태 "활성화" 전송<br>
+        <span class="comment">※ 화면공유·녹화는 Zoom 내 처리</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- BACKEND -->
+  <div class="lane-cell">
+    <div class="node changed">
+      <div class="node-title" style="color:var(--changed);">start_url 반환 (DB 조회) <span class="tag-changed">v3</span></div>
+      <div class="node-body">
+        <span class="comment">-- Step 02에서 저장한 start_url 조회</span><br>
+        <span class="key">GET</span> /v2/meetings/{meetingId}<br>
+        <span class="comment">※ 방안 A: 시작 버튼 클릭 시<br>재조회 → 최신 start_url 반환<br>(ZAK 만료 가능성 대비)</span><br><br>
+        <span style="color:var(--zoom);">✅ ZAK Token 별도 발급 불필요</span><br>
+        <span class="strike">GET /v2/users/me/token?type=zak</span><br>
+        <span class="comment">&nbsp;← 제거됨 (v3)</span>
+      </div>
+    </div>
+    <div class="arrow">↓ 강의 시작 수신 시</div>
+    <div class="node back">
+      <div class="node-title" style="color:var(--backend);">강의 상태값 업데이트</div>
+      <div class="node-body">
+        강사 강의 시작 확인<br>
+        → DB <span class="key">lecture_status</span> = <span class="val">"active"</span><br>
+        → 수강생 참여 버튼 활성화 트리거
+      </div>
+    </div>
+  </div>
+
+  <!-- ZOOM -->
+  <div class="lane-cell">
+    <div style="height:60px;"></div>
+    <div class="node zoom-n">
+      <div class="node-title" style="color:var(--zoom);">start_url — ZAK 포함 구조</div>
+      <div class="node-body">
+        <span class="val">https://zoom.us/s/{meetingId}</span><br>
+        <span class="comment">&nbsp;&nbsp;?zak=eyJ0eXAiOiJKV1Qi...</span><br><br>
+        <span class="comment">// ZAK = JWT 토큰</span><br>
+        <span class="comment">// 호스트 자동 인증 역할</span><br>
+        <span class="comment">// 웹/앱 모두 동작</span><br><br>
+        <span style="color:var(--zoom);">join_url (수강생용)</span><br>
+        <span class="val">https://zoom.us/j/{meetingId}</span><br>
+        <span class="comment">// ZAK 불필요 (참가자)</span>
+      </div>
+    </div>
+    <div class="arrow">↓ 앱 실행 시</div>
+    <div class="node zoom-n">
+      <div class="node-title" style="color:var(--zoom);">Zoom 데스크탑 앱</div>
+      <div class="node-body">
+        ZAK 기반 호스트 자동 로그인<br>
+        → 강의 화면 진입<br><br>
+        지원 기능 (풀기능):<br>
+        화면공유 / 녹화 / 화이트보드<br>
+        채팅 / 반응 / 참가자 관리<br>
+        소회의실 / 투표 / 대기실
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ STEP 04 ═══ -->
+<div class="step-row">
+  <div class="step-title-bar">
+    <span class="step-title-num">04</span>
+    <span class="step-title-text">수강생 강의 입장</span>
+    <span class="step-title-sub">강사 활성화 후 참여 버튼 활성 → join_url Web Client</span>
+  </div>
+
+  <div class="step-id-col"><span>ATTEND</span></div>
+
+  <!-- ADMIN -->
+  <div class="lane-cell">
+    <div class="lane-empty"><span>—</span></div>
+  </div>
+
+  <!-- FRONTEND -->
+  <div class="lane-cell">
+    <div class="node front">
+      <div class="node-title" style="color:var(--frontend);">참여 버튼 상태 조건</div>
+      <div class="node-body">
+        강사 강의 시작 전<br>
+        → <span style="color:var(--warn);">버튼 비활성화</span> <span class="comment">(회색)</span><br><br>
+        강사 강의 시작 후 (lecture_status = "active")<br>
+        → <span style="color:var(--zoom);">버튼 활성화</span>
+      </div>
+    </div>
+    <div class="arrow">↓</div>
+    <div class="node front">
+      <div class="node-title" style="color:var(--frontend);">🎓 [강의 입장] 클릭</div>
+      <div class="node-body">
+        백엔드에서 <span class="key">join_url</span> 수신<br>
+        → 새 탭으로 <span class="val">join_url</span> 열기
+      </div>
+    </div>
+    <div class="arrow" style="color:var(--frontend);">↓ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; →</div>
+    <div class="arrow-label" style="color:var(--text-dim); font-size:9px; font-family:var(--mono);">join_url 새 탭 오픈</div>
+    <div style="height:40px;"></div>
+
+    <div class="branch-box">
+      <div class="branch-label">🔀 브라우저 동작 분기</div>
+      <div class="branch-case">
+        <span class="case-badge case-green">앱 없음</span>
+        <div class="case-text">
+          Zoom Web Client 자동 진입<br>
+          → 브라우저에서 바로 강의 참여 (기본)
+        </div>
+      </div>
+      <div class="case-divider"></div>
+      <div class="branch-case">
+        <span class="case-badge case-yellow">앱 있음</span>
+        <div class="case-text">
+          브라우저 팝업 표시<br>
+          <strong>"Zoom 앱으로 열겠습니까?"</strong><br>
+          → [앱으로 열기] 또는 [취소 - Web 유지]<br>
+          <span style="color:var(--text-dim); font-size:10px;">※ 자동 실행 아님 — 사용자 선택</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow">↓</div>
+    <div class="status-row">
+      <div class="status-pill status-green">✅ 대기실 없을 때<br>즉시 입장</div>
+      <div class="status-pill status-yellow">⏳ 대기실 있을 때<br>강사 승인 후 입장</div>
+    </div>
+  </div>
+
+  <!-- BACKEND -->
+  <div class="lane-cell">
+    <div style="height:60px;"></div>
+    <div class="node back">
+      <div class="node-title" style="color:var(--backend);">join_url 반환</div>
+      <div class="node-body">
+        DB에서 <span class="key">join_url</span> 조회<br>
+        <span class="comment">(Step 02에서 저장된 값)</span><br><br>
+        Signature 생성 불필요<br>
+        <span class="comment">※ Web Client는 join_url만으로<br>참가자 인증 처리됨</span><br><br>
+        ZAK 불필요<br>
+        <span class="comment">(호스트 권한 아님)</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ZOOM -->
+  <div class="lane-cell">
+    <div style="height:80px;"></div>
+    <div class="node zoom-n">
+      <div class="node-title" style="color:var(--zoom);">Zoom Web Client</div>
+      <div class="node-body">
+        <span class="val">join.zoom.us</span> 브라우저 진입<br>
+        앱 설치 불필요 (기본)<br><br>
+        지원 기능:<br>
+        오디오 / 비디오 / 채팅<br>
+        반응(이모지 👍❤️😂) / 손들기<br>
+        오디오 장치 설정 / 화질 조정<br><br>
+        <span style="color:var(--warn);">미지원:</span><br>
+        화면공유 <span class="comment">(수강생은 불필요)</span><br>
+        가상배경 / 화이트보드
+      </div>
+    </div>
+    <div class="arrow">↓ 앱 선택 시</div>
+    <div class="node zoom-n" style="border:1px dashed rgba(52,211,153,0.3);">
+      <div class="node-title" style="color:#6ee7b7; font-size:11px;">Zoom 데스크탑 앱 (선택적)</div>
+      <div class="node-body">
+        사용자 팝업 선택 시만 실행<br>
+        풀기능 참여 가능<br>
+        <span class="comment">※ 강제 아님 · 웹과 동일 결과</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ STEP 05 ═══ -->
+<div class="step-row">
+  <div class="step-title-bar">
+    <span class="step-title-num">05</span>
+    <span class="step-title-text">녹화 완료 처리</span>
+    <span class="step-title-sub">Webhook → share_url 저장 · S3 이관 없음 (확정)</span>
+  </div>
+
+  <div class="step-id-col"><span>REC</span></div>
+
+  <!-- ADMIN -->
+  <div class="lane-cell">
+    <div class="lane-empty"><span>—</span></div>
+  </div>
+
+  <!-- FRONTEND -->
+  <div class="lane-cell">
+    <div class="node front">
+      <div class="node-title" style="color:var(--frontend);">🛑 강의 종료</div>
+      <div class="node-body">
+        호스트가 [종료] 클릭<br>
+        Zoom이 클라우드 녹화 자동 처리<br>
+        → 강의 화면 종료
+      </div>
+    </div>
+    <div class="arrow">↓</div>
+    <div style="height: 120px;"></div>
+    <div class="arrow" style="color:var(--backend);">← &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+    <div class="arrow-label" style="color:var(--text-dim); font-size:9px; font-family:var(--mono);">다시보기 URL 제공</div>
+    <div class="node front">
+      <div class="node-title" style="color:var(--frontend);">▶ 다시보기 (F-I-08 / F-S-07)</div>
+      <div class="node-body">
+        <span class="key">share_url</span> 링크 재생<br>
+        <span class="comment">⚠️ POC 미완 — share_url 만료/</span><br>
+        <span class="comment">접근 제한 검증 전 UI 구현 금지</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- BACKEND -->
+  <div class="lane-cell">
+    <div class="node back">
+      <div class="node-title" style="color:var(--backend);">
+        <div class="webhook-tag">📥 Webhook 수신</div>
+      </div>
+      <div class="node-body">
+        <span class="key">POST</span> <span class="val">/webhook/zoom</span><br>
+        event: <span class="val">recording.completed</span>
+      </div>
+    </div>
+    <div class="arrow">↓</div>
+    <div class="node warn">
+      <div class="node-title" style="color:var(--warn);">🔐 Secret Token 검증</div>
+      <div class="node-body">
+        위변조 방지 검증<br>
+        실패 시 <span style="color:var(--warn);">400 반환</span>
+      </div>
+    </div>
+    <div class="arrow">↓ 검증 성공</div>
+    <div class="db-badge">
+      💾 share_url DB 저장<br>
+      <span style="color:#7dd3fc;">meeting_id</span> → <span style="color:#7dd3fc;">course_id / lecture_id</span> 매핑<br>
+      <span style="color:#7dd3fc;">recording_url</span> = share_url<br>
+      <span style="color:#7dd3fc;">recording_status</span> = "completed"<br>
+      <span style="color:#475569;">S3 업로드 없음 — Zoom 클라우드 유지</span>
+    </div>
+  </div>
+
+  <!-- ZOOM -->
+  <div class="lane-cell">
+    <div class="node zoom-n">
+      <div class="node-title" style="color:var(--zoom);">☁️ 클라우드 녹화 인코딩</div>
+      <div class="node-body">
+        강의 종료 후 자동 인코딩<br>
+        MP4 Zoom 클라우드 적재<br>
+        <span class="key">share_url</span> 생성<br><br>
+        <span class="val">recording.completed</span><br>
+        Webhook 발송<br><br>
+        <span class="comment">download_url → 미사용</span>
+      </div>
+    </div>
+    <div class="arrow" style="color:var(--zoom);">↓ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Webhook →</div>
+    <div class="arrow-label" style="color:var(--text-dim); font-size:9px; font-family:var(--mono); text-align:right;">recording.completed 발송</div>
+  </div>
+</div>
+
+<!-- RESULT -->
+<div style="background:#0a1a13; border-bottom:2px solid var(--lane-border); padding:20px 48px; display:flex; align-items:center; gap:24px; flex-wrap:wrap;">
+  <div style="font-family:var(--mono); font-size:10px; font-weight:700; color:var(--zoom); letter-spacing:0.1em;">✅ 플로우 완료</div>
+  <div style="font-size:12px; color:var(--text-dim);">
+    관리자 등록 → 강의 개설 → 강사/수강생 입장 → 강의 진행 → 종료 → 녹화 클라우드 저장
+  </div>
+  <div style="margin-left:auto; font-size:11px; font-family:var(--mono); color:#475569;">
+    수강생 다시보기: <span style="color:#7dd3fc;">share_url</span> 링크 제공 (POC 검증 후 오픈)
+  </div>
+</div>
+
+<!-- LEGEND -->
+<div class="legend">
+  <div style="font-family:var(--mono); font-size:10px; font-weight:700; color:var(--text-dim); letter-spacing:0.08em; margin-right:8px;">LEGEND</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--admin);"></div>관리자</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--frontend);"></div>프론트엔드</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--backend);"></div>백엔드</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--zoom);"></div>Zoom API/SDK</div>
+  <div style="width:1px; height:16px; background:var(--lane-border); margin:0 4px;"></div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--changed);"></div>v3 변경사항</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--new);"></div>업데이트</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--warn);"></div>주의/경고</div>
+  <div style="width:1px; height:16px; background:var(--lane-border); margin:0 4px;"></div>
+  <div style="font-family:var(--mono); font-size:10px; color:var(--text-dim);">↓ 동일 레인 흐름</div>
+  <div style="font-family:var(--mono); font-size:10px; color:var(--text-dim);">&nbsp;&nbsp;→ / ← 레인 간 통신</div>
+  <a href="index.html" style="margin-left:auto; font-family:var(--mono); font-size:10px; color:var(--frontend); text-decoration:none;">← 문서 허브로</a>
+</div>
+
+</body>
+</html>
