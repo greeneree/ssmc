@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>강의 개설 플로우차트 v3 — Zoom × AI Studio</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Nanum+Gothic:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#0a0d14; --surface:#111520; --surface2:#181e2e;
+    --border:rgba(255,255,255,0.07); --accent:#2d6cff; --accent2:#00d4aa;
+    --accent3:#ff6b35; --text:#e8ecf4; --muted:#6b7694;
+    --danger:#ff4757; --warning:#ffa502; --success:#2ed573; --changed:#f0c040;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--text);font-family:'Nanum Gothic',sans-serif;min-height:100vh;padding:48px 24px 80px;}
+  body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(45,108,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(45,108,255,0.03) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;z-index:0;}
+  .wrap{position:relative;z-index:1;max-width:860px;margin:0 auto;}
+
+  .nav-bar{display:flex;gap:10px;margin-bottom:32px;flex-wrap:wrap;}
+  .nav-link{padding:6px 14px;border-radius:8px;font-size:12px;font-weight:700;background:var(--surface);border:1px solid var(--border);color:var(--muted);text-decoration:none;transition:all 0.2s;}
+  .nav-link:hover{border-color:var(--accent);color:var(--accent);}
+  .nav-link.active{background:rgba(45,108,255,0.12);border-color:rgba(45,108,255,0.3);color:var(--accent);}
+
+  .eyebrow{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--accent2);margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+  .eyebrow::before{content:'';width:24px;height:1px;background:var(--accent2);}
+  h1{font-family:'Syne',sans-serif;font-size:clamp(24px,4vw,38px);font-weight:800;letter-spacing:-0.02em;margin-bottom:12px;}
+  h1 span{color:var(--accent);}
+  .badge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;border:1px solid;margin-right:6px;}
+  .badge-green{background:rgba(0,212,170,0.12);border-color:rgba(0,212,170,0.3);color:var(--accent2);}
+  .badge-yellow{background:rgba(240,192,64,0.12);border-color:rgba(240,192,64,0.3);color:var(--changed);}
+
+  /* changelog */
+  .changelog{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--changed);border-radius:12px;padding:20px 24px;margin:28px 0 40px;}
+  .changelog h3{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--changed);margin-bottom:14px;}
+  .ci{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--border);}
+  .ci:last-child{border-bottom:none;padding-bottom:0;}
+  .cnum{width:22px;height:22px;border-radius:6px;background:rgba(240,192,64,0.15);border:1px solid rgba(240,192,64,0.3);color:var(--changed);font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:'Syne',sans-serif;}
+  .ctext{font-size:13px;line-height:1.7;}
+  .ctext strong{color:var(--text);}
+  .old{color:var(--danger);text-decoration:line-through;font-size:12px;}
+  .new{color:var(--success);font-size:12px;}
+
+  /* flow */
+  .flow{display:flex;flex-direction:column;}
+  .step{display:flex;gap:0;}
+  .snc{display:flex;flex-direction:column;align-items:center;width:56px;flex-shrink:0;}
+  .snum{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:14px;font-weight:800;flex-shrink:0;border:1px solid;position:relative;z-index:1;}
+  .sline{width:2px;flex:1;min-height:20px;background:linear-gradient(to bottom,rgba(255,255,255,0.07),rgba(255,255,255,0.02));}
+  .sbody{flex:1;margin-bottom:14px;padding-bottom:4px;}
+  .scard{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px 24px;transition:all 0.2s;}
+  .scard:hover{background:var(--surface2);}
+  .scard.changed{border-color:rgba(240,192,64,0.3);background:rgba(240,192,64,0.04);}
+  .scard.changed:hover{background:rgba(240,192,64,0.07);}
+  .stitle{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+  .utag{font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:2px 8px;border-radius:6px;background:rgba(240,192,64,0.15);color:var(--changed);border:1px solid rgba(240,192,64,0.25);}
+  .sdesc{font-size:13px;color:var(--muted);line-height:1.7;}
+  .sdesc strong{color:var(--text);}
+
+  .code{background:rgba(0,0,0,0.45);border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:12px 16px;font-family:'Courier New',monospace;font-size:12px;color:#a8d8a8;margin-top:10px;line-height:1.7;overflow-x:auto;white-space:pre;}
+  .hl{color:var(--changed);font-weight:700;}
+  .cm{color:var(--muted);}
+  .kw{color:#7aa8ff;}
+
+  .note{display:flex;gap:10px;align-items:flex-start;border-radius:8px;padding:10px 14px;margin-top:10px;font-size:12px;line-height:1.6;}
+  .note-red{background:rgba(255,71,87,0.08);border:1px solid rgba(255,71,87,0.2);color:#ff8a95;}
+  .note-green{background:rgba(46,213,115,0.08);border:1px solid rgba(46,213,115,0.2);color:#7ee8a2;}
+  .note-blue{background:rgba(45,108,255,0.08);border:1px solid rgba(45,108,255,0.2);color:#7aa8ff;}
+  .note-yellow{background:rgba(240,192,64,0.08);border:1px solid rgba(240,192,64,0.2);color:var(--changed);}
+
+  .branch{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;}
+  .bitem{background:rgba(0,0,0,0.3);border:1px solid var(--border);border-radius:8px;padding:12px 14px;font-size:12px;line-height:1.6;}
+  .blabel{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px;}
+
+  .nb{background:rgba(45,108,255,0.15);border-color:rgba(45,108,255,0.3);color:var(--accent);}
+  .nt{background:rgba(0,212,170,0.15);border-color:rgba(0,212,170,0.3);color:var(--accent2);}
+  .no{background:rgba(255,107,53,0.15);border-color:rgba(255,107,53,0.3);color:var(--accent3);}
+  .np{background:rgba(168,85,247,0.15);border-color:rgba(168,85,247,0.3);color:#c084fc;}
+  .ny{background:rgba(240,192,64,0.15);border-color:rgba(240,192,64,0.3);color:var(--changed);}
+  .ng{background:rgba(46,213,115,0.15);border-color:rgba(46,213,115,0.3);color:var(--success);}
+
+  footer{margin-top:56px;text-align:center;color:var(--muted);font-size:12px;border-top:1px solid var(--border);padding-top:24px;}
+  footer a{color:var(--accent2);text-decoration:none;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="nav-bar">
+    <a href="index.html" class="nav-link">← 문서 허브</a>
+    <a href="zoom_lecture_flowchart_v3.html" class="nav-link active">강의 개설 플로우 v3</a>
+    <a href="zoom_account_scenario_v1.html" class="nav-link">계정 매핑 시나리오</a>
+    <a href="zoom_mps_spec.html" class="nav-link">기능 명세서</a>
+    <a href="zoom_screen_list_v2.html" class="nav-link">화면 목록</a>
+  </div>
+
+  <div class="eyebrow">플로우차트</div>
+  <h1>강의 개설 플로우 <span>v3</span></h1>
+  <div>
+    <span class="badge badge-green">✦ Latest</span>
+    <span class="badge badge-yellow">⚡ 2개 수정</span>
+  </div>
+
+  <div class="changelog">
+    <h3>v3 변경사항 — 2026-03-05</h3>
+    <div class="ci">
+      <div class="cnum">1</div>
+      <div class="ctext">
+        <strong>start_url에 ZAK 포함 확인 — 별도 ZAK 발급 단계 제거</strong><br>
+        <span class="old">기존: ZAK Token API 별도 호출 → start_url 조합</span><br>
+        <span class="new">변경: POST /v2/users/{email}/meetings 응답의 start_url에 ZAK가 이미 포함됨. 별도 발급 불필요</span>
+      </div>
+    </div>
+    <div class="ci">
+      <div class="cnum">2</div>
+      <div class="ctext">
+        <strong>계정 가용성 판단 — type=upcoming 제거, type=live로 변경</strong><br>
+        <span class="old">기존: GET /v2/users/{userId}/meetings?type=upcoming → 미팅 없으면 배정 가능 판단</span><br>
+        <span class="new">변경: Zoom은 미팅 생성 수 제한 없음 → upcoming으로 판단 불가. DB가 최종 판단, API type=live는 보조 참고용</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="flow">
+
+    <!-- Step 01 -->
+    <div class="step">
+      <div class="snc">
+        <div class="snum nb">01</div>
+        <div class="sline"></div>
+      </div>
+      <div class="sbody">
+        <div class="scard">
+          <div class="stitle"><span class="icon">📝</span>강의 개설 요청</div>
+          <div class="sdesc">강사가 <strong>F-I-02 강의 개설 화면</strong>에서 강의명, 일시, 과정 입력 후 [개설하기] 클릭.<br>
+          어드민 서버로 강의 개설 요청 전달.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 02 -->
+    <div class="step">
+      <div class="snc">
+        <div class="snum ny">02</div>
+        <div class="sline"></div>
+      </div>
+      <div class="sbody">
+        <div class="scard changed">
+          <div class="stitle"><span class="icon">🔍</span>배정 계정 조회 (DB → API 보조)<span class="utag">v3 수정</span></div>
+          <div class="sdesc">
+            <strong>DB가 Source of Truth.</strong> API는 보조 참고용.<br><br>
+            <strong>① DB 체크 (1차 판단)</strong><br>
+            zoom_accounts 테이블에서 assigned_course_id 확인 → 미배정 계정 선택
+          </div>
+          <div class="code"><span class="cm">-- 가용 계정 조회</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> zoom_accounts
+<span class="kw">WHERE</span> assigned_course_id <span class="kw">IS NULL</span>
+  <span class="kw">AND</span> status = 'active'
+<span class="kw">LIMIT</span> 1;</div>
+          <div class="sdesc" style="margin-top:12px;">
+            <strong>② Zoom API (보조 참고용)</strong>
+          </div>
+          <div class="code"><span class="cm">// ✅ v3: type=live 사용 (live 중인 미팅 있으면 사용 중)</span>
+GET /v2/users/{userId}/meetings?<span class="hl">type=live</span>
+
+<span class="cm">// ❌ upcoming 사용 금지</span>
+<span class="cm">// Zoom은 미팅 생성 수 제한 없음 → upcoming 유무로 배정 판단 불가</span></div>
+          <div class="note note-yellow" style="margin-top:10px;">
+            ⚠️ DB 배정 상태와 API live 상태가 불일치할 경우 DB 우선. API는 참고용으로만 활용.
+          </div>
+          <div class="branch">
+            <div class="bitem">
+              <div class="blabel" style="color:var(--success);">✅ 가용 계정 있음</div>
+              Step 03으로 진행
+            </div>
+            <div class="bitem">
+              <div class="blabel" style="color:var(--danger);">❌ 가용 계정 없음</div>
+              예비 계정 투입 또는 오류 반환. 강사에게 알림.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 03 -->
+    <div class="step">
+      <div class="snc">
+        <div class="snum nt">03</div>
+        <div class="sline"></div>
+      </div>
+      <div class="sbody">
+        <div class="scard">
+          <div class="stitle"><span class="icon">🔐</span>Access Token 발급</div>
+          <div class="sdesc">Server-to-Server OAuth로 배정된 Zoom 계정의 Access Token 발급.</div>
+          <div class="code">POST https://zoom.us/oauth/token
+  ?grant_type=account_credentials
+  &account_id={ACCOUNT_ID}
+
+<span class="cm">// Authorization: Basic base64(CLIENT_ID:CLIENT_SECRET)</span>
+<span class="cm">// 응답: access_token (유효 1시간)</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 04 -->
+    <div class="step">
+      <div class="snc">
+        <div class="snum ny">04</div>
+        <div class="sline"></div>
+      </div>
+      <div class="sbody">
+        <div class="scard changed">
+          <div class="stitle"><span class="icon">🎬</span>미팅 생성 — start_url에 ZAK 포함<span class="utag">v3 수정</span></div>
+          <div class="sdesc"><strong>POST /v2/users/{zoomAccountEmail}/meetings</strong> 호출.</div>
+          <div class="code">POST /v2/users/{zoom_account_email}/meetings
+Authorization: Bearer {access_token}
+
+{
+  "topic": "강의명",
+  "type": 2,
+  "start_time": "2026-03-10T10:00:00Z",
+  "duration": 90,
+  "settings": {
+    "host_video": true,
+    "participant_video": false,
+    "auto_recording": "cloud"
+  }
+}</div>
+          <div class="sdesc" style="margin-top:12px;"><strong>응답 — start_url에 ZAK 자동 포함</strong></div>
+          <div class="code">{
+  "id": "95650366045",
+  "join_url": "https://zoom.us/j/95650366045",
+  <span class="hl">"start_url": "https://zoom.us/s/95650366045?zak=eyJ0eXAi..."</span>,
+  "password": "abc123"
+}
+
+<span class="cm">// ✅ v3: start_url에 ZAK 포함 확인</span>
+<span class="cm">// 별도 ZAK Token API 호출 불필요</span>
+<span class="cm">// 웹/앱 모두 접속 가능한 링크</span></div>
+          <div class="note note-green">
+            ✅ start_url의 zak= 파라미터가 호스트 인증 역할. 강사 입장 시 이 URL 그대로 전달하면 됨.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 05 -->
+    <div class="step">
+      <div class="snc">
+        <div class="snum np">05</div>
+        <div class="sline"></div>
+      </div>
+      <div class="sbody">
+        <div class="scard">
+          <div class="stitle"><span class="icon">💾</span>DB 저장</div>
+          <div class="sdesc">미팅 생성 결과를 DB에 저장. <strong>start_url은 호스트 전용이므로 노출 주의.</strong></div>
+          <div class="code"><span class="cm">-- lectures 테이블 저장 항목</span>
+meeting_id     = "95650366045"
+join_url       = "https://zoom.us/j/95650366045"
+password       = "abc123"
+<span class="hl">start_url      = "https://zoom.us/s/...?zak=..."  -- ✅ v3 추가</span>
+course_id      = {course_id}     <span class="cm">-- 레코딩 귀속 추적</span>
+lecture_id     = {lecture_id}    <span class="cm">-- 레코딩 귀속 추적</span>
+lecture_status = "scheduled"</div>
+          <div class="note note-red">
+            ⚠️ start_url은 호스트 전용 URL. 수강생에게 노출 금지. API 응답으로 반환 시 마스킹 처리.
+          </div>
+          <div class="note note-blue" style="margin-top:8px;">
+            💡 방안 A: 강의 시작 버튼 클릭 시 GET /v2/meetings/{meetingId} 재조회 → start_url 재발급 (ZAK 만료 대비)
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 06 -->
+    <div class="step">
+      <div class="snc">
+        <div class="snum no">06</div>
+        <div class="sline"></div>
+      </div>
+      <div class="sbody">
+        <div class="scard">
+          <div class="stitle"><span class="icon">👨‍🏫</span>강사 입장 (F-I-04)</div>
+          <div class="sdesc">강사가 [강의 시작] 클릭 → <strong>start_url (ZAK 포함)</strong> 직접 오픈.</div>
+          <div class="code"><span class="cm">// ✅ v3: start_url에 ZAK 포함 → 별도 ZAK 발급 불필요</span>
+window.open(start_url, '_blank');
+
+<span class="cm">// start_url = "https://zoom.us/s/{meetingId}?zak=..."</span>
+<span class="cm">// 웹 브라우저: Zoom Web Client 실행</span>
+<span class="cm">// Zoom 앱 설치 시: 앱으로 자동 실행</span></div>
+          <div class="sdesc" style="margin-top:12px;"><strong>앱 미설치 시 흐름</strong></div>
+          <div class="branch">
+            <div class="bitem">
+              <div class="blabel" style="color:var(--accent2);">앱 설치됨</div>
+              zoomus:// 딥링크 or start_url 클릭 → 앱 자동 실행
+            </div>
+            <div class="bitem">
+              <div class="blabel" style="color:var(--warning);">앱 미설치</div>
+              안내 모달 → 다운로드 링크 → [다시 시도] 버튼 or 웹으로 계속
+            </div>
+          </div>
+          <div class="sdesc" style="margin-top:12px;">강의 시작 시 <strong>lecture_status = "active"</strong> 업데이트 → 수강생 버튼 활성화</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 07 -->
+    <div class="step">
+      <div class="snc">
+        <div class="snum ng">07</div>
+        <div class="sline"></div>
+      </div>
+      <div class="sbody">
+        <div class="scard">
+          <div class="stitle"><span class="icon">👥</span>수강생 입장 (F-S-02)</div>
+          <div class="sdesc">강사 시작 전: <strong>버튼 비활성화</strong> (lecture_status ≠ active)<br>
+          강사 시작 후: <strong>join_url 새 탭으로 열기</strong> — Zoom Web Client 기본</div>
+          <div class="code"><span class="cm">// 수강생은 Signature 생성 불필요</span>
+window.open(join_url, '_blank');
+<span class="cm">// join_url = "https://zoom.us/j/{meetingId}"</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 08 -->
+    <div class="step">
+      <div class="snc">
+        <div class="snum nb">08</div>
+        <div class="sline"></div>
+      </div>
+      <div class="sbody">
+        <div class="scard">
+          <div class="stitle"><span class="icon">🎥</span>녹화 — Webhook 처리</div>
+          <div class="sdesc">Zoom 클라우드 자동 녹화 → 완료 시 Webhook 수신</div>
+          <div class="code">Webhook: recording.completed
+  → Secret Token 검증
+  → meeting_id로 course_id / lecture_id 매핑
+  → share_url DB 저장
+  → S3 이관 없음 (Zoom 클라우드 유지)</div>
+          <div class="note note-yellow">
+            ⚠️ 다시보기 POC 미완 — share_url 만료/접근 제한 가능성 검증 전 UI 구현 금지
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /flow -->
+
+  <footer>
+    강의 개설 플로우차트 v3 &nbsp;·&nbsp; Zoom × AI Studio &nbsp;·&nbsp;
+    <a href="index.html">← 문서 허브로</a>
+  </footer>
+
+</div>
+</body>
+</html>

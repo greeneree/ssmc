@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>기능 명세서 v2 — Zoom × AI Studio</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Nanum+Gothic:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0d14;--surface:#111520;--surface2:#181e2e;--border:rgba(255,255,255,0.07);--accent:#2d6cff;--accent2:#00d4aa;--accent3:#ff6b35;--text:#e8ecf4;--muted:#6b7694;--danger:#ff4757;--warning:#ffa502;--success:#2ed573;--changed:#f0c040;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--text);font-family:'Nanum Gothic',sans-serif;min-height:100vh;padding:48px 24px 80px;}
+  body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(45,108,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(45,108,255,0.03) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;z-index:0;}
+  .wrap{position:relative;z-index:1;max-width:900px;margin:0 auto;}
+
+  .nav-bar{display:flex;gap:10px;margin-bottom:32px;flex-wrap:wrap;}
+  .nav-link{padding:6px 14px;border-radius:8px;font-size:12px;font-weight:700;background:var(--surface);border:1px solid var(--border);color:var(--muted);text-decoration:none;transition:all 0.2s;}
+  .nav-link:hover{border-color:var(--accent);color:var(--accent);}
+  .nav-link.active{background:rgba(45,108,255,0.12);border-color:rgba(45,108,255,0.3);color:var(--accent);}
+
+  .eyebrow{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--accent2);margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+  .eyebrow::before{content:'';width:24px;height:1px;background:var(--accent2);}
+  h1{font-family:'Syne',sans-serif;font-size:clamp(24px,4vw,38px);font-weight:800;letter-spacing:-0.02em;margin-bottom:12px;}
+  h1 span{color:var(--accent);}
+  .badge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;border:1px solid;margin-right:6px;}
+  .badge-green{background:rgba(0,212,170,0.12);border-color:rgba(0,212,170,0.3);color:var(--accent2);}
+  .badge-yellow{background:rgba(240,192,64,0.12);border-color:rgba(240,192,64,0.3);color:var(--changed);}
+
+  /* section */
+  .sec{margin-bottom:44px;}
+  .sec-head{display:flex;align-items:center;gap:16px;margin-bottom:20px;}
+  .sec-head h2{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);white-space:nowrap;}
+  .sec-head::after{content:'';flex:1;height:1px;background:var(--border);}
+
+  /* spec block */
+  .spec{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:14px;}
+  .spec.changed{border-color:rgba(240,192,64,0.3);background:rgba(240,192,64,0.03);}
+  .spec-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:8px;}
+  .spec-sub{font-size:12px;color:var(--muted);margin-bottom:14px;}
+  .utag{font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:2px 8px;border-radius:6px;background:rgba(240,192,64,0.15);color:var(--changed);border:1px solid rgba(240,192,64,0.25);}
+
+  .kv-grid{display:grid;grid-template-columns:180px 1fr;gap:8px 16px;font-size:13px;margin-bottom:12px;}
+  .kv-key{color:var(--muted);font-size:12px;padding-top:2px;}
+  .kv-val{color:var(--text);line-height:1.6;}
+
+  .code{background:rgba(0,0,0,0.45);border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:12px 16px;font-family:'Courier New',monospace;font-size:12px;color:#a8d8a8;margin-top:10px;line-height:1.7;overflow-x:auto;white-space:pre;}
+  .hl{color:var(--changed);font-weight:700;}
+  .cm{color:var(--muted);}
+  .kw{color:#7aa8ff;}
+  .str{color:#ffb347;}
+
+  .note{display:flex;gap:10px;align-items:flex-start;border-radius:8px;padding:10px 14px;margin-top:10px;font-size:12px;line-height:1.6;}
+  .note-red{background:rgba(255,71,87,0.08);border:1px solid rgba(255,71,87,0.2);color:#ff8a95;}
+  .note-green{background:rgba(46,213,115,0.08);border:1px solid rgba(46,213,115,0.2);color:#7ee8a2;}
+  .note-blue{background:rgba(45,108,255,0.08);border:1px solid rgba(45,108,255,0.2);color:#7aa8ff;}
+  .note-yellow{background:rgba(240,192,64,0.08);border:1px solid rgba(240,192,64,0.2);color:var(--changed);}
+
+  /* table */
+  table{width:100%;border-collapse:collapse;font-size:13px;margin-top:10px;}
+  th{background:rgba(255,255,255,0.04);color:var(--muted);font-size:11px;letter-spacing:0.08em;text-transform:uppercase;padding:10px 14px;text-align:left;border-bottom:1px solid var(--border);}
+  td{padding:10px 14px;border-bottom:1px solid var(--border);line-height:1.5;vertical-align:top;}
+  tr:last-child td{border-bottom:none;}
+  tr:hover td{background:rgba(255,255,255,0.02);}
+  .tag{display:inline-block;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:700;}
+  .tag-done{background:rgba(46,213,115,0.15);color:var(--success);}
+  .tag-tbd{background:rgba(255,71,87,0.15);color:var(--danger);}
+  .tag-warn{background:rgba(240,192,64,0.15);color:var(--changed);}
+
+  footer{margin-top:56px;text-align:center;color:var(--muted);font-size:12px;border-top:1px solid var(--border);padding-top:24px;}
+  footer a{color:var(--accent2);text-decoration:none;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="nav-bar">
+    <a href="index.html" class="nav-link">← 문서 허브</a>
+    <a href="zoom_lecture_flowchart_v3.html" class="nav-link">강의 개설 플로우 v3</a>
+    <a href="zoom_account_scenario_v1.html" class="nav-link">계정 매핑 시나리오</a>
+    <a href="zoom_mps_spec.html" class="nav-link active">기능 명세서</a>
+    <a href="zoom_screen_list_v2.html" class="nav-link">화면 목록</a>
+  </div>
+
+  <div class="eyebrow">기능 명세서</div>
+  <h1>기술 스펙 <span>v2</span></h1>
+  <div style="margin-bottom:32px;">
+    <span class="badge badge-green">✦ Latest</span>
+    <span class="badge badge-yellow">⚡ 2개 수정</span>
+  </div>
+
+  <!-- 인증 -->
+  <div class="sec">
+    <div class="sec-head"><h2>인증 방식</h2></div>
+    <div class="spec">
+      <div class="spec-title">🔐 Server-to-Server OAuth</div>
+      <div class="spec-sub">앱 1벌 / 마스터 계정 aistudio.service@multicampus.com</div>
+      <div class="kv-grid">
+        <span class="kv-key">인증 방식</span><span class="kv-val">Server-to-Server OAuth (앱 1벌)</span>
+        <span class="kv-key">마스터 계정</span><span class="kv-val">aistudio.service@multicampus.com — 등록 완료, 개발팀 전달 완료</span>
+        <span class="kv-key">자격증명 저장</span><span class="kv-val">.env 파일 (서버 환경변수)</span>
+        <span class="kv-key">Scope</span><span class="kv-val">meeting 전체 + user 전체 권한</span>
+        <span class="kv-key">Token 갱신</span><span class="kv-val">각 계정별 Access/Refresh Token DB 저장, 1시간마다 자동 갱신</span>
+      </div>
+      <div class="code">POST https://zoom.us/oauth/token
+  ?grant_type=account_credentials
+  &account_id={ACCOUNT_ID}
+Authorization: Basic base64(CLIENT_ID:CLIENT_SECRET)</div>
+    </div>
+  </div>
+
+  <!-- 계정 배정 -->
+  <div class="sec">
+    <div class="sec-head"><h2>계정 배정 로직</h2></div>
+    <div class="spec changed">
+      <div class="spec-title">🗺️ DB 기반 배정 (API 보조)<span class="utag">v2 수정</span></div>
+      <div class="spec-sub">DB = Source of Truth / Zoom API type=live 는 보조 참고용</div>
+      <div class="kv-grid">
+        <span class="kv-key">1차 판단</span><span class="kv-val">DB zoom_accounts.assigned_course_id 체크</span>
+        <span class="kv-key">2차 참고</span><span class="kv-val">GET /v2/users/{userId}/meetings?<strong>type=live</strong> — live 미팅 존재 여부 확인</span>
+        <span class="kv-key">사용 금지</span><span class="kv-val">type=upcoming — Zoom은 미팅 생성 수 제한 없어 upcoming으로 배정 판단 불가</span>
+      </div>
+      <div class="note note-yellow">⚠️ 계정 매핑 방식(시나리오 1 vs 2) 고객 확정 전까지 Step 02 배정 로직 구현 불가</div>
+    </div>
+  </div>
+
+  <!-- 미팅 생성 -->
+  <div class="sec">
+    <div class="sec-head"><h2>미팅 생성 & start_url</h2></div>
+    <div class="spec changed">
+      <div class="spec-title">🎬 POST /v2/users/{email}/meetings<span class="utag">v2 수정</span></div>
+      <div class="spec-sub">start_url에 ZAK 자동 포함 — 별도 ZAK 발급 불필요</div>
+      <div class="kv-grid">
+        <span class="kv-key">API</span><span class="kv-val">POST /v2/users/{zoom_account_email}/meetings</span>
+        <span class="kv-key">start_url</span><span class="kv-val">응답에 ZAK 포함. 호스트 전용 URL. 수강생 노출 금지.</span>
+        <span class="kv-key">join_url</span><span class="kv-val">수강생 입장용. 웹/앱 모두 접속 가능.</span>
+        <span class="kv-key">ZAK 별도 발급</span><span class="kv-val">❌ 불필요 (start_url에 포함됨)</span>
+        <span class="kv-key">ZAK 만료 대비</span><span class="kv-val">강의 시작 버튼 클릭 시 GET /v2/meetings/{id} 재조회 → start_url 재발급 (방안 A)</span>
+      </div>
+      <div class="code"><span class="cm">// 미팅 생성 응답 예시</span>
+{
+  <span class="str">"id"</span>: <span class="str">"95650366045"</span>,
+  <span class="str">"join_url"</span>: <span class="str">"https://zoom.us/j/95650366045"</span>,
+  <span class="hl">"start_url"</span>: <span class="str">"https://zoom.us/s/95650366045?zak=eyJ0eXAi..."</span>,
+  <span class="str">"password"</span>: <span class="str">"abc123"</span>
+}
+<span class="cm">// ✅ start_url의 ?zak= 이 호스트 인증 역할</span>
+<span class="cm">// 웹 브라우저 / Zoom 앱 모두 접속 가능</span></div>
+      <div class="note note-red">⚠️ start_url은 호스트 전용. API 응답 및 프론트 전달 시 마스킹 처리 필요.</div>
+    </div>
+
+    <div class="spec">
+      <div class="spec-title">💾 DB 저장 항목</div>
+      <table>
+        <thead><tr><th>컬럼</th><th>내용</th><th>상태</th></tr></thead>
+        <tbody>
+          <tr><td>meeting_id</td><td>Zoom 미팅 ID</td><td><span class="tag tag-done">기존</span></td></tr>
+          <tr><td>join_url</td><td>수강생 입장 URL</td><td><span class="tag tag-done">기존</span></td></tr>
+          <tr><td>password</td><td>미팅 비밀번호</td><td><span class="tag tag-done">기존</span></td></tr>
+          <tr><td>start_url</td><td>호스트 입장 URL (ZAK 포함)</td><td><span class="tag tag-warn">✅ v2 추가</span></td></tr>
+          <tr><td>course_id</td><td>레코딩 귀속 추적</td><td><span class="tag tag-warn">✅ v2 추가</span></td></tr>
+          <tr><td>lecture_id</td><td>레코딩 귀속 추적</td><td><span class="tag tag-warn">✅ v2 추가</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 강사 입장 -->
+  <div class="sec">
+    <div class="sec-head"><h2>강사 입장</h2></div>
+    <div class="spec">
+      <div class="spec-title">👨‍🏫 start_url 직접 오픈 (ZAK 포함)</div>
+      <div class="kv-grid">
+        <span class="kv-key">입장 방식</span><span class="kv-val">start_url을 새 탭으로 오픈 (웹/앱 모두 가능)</span>
+        <span class="kv-key">ZAK 발급</span><span class="kv-val">❌ 불필요 — start_url에 포함</span>
+        <span class="kv-key">앱 미설치</span><span class="kv-val">설치 안내 모달 → 다운로드 링크 → [다시 시도] 또는 웹으로 계속</span>
+        <span class="kv-key">강의 시작 시</span><span class="kv-val">lecture_status = "active" 업데이트 → 수강생 버튼 활성화</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 수강생 입장 -->
+  <div class="sec">
+    <div class="sec-head"><h2>수강생 입장</h2></div>
+    <div class="spec">
+      <div class="spec-title">👥 join_url 새 탭 (Web Client 기본)</div>
+      <div class="kv-grid">
+        <span class="kv-key">입장 방식</span><span class="kv-val">join_url 새 탭으로 열기 — Zoom Web Client 기본</span>
+        <span class="kv-key">Signature 생성</span><span class="kv-val">불필요</span>
+        <span class="kv-key">버튼 상태</span><span class="kv-val">강사 시작 전 비활성화 (lecture_status != "active")</span>
+        <span class="kv-key">자동 입력</span><span class="kv-val">사용자명 = AI Studio 계정명, Meeting ID/Password 백엔드 전달</span>
+      </div>
+      <div class="note note-yellow">🟡 수강생 Web Client 기능 범위 — 고객 피드백 대기</div>
+    </div>
+  </div>
+
+  <!-- 녹화 -->
+  <div class="sec">
+    <div class="sec-head"><h2>녹화</h2></div>
+    <div class="spec">
+      <div class="spec-title">🎥 Zoom 클라우드 녹화</div>
+      <div class="kv-grid">
+        <span class="kv-key">저장 방식</span><span class="kv-val">Zoom 클라우드 MP4 (S3 이관 없음 — 확정)</span>
+        <span class="kv-key">Webhook</span><span class="kv-val">recording.completed → Secret Token 검증 → meeting_id로 course_id/lecture_id 매핑 → share_url 저장</span>
+        <span class="kv-key">자동 녹화</span><span class="kv-val">미팅 생성 시 auto_recording: "cloud" 설정</span>
+      </div>
+      <div class="note note-yellow">⚠️ 다시보기 POC 미완 — share_url 만료/접근 제한 검증 전 UI 구현 금지</div>
+    </div>
+  </div>
+
+  <!-- 계정 풀 -->
+  <div class="sec">
+    <div class="sec-head"><h2>계정 풀 구조 (시나리오 1 권장)</h2></div>
+    <div class="spec">
+      <div class="spec-title">🏗️ 1:1 고정 매핑 (미확정 — 고객 의사결정 대기)</div>
+      <div class="code">마스터 계정 (Admin: aistudio.service@multicampus.com)
+├── zoom01 (유료) ─── 과정 A 고정
+├── zoom02 (유료) ─── 과정 B 고정
+├── zoom03 (유료) ─── 과정 C 고정
+└── zoom04 (유료) ─── 예비 (긴급 투입용)</div>
+      <div class="note note-blue">💡 계정 추가 시 관리자가 직접 브라우저 OAuth 최초 동의 필요 (자동화 불가)</div>
+      <div class="note note-red">🔴 계정 매핑 방식 확정 전까지 Step 02 배정 로직 구현 불가</div>
+    </div>
+  </div>
+
+  <footer>
+    기능 명세서 v2 &nbsp;·&nbsp; Zoom × AI Studio &nbsp;·&nbsp;
+    <a href="index.html">← 문서 허브로</a>
+  </footer>
+
+</div>
+</body>
+</html>

@@ -6,537 +6,231 @@
 <title>Zoom × AI Studio — 기술 문서 허브</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Nanum+Gothic:wght@400;700;800&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #0a0d14;
-    --surface: #111520;
-    --surface2: #181e2e;
-    --border: rgba(255,255,255,0.07);
-    --accent: #2d6cff;
-    --accent2: #00d4aa;
-    --accent3: #ff6b35;
-    --text: #e8ecf4;
-    --muted: #6b7694;
-    --danger: #ff4757;
-    --warning: #ffa502;
-    --success: #2ed573;
-  }
+  :root{--bg:#0a0d14;--surface:#111520;--surface2:#181e2e;--border:rgba(255,255,255,0.07);--accent:#2d6cff;--accent2:#00d4aa;--accent3:#ff6b35;--text:#e8ecf4;--muted:#6b7694;--danger:#ff4757;--warning:#ffa502;--success:#2ed573;--changed:#f0c040;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--text);font-family:'Nanum Gothic',sans-serif;min-height:100vh;overflow-x:hidden;}
+  body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(45,108,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(45,108,255,0.03) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;z-index:0;}
+  .orb{position:fixed;border-radius:50%;filter:blur(120px);opacity:0.15;pointer-events:none;z-index:0;animation:float 8s ease-in-out infinite;}
+  .orb-1{width:500px;height:500px;background:var(--accent);top:-100px;left:-100px;}
+  .orb-2{width:400px;height:400px;background:var(--accent2);bottom:-80px;right:-80px;animation-delay:-4s;}
+  @keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-28px);}}
+  .container{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:60px 24px 100px;}
+  .eyebrow{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--accent2);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+  .eyebrow::before{content:'';width:24px;height:1px;background:var(--accent2);}
+  h1{font-family:'Syne',sans-serif;font-size:clamp(32px,5vw,52px);font-weight:800;line-height:1.1;letter-spacing:-0.02em;margin-bottom:14px;}
+  h1 span{color:var(--accent);}
+  h1 em{font-style:normal;background:linear-gradient(135deg,var(--accent2),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+  .subtitle{color:var(--muted);font-size:15px;line-height:1.6;max-width:480px;margin-bottom:20px;}
+  .badge-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:48px;}
+  .badge{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;font-size:11px;font-weight:700;border:1px solid;}
+  .badge-blue{background:rgba(45,108,255,0.1);border-color:rgba(45,108,255,0.3);color:#7aa8ff;}
+  .badge-green{background:rgba(0,212,170,0.1);border-color:rgba(0,212,170,0.3);color:#00d4aa;}
+  .badge-orange{background:rgba(255,107,53,0.1);border-color:rgba(255,107,53,0.3);color:#ff8c69;}
+  .status-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;background:var(--border);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:56px;}
+  .status-item{background:var(--surface);padding:20px 24px;text-align:center;transition:background 0.2s;}
+  .status-item:hover{background:var(--surface2);}
+  .status-num{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--accent);line-height:1;}
+  .status-label{font-size:12px;color:var(--muted);margin-top:4px;}
+  .section-head{display:flex;align-items:center;gap:16px;margin-bottom:24px;}
+  .section-head h2{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);white-space:nowrap;}
+  .section-head::after{content:'';flex:1;height:1px;background:var(--border);}
+  .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-bottom:56px;}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;text-decoration:none;color:inherit;display:block;transition:all 0.25s;position:relative;overflow:hidden;}
+  .card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--card-accent,var(--accent));transform:scaleX(0);transform-origin:left;transition:transform 0.3s;}
+  .card:hover{background:var(--surface2);border-color:rgba(255,255,255,0.12);transform:translateY(-3px);box-shadow:0 20px 60px rgba(0,0,0,0.4);}
+  .card:hover::before{transform:scaleX(1);}
+  .card-icon{width:44px;height:44px;border-radius:12px;background:var(--card-icon-bg);display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:20px;border:1px solid var(--card-icon-border);}
+  .card-version{font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;font-family:'Syne',sans-serif;}
+  .card-title{font-family:'Syne',sans-serif;font-size:17px;font-weight:700;margin-bottom:8px;line-height:1.3;}
+  .card-desc{font-size:13px;color:var(--muted);line-height:1.6;}
+  .card-tag{display:inline-block;margin-top:16px;padding:3px 10px;border-radius:6px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;}
+  .tag-latest{background:rgba(0,212,170,0.15);color:var(--accent2);}
+  .tag-v1{background:rgba(107,118,148,0.15);color:var(--muted);}
+  .tag-updated{background:rgba(240,192,64,0.15);color:var(--changed);}
+  .card-blue{--card-accent:#2d6cff;--card-icon-bg:rgba(45,108,255,0.12);--card-icon-border:rgba(45,108,255,0.25);}
+  .card-teal{--card-accent:#00d4aa;--card-icon-bg:rgba(0,212,170,0.12);--card-icon-border:rgba(0,212,170,0.25);}
+  .card-orange{--card-accent:#ff6b35;--card-icon-bg:rgba(255,107,53,0.12);--card-icon-border:rgba(255,107,53,0.25);}
+  .card-purple{--card-accent:#a855f7;--card-icon-bg:rgba(168,85,247,0.12);--card-icon-border:rgba(168,85,247,0.25);}
+  .card-yellow{--card-accent:#ffa502;--card-icon-bg:rgba(255,165,2,0.12);--card-icon-border:rgba(255,165,2,0.25);}
+  .tbd-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-bottom:56px;}
+  .tbd-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 20px;display:flex;align-items:flex-start;gap:14px;}
+  .tbd-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:6px;}
+  .dot-red{background:var(--danger);box-shadow:0 0 8px var(--danger);}
+  .dot-yellow{background:var(--warning);box-shadow:0 0 8px var(--warning);}
+  .dot-green{background:var(--success);box-shadow:0 0 8px var(--success);}
+  .tbd-label{font-size:13px;font-weight:700;margin-bottom:4px;font-family:'Syne',sans-serif;}
+  .tbd-desc{font-size:12px;color:var(--muted);line-height:1.5;}
+  .priority-list{display:flex;flex-direction:column;gap:10px;margin-bottom:56px;}
+  .priority-item{display:flex;align-items:center;gap:16px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 20px;}
+  .priority-num{width:32px;height:32px;border-radius:8px;background:rgba(45,108,255,0.15);border:1px solid rgba(45,108,255,0.25);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:13px;font-weight:800;color:var(--accent);flex-shrink:0;}
+  .priority-text{font-size:14px;line-height:1.5;}
+  .priority-text strong{color:var(--text);}
+  .priority-text span{color:var(--muted);font-size:12px;}
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+  /* changelog archive */
+  .changelog-archive{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:56px;}
+  .ca-header{padding:16px 24px;border-bottom:1px solid var(--border);}
+  .ca-header h3{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);}
+  .ca-entry{padding:16px 24px;border-bottom:1px solid var(--border);display:flex;gap:20px;align-items:flex-start;}
+  .ca-entry:last-child{border-bottom:none;}
+  .ca-date{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;color:var(--muted);white-space:nowrap;padding-top:3px;min-width:88px;}
+  .ca-title{font-size:13px;font-weight:700;margin-bottom:6px;color:var(--text);line-height:1.4;}
+  .ca-items{font-size:12px;color:var(--muted);line-height:1.8;}
+  .ct{display:inline-block;padding:1px 7px;border-radius:5px;font-size:10px;font-weight:700;margin-right:4px;vertical-align:middle;}
+  .ct-y{background:rgba(240,192,64,0.15);color:var(--changed);}
+  .ct-b{background:rgba(45,108,255,0.12);color:#7aa8ff;}
+  .ct-g{background:rgba(0,212,170,0.12);color:var(--accent2);}
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Nanum Gothic', sans-serif;
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
-
-  /* ── grid noise bg ── */
-  body::before {
-    content: '';
-    position: fixed; inset: 0;
-    background-image:
-      linear-gradient(rgba(45,108,255,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(45,108,255,0.03) 1px, transparent 1px);
-    background-size: 48px 48px;
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  /* ── glow orbs ── */
-  .orb {
-    position: fixed;
-    border-radius: 50%;
-    filter: blur(120px);
-    opacity: 0.18;
-    pointer-events: none;
-    z-index: 0;
-    animation: float 8s ease-in-out infinite;
-  }
-  .orb-1 { width: 500px; height: 500px; background: var(--accent); top: -100px; left: -100px; animation-delay: 0s; }
-  .orb-2 { width: 400px; height: 400px; background: var(--accent2); bottom: -80px; right: -80px; animation-delay: -4s; }
-  @keyframes float {
-    0%,100% { transform: translateY(0); }
-    50% { transform: translateY(-30px); }
-  }
-
-  /* ── layout ── */
-  .container {
-    position: relative; z-index: 1;
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 60px 24px 100px;
-  }
-
-  /* ── header ── */
-  header {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    margin-bottom: 64px;
-    gap: 24px;
-  }
-  .logo-area { flex: 1; }
-  .eyebrow {
-    font-family: 'Syne', sans-serif;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--accent2);
-    margin-bottom: 12px;
-    display: flex; align-items: center; gap: 8px;
-  }
-  .eyebrow::before {
-    content: '';
-    width: 24px; height: 1px;
-    background: var(--accent2);
-  }
-  h1 {
-    font-family: 'Syne', sans-serif;
-    font-size: clamp(32px, 5vw, 52px);
-    font-weight: 800;
-    line-height: 1.1;
-    letter-spacing: -0.02em;
-  }
-  h1 span { color: var(--accent); }
-  h1 em {
-    font-style: normal;
-    background: linear-gradient(135deg, var(--accent2), var(--accent));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-  .subtitle {
-    margin-top: 16px;
-    color: var(--muted);
-    font-size: 15px;
-    line-height: 1.6;
-    max-width: 480px;
-  }
-  .badge-row {
-    display: flex; gap: 8px; flex-wrap: wrap;
-    margin-top: 20px;
-  }
-  .badge {
-    display: inline-flex; align-items: center; gap: 6px;
-    padding: 5px 12px;
-    border-radius: 20px;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    border: 1px solid;
-  }
-  .badge-blue { background: rgba(45,108,255,0.1); border-color: rgba(45,108,255,0.3); color: #7aa8ff; }
-  .badge-green { background: rgba(0,212,170,0.1); border-color: rgba(0,212,170,0.3); color: #00d4aa; }
-  .badge-orange { background: rgba(255,107,53,0.1); border-color: rgba(255,107,53,0.3); color: #ff8c69; }
-
-  /* ── status strip ── */
-  .status-strip {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    gap: 1px;
-    background: var(--border);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    overflow: hidden;
-    margin-bottom: 56px;
-  }
-  .status-item {
-    background: var(--surface);
-    padding: 20px 24px;
-    text-align: center;
-  }
-  .status-item:hover { background: var(--surface2); }
-  .status-num {
-    font-family: 'Syne', sans-serif;
-    font-size: 28px;
-    font-weight: 800;
-    color: var(--accent);
-    line-height: 1;
-  }
-  .status-label { font-size: 12px; color: var(--muted); margin-top: 4px; }
-
-  /* ── section heading ── */
-  .section-head {
-    display: flex; align-items: center; gap: 16px;
-    margin-bottom: 24px;
-  }
-  .section-head h2 {
-    font-family: 'Syne', sans-serif;
-    font-size: 13px;
-    font-weight: 700;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--muted);
-  }
-  .section-head::after {
-    content: '';
-    flex: 1; height: 1px;
-    background: var(--border);
-  }
-
-  /* ── doc cards ── */
-  .cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 16px;
-    margin-bottom: 56px;
-  }
-
-  .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 28px;
-    cursor: pointer;
-    text-decoration: none;
-    color: inherit;
-    display: block;
-    transition: all 0.25s ease;
-    position: relative;
-    overflow: hidden;
-  }
-  .card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 2px;
-    background: var(--card-accent, var(--accent));
-    transform: scaleX(0);
-    transform-origin: left;
-    transition: transform 0.3s ease;
-  }
-  .card:hover {
-    background: var(--surface2);
-    border-color: rgba(255,255,255,0.12);
-    transform: translateY(-3px);
-    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
-  }
-  .card:hover::before { transform: scaleX(1); }
-
-  .card-icon {
-    width: 44px; height: 44px;
-    border-radius: 12px;
-    background: var(--card-icon-bg, rgba(45,108,255,0.15));
-    display: flex; align-items: center; justify-content: center;
-    font-size: 20px;
-    margin-bottom: 20px;
-    border: 1px solid var(--card-icon-border, rgba(45,108,255,0.2));
-  }
-  .card-version {
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 8px;
-    font-family: 'Syne', sans-serif;
-  }
-  .card-title {
-    font-family: 'Syne', sans-serif;
-    font-size: 17px;
-    font-weight: 700;
-    margin-bottom: 8px;
-    line-height: 1.3;
-  }
-  .card-desc {
-    font-size: 13px;
-    color: var(--muted);
-    line-height: 1.6;
-  }
-  .card-tag {
-    display: inline-block;
-    margin-top: 16px;
-    padding: 3px 10px;
-    border-radius: 6px;
-    font-size: 10px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-  }
-  .tag-latest { background: rgba(0,212,170,0.15); color: var(--accent2); }
-  .tag-v1 { background: rgba(107,118,148,0.15); color: var(--muted); }
-
-  /* ── card color themes ── */
-  .card-blue { --card-accent: #2d6cff; --card-icon-bg: rgba(45,108,255,0.12); --card-icon-border: rgba(45,108,255,0.25); }
-  .card-teal { --card-accent: #00d4aa; --card-icon-bg: rgba(0,212,170,0.12); --card-icon-border: rgba(0,212,170,0.25); }
-  .card-orange { --card-accent: #ff6b35; --card-icon-bg: rgba(255,107,53,0.12); --card-icon-border: rgba(255,107,53,0.25); }
-  .card-purple { --card-accent: #a855f7; --card-icon-bg: rgba(168,85,247,0.12); --card-icon-border: rgba(168,85,247,0.25); }
-  .card-yellow { --card-accent: #ffa502; --card-icon-bg: rgba(255,165,2,0.12); --card-icon-border: rgba(255,165,2,0.25); }
-
-  /* ── tbd table ── */
-  .tbd-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 12px;
-    margin-bottom: 56px;
-  }
-  .tbd-item {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 18px 20px;
-    display: flex; align-items: flex-start; gap: 14px;
-  }
-  .tbd-dot {
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    flex-shrink: 0;
-    margin-top: 6px;
-  }
-  .dot-red { background: var(--danger); box-shadow: 0 0 8px var(--danger); }
-  .dot-yellow { background: var(--warning); box-shadow: 0 0 8px var(--warning); }
-  .dot-green { background: var(--success); box-shadow: 0 0 8px var(--success); }
-  .tbd-content {}
-  .tbd-label {
-    font-size: 13px;
-    font-weight: 700;
-    margin-bottom: 4px;
-    font-family: 'Syne', sans-serif;
-  }
-  .tbd-desc { font-size: 12px; color: var(--muted); line-height: 1.5; }
-
-  /* ── priorities ── */
-  .priority-list {
-    display: flex; flex-direction: column; gap: 10px;
-    margin-bottom: 56px;
-  }
-  .priority-item {
-    display: flex; align-items: center; gap: 16px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 16px 20px;
-  }
-  .priority-num {
-    width: 32px; height: 32px;
-    border-radius: 8px;
-    background: rgba(45,108,255,0.15);
-    border: 1px solid rgba(45,108,255,0.25);
-    display: flex; align-items: center; justify-content: center;
-    font-family: 'Syne', sans-serif;
-    font-size: 13px;
-    font-weight: 800;
-    color: var(--accent);
-    flex-shrink: 0;
-  }
-  .priority-text { font-size: 14px; line-height: 1.4; }
-  .priority-text strong { color: var(--text); }
-  .priority-text span { color: var(--muted); font-size: 12px; }
-
-  /* ── footer ── */
-  footer {
-    position: relative; z-index: 1;
-    text-align: center;
-    padding: 32px 24px;
-    border-top: 1px solid var(--border);
-    color: var(--muted);
-    font-size: 12px;
-  }
-  footer a { color: var(--accent2); text-decoration: none; }
-
-  /* ── scroll reveal ── */
-  .reveal {
-    opacity: 0;
-    transform: translateY(20px);
-    animation: reveal 0.5s ease forwards;
-  }
-  @keyframes reveal {
-    to { opacity: 1; transform: translateY(0); }
-  }
-  .reveal:nth-child(1) { animation-delay: 0.05s; }
-  .reveal:nth-child(2) { animation-delay: 0.1s; }
-  .reveal:nth-child(3) { animation-delay: 0.15s; }
-  .reveal:nth-child(4) { animation-delay: 0.2s; }
-  .reveal:nth-child(5) { animation-delay: 0.25s; }
+  footer{position:relative;z-index:1;text-align:center;padding:32px 24px;border-top:1px solid var(--border);color:var(--muted);font-size:12px;}
 </style>
 </head>
 <body>
-
 <div class="orb orb-1"></div>
 <div class="orb orb-2"></div>
-
 <div class="container">
 
-  <!-- Header -->
-  <header>
-    <div class="logo-area">
-      <div class="eyebrow">기술 문서 허브</div>
-      <h1><span>Zoom</span> × <em>AI Studio</em></h1>
-      <p class="subtitle">멀티캠퍼스 실시간 강의 연동 프로젝트 — 기획·설계 산출물 모음</p>
-      <div class="badge-row">
-        <span class="badge badge-blue">🔐 S2S OAuth</span>
-        <span class="badge badge-green">☁️ Cloud Recording</span>
-        <span class="badge badge-orange">⚡ ZAK Token</span>
-      </div>
-    </div>
-  </header>
+  <div class="eyebrow">기술 문서 허브</div>
+  <h1><span>Zoom</span> × <em>AI Studio</em></h1>
+  <p class="subtitle">멀티캠퍼스 실시간 강의 연동 프로젝트 — 기획·설계 산출물 모음</p>
+  <div class="badge-row">
+    <span class="badge badge-blue">🔐 S2S OAuth</span>
+    <span class="badge badge-green">☁️ Cloud Recording</span>
+    <span class="badge badge-orange">⚡ ZAK in start_url</span>
+  </div>
 
-  <!-- Stats Strip -->
-  <div class="status-strip reveal">
-    <div class="status-item">
-      <div class="status-num">5</div>
-      <div class="status-label">생성된 문서</div>
-    </div>
-    <div class="status-item">
-      <div class="status-num">21</div>
-      <div class="status-label">화면 설계 (강사·운영자·수강생·어드민)</div>
-    </div>
-    <div class="status-item">
-      <div class="status-num">5</div>
-      <div class="status-label">미결 사항 (TBD)</div>
-    </div>
-    <div class="status-item">
-      <div class="status-num">3월</div>
-      <div class="status-label">우선순위 스프린트</div>
-    </div>
+  <div class="status-strip">
+    <div class="status-item"><div class="status-num">5</div><div class="status-label">산출물 문서</div></div>
+    <div class="status-item"><div class="status-num">28</div><div class="status-label">화면 설계</div></div>
+    <div class="status-item"><div class="status-num">5</div><div class="status-label">미결 사항</div></div>
+    <div class="status-item"><div class="status-num">v3</div><div class="status-label">플로우차트 최신</div></div>
   </div>
 
   <!-- 문서 카드 -->
-  <div class="section-head">
-    <h2>산출물 문서</h2>
-  </div>
+  <div class="section-head"><h2>산출물 문서</h2></div>
   <div class="cards">
 
-    <a href="zoom_lecture_flowchart_v2.html" class="card card-teal reveal">
+    <a href="zoom_lecture_flowchart_v3.html" class="card card-teal">
       <div class="card-icon">🔄</div>
-      <div class="card-version">Latest · v2</div>
+      <div class="card-version">Latest · v3</div>
       <div class="card-title">강의 개설 플로우차트</div>
-      <div class="card-desc">강의 개설 요청 → 계정 배정 → 미팅 생성 → DB 저장까지 전체 흐름. `type=upcoming` 사용 금지 피드백 반영 완료.</div>
+      <div class="card-desc">start_url ZAK 포함 확인 반영. type=upcoming → live 수정. DB = Source of Truth 강화.</div>
       <div class="card-tag tag-latest">✦ 최신</div>
     </a>
 
-    <a href="zoom_account_scenario_v1.html" class="card card-orange reveal">
+    <a href="zoom_account_scenario_v1.html" class="card card-orange">
       <div class="card-icon">🗺️</div>
-      <div class="card-version">Latest · v1</div>
+      <div class="card-version">v1</div>
       <div class="card-title">계정 매핑 시나리오</div>
-      <div class="card-desc">시나리오 1(고정 1:1) vs 2(동적 풀) vs 3(혼합형) 비교. 고객 의사결정 선행 필요 항목.</div>
+      <div class="card-desc">시나리오 1(고정 1:1) vs 2(동적 풀) vs 3(혼합형) 비교. 고객 의사결정 선행 필요.</div>
       <div class="card-tag tag-latest">✦ 최신</div>
     </a>
 
-    <a href="zoom_mps_spec.html" class="card card-blue reveal">
+    <a href="zoom_mps_spec.html" class="card card-blue">
       <div class="card-icon">📐</div>
-      <div class="card-version">v1</div>
+      <div class="card-version">v2</div>
       <div class="card-title">기능 명세서</div>
-      <div class="card-desc">인증 방식, 강사 입장, 수강생 입장, 녹화, 계정 풀 구조 등 전체 기술 스펙 정리.</div>
-      <div class="card-tag tag-v1">v1</div>
+      <div class="card-desc">ZAK/live 수정 반영. 인증·강사 입장·수강생 입장·녹화·계정 풀 전체 스펙.</div>
+      <div class="card-tag tag-updated">⚡ 수정됨</div>
     </a>
 
-    <a href="zoom_screen_list.html" class="card card-purple reveal">
+    <a href="zoom_screen_list_v2.html" class="card card-purple">
       <div class="card-icon">🖥️</div>
-      <div class="card-version">v1</div>
+      <div class="card-version">v2</div>
       <div class="card-title">화면 목록</div>
-      <div class="card-desc">강사(8) · 운영자(6) · 수강생(7) · 어드민(7) 총 28개 화면 목록 및 주요 기능 정리.</div>
-      <div class="card-tag tag-v1">v1</div>
+      <div class="card-desc">Confluence 화면 스펙 반영. 강사(8) · 운영자(6) · 수강생(7) · 어드민(7) 총 28개.</div>
+      <div class="card-tag tag-updated">⚡ 수정됨</div>
     </a>
 
-    <a href="zoom_mps_flowchart.html" class="card card-yellow reveal">
+    <a href="zoom_mps_flowchart.html" class="card card-yellow">
       <div class="card-icon">📊</div>
       <div class="card-version">v1 · 구버전</div>
       <div class="card-title">전체 플로우차트</div>
-      <div class="card-desc">초기 전체 흐름도. 최신 버전은 강의 개설 플로우차트 v2를 참고할 것.</div>
+      <div class="card-desc">초기 전체 흐름도. 최신은 강의 개설 플로우차트 v3 참고.</div>
       <div class="card-tag tag-v1">참고용</div>
     </a>
 
   </div>
 
-  <!-- TBD 미결사항 -->
-  <div class="section-head">
-    <h2>미결 사항 (TBD)</h2>
-  </div>
-  <div class="tbd-grid">
-    <div class="tbd-item reveal">
-      <div class="tbd-dot dot-red"></div>
-      <div class="tbd-content">
-        <div class="tbd-label">🔴 계정 매핑 방식</div>
-        <div class="tbd-desc">시나리오 1 vs 2 — 상무님 보고 후 확정. Step 02 구현 블로킹 중</div>
+  <!-- 변경 이력 -->
+  <div class="section-head"><h2>변경 이력 아카이브</h2></div>
+  <div class="changelog-archive">
+    <div class="ca-header"><h3>Changelog</h3></div>
+
+    <div class="ca-entry">
+      <div class="ca-date">2026-03-05</div>
+      <div>
+        <div class="ca-title">
+          <span class="ct ct-y">플로우차트 v3</span>
+          <span class="ct ct-y">명세서 v2</span>
+          <span class="ct ct-y">화면목록 v2</span>
+          Zoom 피드백 반영 + Confluence 화면 스펙 통합
+        </div>
+        <div class="ca-items">
+          · start_url에 ZAK 포함 확인 — 별도 ZAK Token 발급 단계 제거<br>
+          · 계정 가용성 판단 type=upcoming → type=live 변경 (Zoom 미팅 생성 무제한 특성 반영)<br>
+          · Confluence 화면 개요 반영: 수강생 이모지/손들기, 강사 호스트 전용 기능 목록 추가<br>
+          · F-I-08 다시보기 공개범위·다운로드 설정 추가 / F-O-01 실시간 진행중 회의 목록 추가<br>
+          · A-02 신규 강사 등록 흐름 상세화
+        </div>
       </div>
     </div>
-    <div class="tbd-item reveal">
-      <div class="tbd-dot dot-red"></div>
-      <div class="tbd-content">
-        <div class="tbd-label">🔴 예산 정책</div>
-        <div class="tbd-desc">N빵 vs Pool — 정책팀 협의 필요</div>
+
+    <div class="ca-entry">
+      <div class="ca-date">2026-03-04</div>
+      <div>
+        <div class="ca-title">
+          <span class="ct ct-b">플로우차트 v2</span>
+          개발팀 피드백 반영
+        </div>
+        <div class="ca-items">
+          · type=upcoming 사용 금지 — DB를 Source of Truth로 확정<br>
+          · start_url / course_id / lecture_id DB 저장 항목 추가<br>
+          · 강의 시작 버튼 클릭 시 start_url 재조회 방안 A 추가
+        </div>
       </div>
     </div>
-    <div class="tbd-item reveal">
-      <div class="tbd-dot dot-yellow"></div>
-      <div class="tbd-content">
-        <div class="tbd-label">🟡 다시보기 POC</div>
-        <div class="tbd-desc">share_url 만료/접근 제한 검증 전 UI 구현 금지</div>
+
+    <div class="ca-entry">
+      <div class="ca-date">2026-03-01</div>
+      <div>
+        <div class="ca-title">
+          <span class="ct ct-g">초기 v1</span>
+          기술 결정사항 확정 및 문서화
+        </div>
+        <div class="ca-items">
+          · Server-to-Server OAuth 인증 방식 확정<br>
+          · 마스터 계정 aistudio.service@multicampus.com 등록 완료<br>
+          · 계정 풀 3가지 시나리오 정리 (시나리오 1 권장)<br>
+          · 화면 목록 v1, 기능 명세서 v1, 전체 플로우차트 v1 생성<br>
+          · 용어 통일 (MPS Server → 어드민, 강사 미러링 → 실시간 강의 등)
+        </div>
       </div>
     </div>
-    <div class="tbd-item reveal">
-      <div class="tbd-dot dot-yellow"></div>
-      <div class="tbd-content">
-        <div class="tbd-label">🟡 수강생 Web Client 기능</div>
-        <div class="tbd-desc">고객 피드백 대기 중</div>
-      </div>
-    </div>
-    <div class="tbd-item reveal">
-      <div class="tbd-dot dot-green"></div>
-      <div class="tbd-content">
-        <div class="tbd-label">🟢 AI 문항 자동생성/채점</div>
-        <div class="tbd-desc">4G큐브 협의 후 비용·일정 검토</div>
-      </div>
-    </div>
+
   </div>
 
-  <!-- 3월 우선순위 -->
-  <div class="section-head">
-    <h2>3월 우선순위</h2>
+  <!-- TBD -->
+  <div class="section-head"><h2>미결 사항 (TBD)</h2></div>
+  <div class="tbd-grid">
+    <div class="tbd-item"><div class="tbd-dot dot-red"></div><div><div class="tbd-label">🔴 계정 매핑 방식</div><div class="tbd-desc">시나리오 1 vs 2 — 상무님 보고 후 확정. Step 02 블로킹 중</div></div></div>
+    <div class="tbd-item"><div class="tbd-dot dot-red"></div><div><div class="tbd-label">🔴 예산 정책</div><div class="tbd-desc">N빵 vs Pool — 정책팀 협의 필요</div></div></div>
+    <div class="tbd-item"><div class="tbd-dot dot-yellow"></div><div><div class="tbd-label">🟡 다시보기 POC</div><div class="tbd-desc">share_url 만료/접근 제한 검증 전 UI 구현 금지</div></div></div>
+    <div class="tbd-item"><div class="tbd-dot dot-yellow"></div><div><div class="tbd-label">🟡 수강생 Web Client 기능</div><div class="tbd-desc">고객 피드백 대기 중</div></div></div>
+    <div class="tbd-item"><div class="tbd-dot dot-green"></div><div><div class="tbd-label">🟢 AI 문항 자동생성/채점</div><div class="tbd-desc">4G큐브 협의 후 비용·일정 검토</div></div></div>
   </div>
+
+  <!-- 우선순위 -->
+  <div class="section-head"><h2>3월 우선순위</h2></div>
   <div class="priority-list">
-    <div class="priority-item reveal">
-      <div class="priority-num">01</div>
-      <div class="priority-text">
-        <strong>계정 매핑 방식 확정</strong><br>
-        <span>모든 설계의 선행 조건 — 이게 안 되면 Step 02 아무것도 못 씀</span>
-      </div>
-    </div>
-    <div class="priority-item reveal">
-      <div class="priority-num">02</div>
-      <div class="priority-text">
-        <strong>Zoom 실시간 강의 연동 (Step 03~04)</strong><br>
-        <span>강사 입장 딥링크 + 수강생 join_url 새 탭</span>
-      </div>
-    </div>
-    <div class="priority-item reveal">
-      <div class="priority-num">03</div>
-      <div class="priority-text">
-        <strong>VM 생성/관리 연동</strong><br>
-        <span>담당자 즉시 결정 필요</span>
-      </div>
-    </div>
-    <div class="priority-item reveal">
-      <div class="priority-num">04</div>
-      <div class="priority-text">
-        <strong>운영자 채팅 통합 대시보드</strong><br>
-        <span>긴급 — 현재 운영 불가 수준</span>
-      </div>
-    </div>
-    <div class="priority-item reveal">
-      <div class="priority-num">05</div>
-      <div class="priority-text">
-        <strong>릴리즈 노트 기능</strong><br>
-        <span>확정</span>
-      </div>
-    </div>
-    <div class="priority-item reveal">
-      <div class="priority-num">06</div>
-      <div class="priority-text">
-        <strong>과제 미리보기</strong><br>
-        <span>3월 고도화 예정</span>
-      </div>
-    </div>
+    <div class="priority-item"><div class="priority-num">01</div><div class="priority-text"><strong>계정 매핑 방식 확정</strong><br><span>모든 설계의 선행 조건 — 확정 전 Step 02 구현 불가</span></div></div>
+    <div class="priority-item"><div class="priority-num">02</div><div class="priority-text"><strong>Zoom 실시간 강의 연동 (Step 03~04)</strong><br><span>강사 start_url 입장 + 수강생 join_url 새 탭</span></div></div>
+    <div class="priority-item"><div class="priority-num">03</div><div class="priority-text"><strong>VM 생성/관리 연동</strong><br><span>담당자 즉시 결정 필요</span></div></div>
+    <div class="priority-item"><div class="priority-num">04</div><div class="priority-text"><strong>운영자 채팅 통합 대시보드</strong><br><span>긴급 — 현재 운영 불가 수준</span></div></div>
+    <div class="priority-item"><div class="priority-num">05</div><div class="priority-text"><strong>릴리즈 노트 기능</strong><br><span>확정</span></div></div>
+    <div class="priority-item"><div class="priority-num">06</div><div class="priority-text"><strong>과제 미리보기</strong><br><span>3월 고도화 예정</span></div></div>
   </div>
 
 </div>
-
-<footer>
-  <p>Zoom × AI Studio 기술 문서 허브 &nbsp;·&nbsp; 멀티캠퍼스 × AI Studio &nbsp;·&nbsp; 스레드 인수인계 v3 기준</p>
-</footer>
-
+<footer>Zoom × AI Studio 기술 문서 허브 &nbsp;·&nbsp; 멀티캠퍼스 × AI Studio &nbsp;·&nbsp; 스레드 인수인계 v3 기준</footer>
 </body>
 </html>
