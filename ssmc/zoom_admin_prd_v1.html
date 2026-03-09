@@ -1,0 +1,1177 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>어드민 — 실시간 강의 관리 PRD v1</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=IBM+Plex+Sans+KR:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0d0d;
+    --surface: #141414;
+    --surface2: #1a1a1a;
+    --surface3: #202020;
+    --border: #2a2a2a;
+    --border2: #333;
+    --text: #e8e8e8;
+    --text2: #999;
+    --text3: #666;
+    --accent: #4a9eff;
+    --accent2: #2d7dd2;
+    --green: #3ecf8e;
+    --yellow: #f5a623;
+    --red: #ff5b5b;
+    --orange: #ff8c42;
+    --mono: 'IBM Plex Mono', monospace;
+    --sans: 'IBM Plex Sans KR', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 14px;
+    line-height: 1.7;
+    padding: 48px 0;
+  }
+
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 32px;
+  }
+
+  /* Header */
+  .doc-header {
+    border-bottom: 1px solid var(--border2);
+    padding-bottom: 32px;
+    margin-bottom: 48px;
+  }
+
+  .doc-meta {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text3);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .doc-title {
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 8px;
+    line-height: 1.3;
+  }
+
+  .doc-title span {
+    color: var(--accent);
+  }
+
+  .doc-desc {
+    color: var(--text2);
+    font-size: 14px;
+    max-width: 600px;
+  }
+
+  .badges {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+  }
+
+  .badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 3px 10px;
+    border-radius: 2px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .badge-blue { background: rgba(74,158,255,0.12); color: var(--accent); border: 1px solid rgba(74,158,255,0.25); }
+  .badge-green { background: rgba(62,207,142,0.12); color: var(--green); border: 1px solid rgba(62,207,142,0.25); }
+  .badge-yellow { background: rgba(245,166,35,0.12); color: var(--yellow); border: 1px solid rgba(245,166,35,0.25); }
+  .badge-red { background: rgba(255,91,91,0.12); color: var(--red); border: 1px solid rgba(255,91,91,0.25); }
+  .badge-gray { background: rgba(255,255,255,0.06); color: var(--text3); border: 1px solid var(--border); }
+
+  /* TOC */
+  .toc {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 24px 28px;
+    margin-bottom: 48px;
+  }
+
+  .toc-title {
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text3);
+    margin-bottom: 14px;
+  }
+
+  .toc-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .toc-list li a {
+    color: var(--text2);
+    text-decoration: none;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: color 0.15s;
+  }
+
+  .toc-list li a:hover { color: var(--accent); }
+
+  .toc-num {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text3);
+    min-width: 20px;
+  }
+
+  /* Section */
+  .section {
+    margin-bottom: 56px;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.06em;
+  }
+
+  .section-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .section-desc {
+    color: var(--text2);
+    font-size: 13px;
+    margin-bottom: 20px;
+    line-height: 1.8;
+  }
+
+  /* Subsection */
+  .subsection {
+    margin-bottom: 32px;
+  }
+
+  .subsection-title {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text2);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .subsection-title::before {
+    content: '';
+    display: inline-block;
+    width: 3px;
+    height: 12px;
+    background: var(--accent);
+    border-radius: 1px;
+  }
+
+  /* Spec block */
+  .spec-block {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+
+  .spec-block-header {
+    background: var(--surface2);
+    padding: 10px 16px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text2);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .spec-block-body {
+    padding: 16px 20px;
+  }
+
+  /* Table */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  th {
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text3);
+    text-align: left;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border2);
+    background: var(--surface2);
+  }
+
+  td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+    vertical-align: top;
+  }
+
+  tr:last-child td { border-bottom: none; }
+
+  td code {
+    font-family: var(--mono);
+    font-size: 11px;
+    background: var(--surface3);
+    padding: 2px 6px;
+    border-radius: 3px;
+    color: var(--accent);
+  }
+
+  /* Component spec */
+  .component {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 20px;
+    margin-bottom: 12px;
+  }
+
+  .component-name {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--accent);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .component-name::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .field-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+  }
+
+  .field-list li {
+    font-size: 13px;
+    color: var(--text2);
+    display: flex;
+    gap: 10px;
+    padding-left: 4px;
+  }
+
+  .field-list li::before {
+    content: '·';
+    color: var(--text3);
+    flex-shrink: 0;
+  }
+
+  .field-list li strong {
+    color: var(--text);
+    font-weight: 500;
+    min-width: 100px;
+    flex-shrink: 0;
+  }
+
+  /* Rule block */
+  .rule-block {
+    background: var(--surface2);
+    border-left: 3px solid var(--accent);
+    padding: 12px 16px;
+    border-radius: 0 4px 4px 0;
+    margin-bottom: 10px;
+    font-size: 13px;
+    color: var(--text2);
+  }
+
+  .rule-block.yellow { border-left-color: var(--yellow); }
+  .rule-block.red { border-left-color: var(--red); }
+  .rule-block.green { border-left-color: var(--green); }
+
+  .rule-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 6px;
+    color: var(--accent);
+  }
+
+  .rule-label.yellow { color: var(--yellow); }
+  .rule-label.red { color: var(--red); }
+  .rule-label.green { color: var(--green); }
+
+  /* State table */
+  .state-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin-bottom: 12px;
+  }
+
+  .state-table th {
+    background: var(--surface3);
+  }
+
+  /* Status badges inline */
+  .st {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 2px;
+    letter-spacing: 0.04em;
+  }
+
+  .st-live { background: rgba(255,91,91,0.15); color: var(--red); border: 1px solid rgba(255,91,91,0.3); }
+  .st-assigned { background: rgba(74,158,255,0.15); color: var(--accent); border: 1px solid rgba(74,158,255,0.3); }
+  .st-free { background: rgba(255,255,255,0.07); color: var(--text3); border: 1px solid var(--border2); }
+  .st-active { background: rgba(62,207,142,0.15); color: var(--green); border: 1px solid rgba(62,207,142,0.3); }
+  .st-inactive { background: rgba(255,255,255,0.07); color: var(--text3); border: 1px solid var(--border2); }
+  .st-d2 { background: rgba(245,166,35,0.15); color: var(--yellow); border: 1px solid rgba(245,166,35,0.3); }
+
+  /* Note */
+  .note {
+    background: rgba(245,166,35,0.07);
+    border: 1px solid rgba(245,166,35,0.2);
+    border-radius: 4px;
+    padding: 12px 16px;
+    font-size: 13px;
+    color: var(--yellow);
+    margin-bottom: 16px;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+
+  .note-icon { flex-shrink: 0; margin-top: 1px; }
+
+  /* Navigation path */
+  .nav-path {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text3);
+    background: var(--surface2);
+    padding: 8px 14px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .nav-path span { color: var(--text3); }
+  .nav-path .current { color: var(--accent); }
+
+  /* Flow steps */
+  .flow-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .flow-step {
+    display: flex;
+    gap: 16px;
+    position: relative;
+  }
+
+  .flow-step-line {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  .flow-step-dot {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--surface3);
+    border: 1px solid var(--border2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--accent);
+    flex-shrink: 0;
+    z-index: 1;
+  }
+
+  .flow-step-connector {
+    width: 1px;
+    flex: 1;
+    background: var(--border);
+    min-height: 16px;
+  }
+
+  .flow-step-content {
+    padding: 4px 0 20px;
+    flex: 1;
+  }
+
+  .flow-step-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+
+  .flow-step-desc {
+    font-size: 12px;
+    color: var(--text2);
+    line-height: 1.6;
+  }
+
+  .flow-step:last-child .flow-step-connector { display: none; }
+
+  /* Divider */
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 40px 0;
+  }
+
+  /* Footer */
+  .doc-footer {
+    padding-top: 32px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: gap;
+  }
+
+  .footer-left {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text3);
+    line-height: 1.8;
+  }
+
+  .footer-right a {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  .footer-right a:hover { text-decoration: underline; }
+
+  /* Responsive */
+  @media (max-width: 640px) {
+    .container { padding: 0 20px; }
+    .doc-title { font-size: 22px; }
+    .section-title { font-size: 16px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Header -->
+  <div class="doc-header">
+    <div class="doc-meta">Samsung SDS Multicampus · AI Studio LMS · Admin PRD</div>
+    <h1 class="doc-title">실시간 강의 관리 <span>— 어드민</span></h1>
+    <p class="doc-desc">시스템 관리자가 Zoom 계정을 등록·관리하고 강좌에 배정하는 어드민 화면 기능 명세서</p>
+    <div class="badges">
+      <span class="badge badge-blue">v1</span>
+      <span class="badge badge-gray">2026-03-09</span>
+      <span class="badge badge-yellow">⚠ 계정 매핑 방식 미확정</span>
+      <span class="badge badge-green">탭 구조 확정</span>
+    </div>
+  </div>
+
+  <!-- Navigation context -->
+  <div class="nav-path">
+    서비스 관리
+    <span>›</span> VM 관리
+    <span>›</span> AI 도구
+    <span>›</span> 채팅 관리
+    <span class="current">› 실시간 강의 관리 ← 현재 영역</span>
+    <span>›</span> 보안 &amp; 로그
+  </div>
+
+  <!-- TOC -->
+  <div class="toc">
+    <div class="toc-title">목차</div>
+    <ul class="toc-list">
+      <li><a href="#overview"><span class="toc-num">00</span> 화면 구조 개요</a></li>
+      <li><a href="#tab1"><span class="toc-num">01</span> 탭 1 — 배정 관리</a></li>
+      <li><a href="#tab2"><span class="toc-num">02</span> 탭 2 — 계정 관리</a></li>
+      <li><a href="#state"><span class="toc-num">03</span> 상태 정의 및 전이</a></li>
+      <li><a href="#modals"><span class="toc-num">04</span> 모달 명세</a></li>
+      <li><a href="#data"><span class="toc-num">05</span> 데이터 연동 규칙</a></li>
+    </ul>
+  </div>
+
+  <!-- 00. Overview -->
+  <div class="section" id="overview">
+    <div class="section-header">
+      <span class="section-num">00</span>
+      <h2 class="section-title">화면 구조 개요</h2>
+    </div>
+
+    <div class="section-desc">
+      어드민 메뉴 <strong>실시간 강의 관리</strong> 진입 시 탭 2개로 구성된 단일 화면으로 진입한다.<br>
+      LNB 3depth 분리 아님 — 같은 도메인(Zoom 계정)의 두 뷰를 탭으로 통합.
+    </div>
+
+    <div class="spec-block">
+      <div class="spec-block-header">
+        <span>TAB STRUCTURE</span>
+        <span class="badge badge-green">기본 탭: 배정 관리</span>
+      </div>
+      <div class="spec-block-body">
+        <table>
+          <thead>
+            <tr>
+              <th>탭</th>
+              <th>레이블</th>
+              <th>기본 진입</th>
+              <th>목적</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>TAB_1</code></td>
+              <td>배정 관리</td>
+              <td>✓ 기본 활성</td>
+              <td>Zoom 계정 ↔ 강좌 매핑 및 해제. 이번 주 강의 현황 확인.</td>
+            </tr>
+            <tr>
+              <td><code>TAB_2</code></td>
+              <td>계정 관리</td>
+              <td>—</td>
+              <td>Zoom 계정 등록 / 비활성화 / 삭제 / 사용 이력 조회.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="note">
+      <span class="note-icon">⚠</span>
+      <span>계정 추가(탭 2) 시 탭 1 헤더 카운트 <code>계정 {N}개</code> 와 탭 2 헤더 카운트가 동시 동기화 필요. 비활성화된 계정은 탭 1 배정 목록에서 노출 제외.</span>
+    </div>
+  </div>
+
+  <!-- 01. Tab 1 -->
+  <div class="section" id="tab1">
+    <div class="section-header">
+      <span class="section-num">01</span>
+      <h2 class="section-title">탭 1 — 배정 관리</h2>
+    </div>
+
+    <!-- Header area -->
+    <div class="subsection">
+      <div class="subsection-title">헤더 영역</div>
+      <div class="component">
+        <div class="component-name">HEADER</div>
+        <ul class="field-list">
+          <li><strong>Title</strong> Zoom 배정 관리</li>
+          <li><strong>Subtitle</strong> 계정 {N}개 · 과정을 배정하거나 해제할 수 있습니다.</li>
+          <li><strong>{N} 동기화</strong> 탭 2 계정 등록/삭제 시 자동 반영</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Summary bar -->
+    <div class="subsection">
+      <div class="subsection-title">요약 바 (Summary Bar)</div>
+      <div class="component">
+        <div class="component-name">SUMMARY_PILLS</div>
+        <ul class="field-list">
+          <li><strong>전체 {N}</strong> 활성 상태인 전체 Zoom 계정 수</li>
+          <li><strong>배정 {N}</strong> 강좌에 배정된 계정 수 (진행 중 포함)</li>
+          <li><strong>미배정 {N}</strong> 아직 배정되지 않은 계정 수</li>
+          <li><strong>강의 진행 중 {N}</strong> 현재 라이브 강의 중인 계정 수</li>
+        </ul>
+      </div>
+      <div class="rule-block yellow">
+        <div class="rule-label yellow">주의</div>
+        비활성화 계정은 요약 바 카운트에서 제외. 활성 계정만 집계.
+      </div>
+    </div>
+
+    <!-- Account list -->
+    <div class="subsection">
+      <div class="subsection-title">Zoom 계정 목록</div>
+      <div class="spec-block">
+        <div class="spec-block-header">ACCOUNT LIST — 카드 단위 표시</div>
+        <div class="spec-block-body">
+          <table>
+            <thead>
+              <tr>
+                <th>필드</th>
+                <th>표시 위치</th>
+                <th>비고</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>계정명</td>
+                <td>카드 상단, 1차 텍스트</td>
+                <td>Zoom01, Zoom02 …</td>
+              </tr>
+              <tr>
+                <td>이메일</td>
+                <td>계정명 옆, 2차 텍스트</td>
+                <td>aistudio.service+zoom0N@multicampus.com</td>
+              </tr>
+              <tr>
+                <td>배정된 강좌명</td>
+                <td>계정명 하단, 2차 텍스트</td>
+                <td>미배정 시 비워두거나 "—" 표시</td>
+              </tr>
+              <tr>
+                <td>상태 배지</td>
+                <td>카드 우측</td>
+                <td>진행 중 / 배정 / 미배정</td>
+              </tr>
+              <tr>
+                <td>기능 버튼</td>
+                <td>카드 최우측</td>
+                <td>상태에 따라 다름 (하단 규칙 참조)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Status & Button rules -->
+      <div class="component">
+        <div class="component-name">STATUS × BUTTON RULES</div>
+        <table class="state-table">
+          <thead>
+            <tr>
+              <th>상태값</th>
+              <th>배지 색상</th>
+              <th>조건</th>
+              <th>기능 버튼</th>
+              <th>버튼 동작</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="st st-live">진행 중</span></td>
+              <td>Red / Orange</td>
+              <td>현재 Zoom 강의 라이브 중</td>
+              <td>해제 불가 (disabled)</td>
+              <td>클릭 불가 — 강의 종료 후 해제 가능</td>
+            </tr>
+            <tr>
+              <td><span class="st st-assigned">배정</span></td>
+              <td>Blue</td>
+              <td>강좌 배정됨, 강의 대기 중</td>
+              <td>배정 해제</td>
+              <td>확인 경고 모달 → 확인 시 배정 해제 처리</td>
+            </tr>
+            <tr>
+              <td><span class="st st-free">미배정</span></td>
+              <td>Gray</td>
+              <td>배정된 강좌 없음</td>
+              <td>과정 배정</td>
+              <td>강좌 dropdown 노출 → 선택 시 배정 처리</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Dropdown spec -->
+      <div class="rule-block">
+        <div class="rule-label">과정 배정 드롭다운 옵션 (예시)</div>
+        AI 활용 실무 과정 · 클라우드 기초 과정 · LLM 맞춤 실무 과정 · (실제 운영 강좌 목록으로 동적 바인딩)
+      </div>
+    </div>
+
+    <!-- Weekly schedule -->
+    <div class="subsection">
+      <div class="subsection-title">이번 주 강의 현황</div>
+      <div class="component">
+        <div class="component-name">WEEKLY_SCHEDULE_TABLE</div>
+        <ul class="field-list">
+          <li><strong>정렬</strong> 일시 빠른 순 (ASC), 가장 임박한 강의 상단</li>
+          <li><strong>페이지당 최대</strong> 10개, 초과 시 페이지네이션</li>
+          <li><strong>컬럼</strong> 강의명 / 강좌명 / 매핑 Zoom 계정 / 강의 일시 / 상태</li>
+        </ul>
+      </div>
+
+      <div class="spec-block">
+        <div class="spec-block-header">WEEKLY SCHEDULE — 상태 배지 규칙</div>
+        <div class="spec-block-body">
+          <table>
+            <thead>
+              <tr>
+                <th>상태</th>
+                <th>표시 조건</th>
+                <th>배지 스타일</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="st st-live">진행 중</span></td>
+                <td>현재 시각 기준 강의 진행 중</td>
+                <td>Red</td>
+              </tr>
+              <tr>
+                <td><span class="st st-d2">D-N</span></td>
+                <td>강의 시작까지 N일 전 (D-1 ~ D-7)</td>
+                <td>Yellow/Amber</td>
+              </tr>
+              <tr>
+                <td><span class="st st-free">완료</span></td>
+                <td>강의 종료 후</td>
+                <td>Gray</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 02. Tab 2 -->
+  <div class="section" id="tab2">
+    <div class="section-header">
+      <span class="section-num">02</span>
+      <h2 class="section-title">탭 2 — 계정 관리</h2>
+    </div>
+
+    <!-- Header area -->
+    <div class="subsection">
+      <div class="subsection-title">헤더 영역</div>
+      <div class="component">
+        <div class="component-name">HEADER</div>
+        <ul class="field-list">
+          <li><strong>Title</strong> Zoom 계정 관리</li>
+          <li><strong>Subtitle</strong> 계정 {N}개 · 보유 계정 등록·비활성화 및 사용 이력을 관리합니다.</li>
+          <li><strong>{N} 동기화</strong> 계정 등록/삭제 시 탭 1 헤더와 동시 반영</li>
+          <li><strong>우측 버튼</strong> + 계정 추가 → 계정 추가 모달 오픈</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Summary pills -->
+    <div class="subsection">
+      <div class="subsection-title">요약 바</div>
+      <div class="component">
+        <div class="component-name">SUMMARY_PILLS</div>
+        <ul class="field-list">
+          <li><strong>전체 {N}</strong> 등록된 전체 계정 수 (활성 + 비활성)</li>
+          <li><strong>활성 {N}</strong> 활성화 상태 계정 수</li>
+          <li><strong>비활성 {N}</strong> 비활성화 처리된 계정 수</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Account list spec -->
+    <div class="subsection">
+      <div class="subsection-title">계정 목록</div>
+      <div class="spec-block">
+        <div class="spec-block-header">ACCOUNT MANAGEMENT LIST — 컬럼 명세</div>
+        <div class="spec-block-body">
+          <table>
+            <thead>
+              <tr>
+                <th>컬럼</th>
+                <th>내용</th>
+                <th>비고</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>계정명 (ID)</td>
+                <td>Zoom01, Zoom02 …</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>이메일</td>
+                <td>Zoom 계정에 연결된 이메일</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>등록일 / 만료일</td>
+                <td>계정 등록 시 설정한 시작·만료 일자</td>
+                <td>YYYY.MM.DD 형식</td>
+              </tr>
+              <tr>
+                <td>상태</td>
+                <td><span class="st st-active">활성</span> <span class="st st-inactive">비활성</span></td>
+                <td>비활성 시 탭 1 목록 미노출</td>
+              </tr>
+              <tr>
+                <td>사용 이력</td>
+                <td>이력 보기 버튼</td>
+                <td>클릭 시 이력 모달 오픈</td>
+              </tr>
+              <tr>
+                <td>관리</td>
+                <td>상태별 버튼 (하단 규칙 참조)</td>
+                <td></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Management button rules -->
+      <div class="component">
+        <div class="component-name">관리 버튼 규칙 (상태별)</div>
+        <table class="state-table">
+          <thead>
+            <tr>
+              <th>계정 상태</th>
+              <th>노출 버튼</th>
+              <th>동작</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="st st-active">활성</span></td>
+              <td>비활성화</td>
+              <td>경고 모달 노출 → 확인 시 비활성 처리, 탭 1 목록에서 제거</td>
+            </tr>
+            <tr>
+              <td><span class="st st-inactive">비활성</span></td>
+              <td>활성화 / 삭제</td>
+              <td>활성화: 활성 상태 복원, 탭 1 재노출<br>삭제: 삭제 확인 모달 → 계정 영구 삭제</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- 03. State transitions -->
+  <div class="section" id="state">
+    <div class="section-header">
+      <span class="section-num">03</span>
+      <h2 class="section-title">상태 정의 및 전이</h2>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">계정 상태 전이도</div>
+      <div class="spec-block">
+        <div class="spec-block-header">STATE TRANSITION</div>
+        <div class="spec-block-body">
+          <div class="flow-steps">
+            <div class="flow-step">
+              <div class="flow-step-line">
+                <div class="flow-step-dot">01</div>
+                <div class="flow-step-connector"></div>
+              </div>
+              <div class="flow-step-content">
+                <div class="flow-step-title">등록 (탭 2 계정 추가)</div>
+                <div class="flow-step-desc">계정 추가 모달 → 등록 버튼 → <span class="st st-active">활성</span> 상태로 생성. 탭 1 미배정 목록에 자동 추가. 전체/활성 카운트 +1.</div>
+              </div>
+            </div>
+            <div class="flow-step">
+              <div class="flow-step-line">
+                <div class="flow-step-dot">02</div>
+                <div class="flow-step-connector"></div>
+              </div>
+              <div class="flow-step-content">
+                <div class="flow-step-title">배정 (탭 1 과정 배정)</div>
+                <div class="flow-step-desc"><span class="st st-free">미배정</span> → 과정 배정 드롭다운 → 강좌 선택 → <span class="st st-assigned">배정</span> 상태 전환.</div>
+              </div>
+            </div>
+            <div class="flow-step">
+              <div class="flow-step-line">
+                <div class="flow-step-dot">03</div>
+                <div class="flow-step-connector"></div>
+              </div>
+              <div class="flow-step-content">
+                <div class="flow-step-title">강의 시작</div>
+                <div class="flow-step-desc"><span class="st st-assigned">배정</span> → 강의 시작 시 <span class="st st-live">진행 중</span> 자동 전환. 이 상태에서 배정 해제 불가.</div>
+              </div>
+            </div>
+            <div class="flow-step">
+              <div class="flow-step-line">
+                <div class="flow-step-dot">04</div>
+                <div class="flow-step-connector"></div>
+              </div>
+              <div class="flow-step-content">
+                <div class="flow-step-title">강의 종료 / 배정 해제</div>
+                <div class="flow-step-desc">강의 종료 → <span class="st st-assigned">배정</span> 복귀 (과정 기간 중). 과정 종료 또는 수동 해제 → <span class="st st-free">미배정</span> 전환.</div>
+              </div>
+            </div>
+            <div class="flow-step">
+              <div class="flow-step-line">
+                <div class="flow-step-dot">05</div>
+                <div class="flow-step-connector"></div>
+              </div>
+              <div class="flow-step-content">
+                <div class="flow-step-title">비활성화 (탭 2)</div>
+                <div class="flow-step-desc"><span class="st st-active">활성</span> → 비활성화 버튼 → <span class="st st-inactive">비활성</span>. 탭 1 배정 목록에서 제거. 기존 배정 있으면 먼저 해제 필요.</div>
+              </div>
+            </div>
+            <div class="flow-step">
+              <div class="flow-step-line">
+                <div class="flow-step-dot">06</div>
+              </div>
+              <div class="flow-step-content">
+                <div class="flow-step-title">삭제 (탭 2, 비활성 상태에서만 가능)</div>
+                <div class="flow-step-desc"><span class="st st-inactive">비활성</span> → 삭제 버튼 → 삭제 확인 모달 → 영구 삭제. 모든 이력 함께 삭제. 전체 카운트 -1.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 04. Modals -->
+  <div class="section" id="modals">
+    <div class="section-header">
+      <span class="section-num">04</span>
+      <h2 class="section-title">모달 명세</h2>
+    </div>
+
+    <!-- Modal 1 -->
+    <div class="subsection">
+      <div class="subsection-title">계정 추가 모달</div>
+      <div class="component">
+        <div class="component-name">MODAL — 계정 추가</div>
+        <ul class="field-list">
+          <li><strong>트리거</strong> 탭 2 우측 상단 "+ 계정 추가" 버튼</li>
+          <li><strong>계정 ID</strong> 텍스트 입력 (예: Zoom06)</li>
+          <li><strong>이메일 주소</strong> 텍스트 입력 (예: aistudio.service+zoom06@multicampus.com)</li>
+          <li><strong>계정 시작일</strong> Date Picker</li>
+          <li><strong>만료일</strong> Date Picker</li>
+          <li><strong>안내 문구</strong> "등록 후 Zoom 마스터 계정에서 해당 유저가 Licensed 상태인지 확인하세요."</li>
+          <li><strong>버튼 — 등록</strong> 등록 처리 → 목록 추가 → 전체/활성 카운트 +1 → 탭 1 미배정 목록 추가</li>
+          <li><strong>버튼 — 취소</strong> 모달 닫힘, 변경 없음</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Modal 2 -->
+    <div class="subsection">
+      <div class="subsection-title">배정 해제 확인 모달</div>
+      <div class="component">
+        <div class="component-name">MODAL — 배정 해제 확인</div>
+        <ul class="field-list">
+          <li><strong>트리거</strong> 탭 1 "배정 해제" 버튼 클릭 (상태: 배정)</li>
+          <li><strong>메시지</strong> "해당 과정의 배정을 해제하시겠습니까?" + 강좌명 표시</li>
+          <li><strong>버튼 — 취소</strong> 모달 닫힘</li>
+          <li><strong>버튼 — 확인</strong> 배정 해제, 상태 미배정으로 전환</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Modal 3 -->
+    <div class="subsection">
+      <div class="subsection-title">비활성화 경고 모달</div>
+      <div class="component">
+        <div class="component-name">MODAL — 비활성화 경고</div>
+        <ul class="field-list">
+          <li><strong>트리거</strong> 탭 2 "비활성화" 버튼 클릭 (상태: 활성)</li>
+          <li><strong>메시지</strong> "비활성화 시 배정 관리에서 선택이 불가합니다. 현재 배정된 과정이 있다면 먼저 해제하세요."</li>
+          <li><strong>버튼 — 취소</strong> 모달 닫힘</li>
+          <li><strong>버튼 — 비활성화</strong> 상태 비활성으로 변경, 탭 1 목록에서 제거</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Modal 4 -->
+    <div class="subsection">
+      <div class="subsection-title">계정 삭제 확인 모달</div>
+      <div class="component">
+        <div class="component-name">MODAL — 삭제 확인 (Destructive)</div>
+        <ul class="field-list">
+          <li><strong>트리거</strong> 탭 2 "삭제" 버튼 클릭 (상태: 비활성에서만 노출)</li>
+          <li><strong>계정명 표시</strong> 삭제 대상 계정명 강조 표시</li>
+          <li><strong>메시지</strong> "삭제 시 해당 계정의 모든 이력이 함께 삭제됩니다. 이 작업은 되돌릴 수 없습니다."</li>
+          <li><strong>버튼 — 취소</strong> 모달 닫힘</li>
+          <li><strong>버튼 — 삭제</strong> Red/Destructive 스타일. 계정 영구 삭제. 전체 카운트 -1.</li>
+        </ul>
+      </div>
+      <div class="rule-block red">
+        <div class="rule-label red">중요</div>
+        삭제는 비활성화 상태에서만 가능. 활성 상태에서는 삭제 버튼 미노출. 삭제 시 사용 이력 포함 모든 데이터 영구 삭제.
+      </div>
+    </div>
+
+    <!-- Modal 5 -->
+    <div class="subsection">
+      <div class="subsection-title">사용 이력 모달</div>
+      <div class="component">
+        <div class="component-name">MODAL — 사용 이력 조회</div>
+        <ul class="field-list">
+          <li><strong>트리거</strong> 탭 2 목록 "이력 보기" 버튼 클릭</li>
+          <li><strong>제목</strong> "{계정명} 사용 이력"</li>
+          <li><strong>컬럼</strong> 과정명 / 강의명 / 일시 / 상태 (진행 중 / 완료)</li>
+          <li><strong>정렬</strong> 최신 순 (DESC)</li>
+          <li><strong>버튼 — 닫기</strong> 모달 닫힘</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- 05. Data rules -->
+  <div class="section" id="data">
+    <div class="section-header">
+      <span class="section-num">05</span>
+      <h2 class="section-title">데이터 연동 규칙</h2>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">카운트 동기화</div>
+      <div class="spec-block">
+        <div class="spec-block-header">COUNTER SYNC RULES</div>
+        <div class="spec-block-body">
+          <table>
+            <thead>
+              <tr>
+                <th>액션</th>
+                <th>탭 1 헤더 {N}</th>
+                <th>탭 2 헤더 {N}</th>
+                <th>탭 2 전체</th>
+                <th>탭 2 활성</th>
+                <th>탭 2 비활성</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>계정 추가</td>
+                <td>+1</td>
+                <td>+1</td>
+                <td>+1</td>
+                <td>+1</td>
+                <td>—</td>
+              </tr>
+              <tr>
+                <td>비활성화</td>
+                <td>-1</td>
+                <td>—</td>
+                <td>—</td>
+                <td>-1</td>
+                <td>+1</td>
+              </tr>
+              <tr>
+                <td>활성화 (복원)</td>
+                <td>+1</td>
+                <td>—</td>
+                <td>—</td>
+                <td>+1</td>
+                <td>-1</td>
+              </tr>
+              <tr>
+                <td>삭제</td>
+                <td>—</td>
+                <td>-1</td>
+                <td>-1</td>
+                <td>—</td>
+                <td>-1</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="rule-block">
+        <div class="rule-label">참고</div>
+        탭 1 헤더 {N}은 활성 계정만 집계. 비활성 계정은 탭 1 배정 목록에 미노출되며, 요약 바 카운트에서도 제외.
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">DB 연관 컬럼</div>
+      <div class="spec-block">
+        <div class="spec-block-header">RELATED DB COLUMNS</div>
+        <div class="spec-block-body">
+          <table>
+            <thead>
+              <tr>
+                <th>컬럼</th>
+                <th>설명</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>assigned_course_id</code></td>
+                <td>배정된 강좌 ID. NULL이면 미배정 상태. 가용성 판단의 Source of Truth.</td>
+              </tr>
+              <tr>
+                <td><code>account_status</code></td>
+                <td>active / inactive. inactive 시 배정 관리 화면에서 노출 제외.</td>
+              </tr>
+              <tr>
+                <td><code>lecture_status</code></td>
+                <td>active 시 "진행 중" 배지 노출. 해제 불가 버튼 처리 기준.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="note">
+      <span class="note-icon">⚠</span>
+      <span><strong>미확정:</strong> 계정 매핑 방식 (시나리오 1 과정 고정 vs 시나리오 2 Pool 공유) 상무님 보고 후 최종 확정. 본 PRD는 시나리오 1 기준으로 작성됨.</span>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="doc-footer">
+    <div class="footer-left">
+      zoom_admin_prd_v1.html · v1 · 2026-03-09<br>
+      Samsung SDS Multicampus — AI Studio × Zoom 연동
+    </div>
+    <div class="footer-right">
+      <a href="index.html">← 문서 인덱스</a>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
