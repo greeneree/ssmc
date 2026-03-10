@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>어드민 — Zoom 계정 관리 플로우차트</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&family=IBM+Plex+Sans+KR:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0d0d;
+    --surface: #141414;
+    --surface2: #1a1a1a;
+    --border: #2a2a2a;
+    --border2: #333;
+    --text: #e8e8e8;
+    --text2: #999;
+    --text3: #555;
+    --accent: #4a9eff;
+    --green: #3ecf8e;
+    --yellow: #f5a623;
+    --red: #ff5b5b;
+    --orange: #ff8c42;
+    --purple: #a78bfa;
+    --mono: 'IBM Plex Mono', monospace;
+    --sans: 'IBM Plex Sans KR', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 13px;
+    padding: 48px 32px;
+    min-height: 100vh;
+  }
+
+  /* Header */
+  .doc-header {
+    max-width: 1200px;
+    margin: 0 auto 48px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border2);
+  }
+
+  .doc-meta {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text3);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .doc-title {
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+
+  .doc-title span { color: var(--accent); }
+
+  .doc-desc { color: var(--text2); font-size: 13px; }
+
+  .badges {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+  }
+
+  .badge {
+    font-family: var(--mono);
+    font-size: 9px;
+    padding: 3px 10px;
+    border-radius: 2px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .badge-blue { background: rgba(74,158,255,0.12); color: var(--accent); border: 1px solid rgba(74,158,255,0.25); }
+  .badge-yellow { background: rgba(245,166,35,0.12); color: var(--yellow); border: 1px solid rgba(245,166,35,0.25); }
+  .badge-gray { background: rgba(255,255,255,0.06); color: var(--text3); border: 1px solid var(--border); }
+
+  /* Legend */
+  .legend {
+    max-width: 1200px;
+    margin: 0 auto 40px;
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    padding: 16px 20px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    color: var(--text2);
+  }
+
+  .legend-box {
+    width: 14px;
+    height: 14px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  .legend-diamond {
+    width: 14px;
+    height: 14px;
+    transform: rotate(45deg);
+    flex-shrink: 0;
+  }
+
+  /* Flow canvas */
+  .flow-canvas {
+    max-width: 1200px;
+    margin: 0 auto;
+    overflow-x: auto;
+  }
+
+  svg {
+    display: block;
+    margin: 0 auto;
+  }
+
+  /* Node styles */
+  .node-start { fill: #2a2a2a; stroke: #555; stroke-width: 1.5; }
+  .node-action { fill: #1a2a3a; stroke: var(--accent); stroke-width: 1.5; }
+  .node-action-green { fill: #1a2e25; stroke: var(--green); stroke-width: 1.5; }
+  .node-action-red { fill: #2e1a1a; stroke: var(--red); stroke-width: 1.5; }
+  .node-action-yellow { fill: #2e2510; stroke: var(--yellow); stroke-width: 1.5; }
+  .node-action-orange { fill: #2e2010; stroke: var(--orange); stroke-width: 1.5; }
+  .node-action-purple { fill: #221a30; stroke: var(--purple); stroke-width: 1.5; }
+  .node-diamond { fill: #1e1e10; stroke: var(--yellow); stroke-width: 1.5; }
+  .node-diamond-red { fill: #2e1a1a; stroke: var(--red); stroke-width: 1.5; }
+  .node-disabled { fill: #1a1a1a; stroke: #444; stroke-width: 1.5; stroke-dasharray: 5,3; }
+
+  .text-main { fill: var(--text); font-family: 'IBM Plex Sans KR', sans-serif; font-size: 11px; font-weight: 500; }
+  .text-sub { fill: var(--text2); font-family: 'IBM Plex Sans KR', sans-serif; font-size: 9px; }
+  .text-mono { fill: var(--text3); font-family: 'IBM Plex Mono', monospace; font-size: 8px; }
+  .text-accent { fill: var(--accent); }
+  .text-green { fill: var(--green); }
+  .text-red { fill: var(--red); }
+  .text-yellow { fill: var(--yellow); }
+  .text-orange { fill: var(--orange); }
+  .text-purple { fill: var(--purple); }
+
+  .arrow { stroke: var(--text3); stroke-width: 1.5; fill: none; marker-end: url(#arrowhead); }
+  .arrow-red { stroke: var(--red); stroke-width: 1.5; fill: none; marker-end: url(#arrowhead-red); }
+  .arrow-green { stroke: var(--green); stroke-width: 1.5; fill: none; marker-end: url(#arrowhead-green); }
+  .arrow-yellow { stroke: var(--yellow); stroke-width: 1.5; fill: none; marker-end: url(#arrowhead-yellow); }
+  .arrow-dashed { stroke: #444; stroke-width: 1.5; fill: none; stroke-dasharray: 5,3; marker-end: url(#arrowhead-gray); }
+
+  .section-label {
+    fill: none;
+    stroke: var(--border2);
+    stroke-width: 1;
+    stroke-dasharray: 4,4;
+    rx: 8;
+  }
+
+  .section-title { fill: var(--text3); font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; }
+
+  /* Footer */
+  .doc-footer {
+    max-width: 1200px;
+    margin: 40px auto 0;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .footer-text { font-family: var(--mono); font-size: 10px; color: var(--text3); }
+  .footer-link a { font-family: var(--mono); font-size: 10px; color: var(--accent); text-decoration: none; }
+</style>
+</head>
+<body>
+
+<div class="doc-header">
+  <div class="doc-meta">Samsung SDS Multicampus · AI Studio LMS · Admin Flowchart</div>
+  <h1 class="doc-title">Zoom 계정 관리 <span>플로우차트</span></h1>
+  <p class="doc-desc">시스템 관리자 기준 — 계정 등록부터 배정·해제·만료·삭제까지 전체 흐름</p>
+  <div class="badges">
+    <span class="badge badge-blue">v1</span>
+    <span class="badge badge-gray">2026-03-10</span>
+    <span class="badge badge-yellow">⚠ 계정 매핑 방식 미확정</span>
+  </div>
+</div>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-box" style="background:#1a2a3a;border:1px solid var(--accent)"></div> 액션 / 화면</div>
+  <div class="legend-item"><div class="legend-box" style="background:#1a2e25;border:1px solid var(--green)"></div> 완료 / 정상 처리</div>
+  <div class="legend-item"><div class="legend-box" style="background:#2e1a1a;border:1px solid var(--red)"></div> 차단 / 오류 / 삭제</div>
+  <div class="legend-item"><div class="legend-box" style="background:#2e2510;border:1px solid var(--yellow)"></div> 주의 / 만료</div>
+  <div class="legend-item"><div class="legend-box" style="background:#221a30;border:1px solid var(--purple)"></div> 상태 복원</div>
+  <div class="legend-item"><div class="legend-diamond" style="background:#1e1e10;border:1px solid var(--yellow)"></div> 조건 분기</div>
+  <div class="legend-item"><div class="legend-box" style="background:#1a1a1a;border:1px dashed #444"></div> 비활성 / 불가</div>
+</div>
+
+<div class="flow-canvas">
+<svg width="1160" height="1380" viewBox="0 0 1160 1380" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="arrowhead" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#555"/>
+    </marker>
+    <marker id="arrowhead-red" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#ff5b5b"/>
+    </marker>
+    <marker id="arrowhead-green" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#3ecf8e"/>
+    </marker>
+    <marker id="arrowhead-yellow" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#f5a623"/>
+    </marker>
+    <marker id="arrowhead-gray" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#444"/>
+    </marker>
+  </defs>
+
+  <!-- ==============================
+       SECTION 1: 계정 등록
+  ============================== -->
+  <rect x="20" y="20" width="220" height="200" rx="6" class="section-label"/>
+  <text x="30" y="38" class="section-title">01 · 계정 등록</text>
+
+  <!-- Start -->
+  <ellipse cx="120" cy="70" rx="40" ry="20" class="node-start"/>
+  <text x="120" y="74" class="text-main" text-anchor="middle">시작</text>
+
+  <!-- Arrow -->
+  <line x1="120" y1="90" x2="120" y2="110" class="arrow"/>
+
+  <!-- 계정 추가 버튼 클릭 -->
+  <rect x="50" y="110" width="140" height="44" rx="4" class="node-action"/>
+  <text x="120" y="128" class="text-main" text-anchor="middle">+ 계정 추가 클릭</text>
+  <text x="120" y="143" class="text-sub text-accent" text-anchor="middle">탭 2 · 계정 관리</text>
+
+  <line x1="120" y1="154" x2="120" y2="174" class="arrow"/>
+
+  <!-- 계정 정보 입력 모달 -->
+  <rect x="40" y="174" width="160" height="52" rx="4" class="node-action"/>
+  <text x="120" y="192" class="text-main" text-anchor="middle">계정 정보 입력</text>
+  <text x="120" y="207" class="text-sub" text-anchor="middle">ID · 이메일 · 시작일 · 만료일</text>
+  <text x="120" y="218" class="text-mono" text-anchor="middle">등록 버튼 클릭</text>
+
+  <!-- ==============================
+       SECTION 2: 등록 결과
+  ============================== -->
+  <rect x="270" y="20" width="220" height="200" rx="6" class="section-label"/>
+  <text x="280" y="38" class="section-title">02 · 등록 결과</text>
+
+  <!-- Arrow right -->
+  <line x1="200" y1="200" x2="270" y2="200" class="arrow"/>
+
+  <!-- 활성 상태 생성 -->
+  <rect x="270" y="174" width="160" height="52" rx="4" class="node-action-green"/>
+  <text x="350" y="192" class="text-main text-green" text-anchor="middle">활성 상태 생성</text>
+  <text x="350" y="207" class="text-sub" text-anchor="middle">탭 1 미배정 목록 추가</text>
+  <text x="350" y="218" class="text-mono" text-anchor="middle">전체·활성 카운트 +1</text>
+
+  <!-- Zoom 마스터 확인 안내 -->
+  <rect x="270" y="100" width="160" height="44" rx="4" class="node-action-yellow"/>
+  <text x="350" y="118" class="text-main text-yellow" text-anchor="middle">⚠ Zoom 마스터 확인</text>
+  <text x="350" y="133" class="text-sub" text-anchor="middle">Licensed 상태 수동 확인</text>
+
+  <line x1="350" y1="174" x2="350" y2="144" class="arrow"/>
+
+  <!-- ==============================
+       SECTION 3: 배정
+  ============================== -->
+  <rect x="20" y="248" width="470" height="160" rx="6" class="section-label"/>
+  <text x="30" y="266" class="section-title">03 · 과정 배정</text>
+
+  <line x1="120" y1="226" x2="120" y2="290" class="arrow"/>
+
+  <!-- 과정 배정 버튼 -->
+  <rect x="50" y="290" width="140" height="44" rx="4" class="node-action"/>
+  <text x="120" y="308" class="text-main" text-anchor="middle">과정 배정 클릭</text>
+  <text x="120" y="323" class="text-sub text-accent" text-anchor="middle">탭 1 · 미배정 계정</text>
+
+  <line x1="190" y1="312" x2="220" y2="312" class="arrow"/>
+
+  <!-- 강좌 드롭다운 선택 -->
+  <rect x="220" y="290" width="140" height="44" rx="4" class="node-action"/>
+  <text x="290" y="308" class="text-main" text-anchor="middle">강좌 선택</text>
+  <text x="290" y="323" class="text-sub" text-anchor="middle">드롭다운 · 운영 강좌 목록</text>
+
+  <line x1="290" y1="334" x2="290" y2="354" class="arrow"/>
+
+  <!-- 배정 상태 전환 -->
+  <rect x="210" y="354" width="160" height="44" rx="4" class="node-action-green"/>
+  <text x="290" y="372" class="text-main text-green" text-anchor="middle">배정 상태 전환</text>
+  <text x="290" y="387" class="text-sub" text-anchor="middle">assigned_course_id 저장</text>
+
+  <!-- ==============================
+       SECTION 4: 강의 진행
+  ============================== -->
+  <rect x="20" y="436" width="470" height="240" rx="6" class="section-label"/>
+  <text x="30" y="454" class="section-title">04 · 강의 진행 및 해제 요청</text>
+
+  <line x1="290" y1="398" x2="290" y2="458" class="arrow"/>
+
+  <!-- 강의 시작 -->
+  <rect x="210" y="458" width="160" height="44" rx="4" class="node-action"/>
+  <text x="290" y="476" class="text-main" text-anchor="middle">강의 시작</text>
+  <text x="290" y="491" class="text-sub" text-anchor="middle">lecture_status = active</text>
+
+  <line x1="290" y1="502" x2="290" y2="522" class="arrow"/>
+
+  <!-- 실시간 강의 여부 분기 -->
+  <polygon points="290,522 370,554 290,586 210,554" class="node-diamond-red"/>
+  <text x="290" y="549" class="text-main text-red" text-anchor="middle">실시간</text>
+  <text x="290" y="563" class="text-main text-red" text-anchor="middle">강의 중?</text>
+
+  <!-- YES → 해제 불가 -->
+  <line x1="370" y1="554" x2="430" y2="554" class="arrow-red"/>
+  <text x="378" y="548" class="text-sub text-red">YES</text>
+
+  <rect x="430" y="532" width="140" height="44" rx="4" class="node-disabled"/>
+  <text x="500" y="550" class="text-main" text-anchor="middle" style="fill:#555">해제 불가</text>
+  <text x="500" y="565" class="text-sub" text-anchor="middle" style="fill:#444">진행 중 상태 유지</text>
+
+  <!-- NO → 해제 요청 가능 -->
+  <line x1="290" y1="586" x2="290" y2="614" class="arrow-green"/>
+  <text x="298" y="605" class="text-sub text-green">NO</text>
+
+  <!-- 배정 해제 버튼 -->
+  <rect x="210" y="614" width="160" height="44" rx="4" class="node-action-yellow"/>
+  <text x="290" y="632" class="text-main text-yellow" text-anchor="middle">배정 해제 클릭</text>
+  <text x="290" y="647" class="text-sub" text-anchor="middle">system confirm 노출</text>
+
+  <!-- ==============================
+       SECTION 5: 해제 분기
+  ============================== -->
+  <rect x="20" y="700" width="470" height="200" rx="6" class="section-label"/>
+  <text x="30" y="718" class="section-title">05 · 배정 해제 분기</text>
+
+  <line x1="290" y1="658" x2="290" y2="730" class="arrow"/>
+
+  <!-- 해제 유형 분기 -->
+  <polygon points="290,730 390,762 290,794 190,762" class="node-diamond"/>
+  <text x="290" y="757" class="text-main text-yellow" text-anchor="middle">해제</text>
+  <text x="290" y="771" class="text-main text-yellow" text-anchor="middle">유형</text>
+
+  <!-- 수동 해제 -->
+  <line x1="190" y1="762" x2="120" y2="762" class="arrow-yellow"/>
+  <text x="148" y="755" class="text-sub text-yellow">수동</text>
+
+  <rect x="40" y="740" width="140" height="52" rx="4" class="node-action-red"/>
+  <text x="110" y="758" class="text-main text-red" text-anchor="middle">수동 해제</text>
+  <text x="110" y="773" class="text-sub" text-anchor="middle">남은 강의 전체 삭제</text>
+  <text x="110" y="784" class="text-mono" text-anchor="middle">수강생 취소 알림 발송</text>
+
+  <!-- 자동 해제 -->
+  <line x1="390" y1="762" x2="460" y2="762" class="arrow-green"/>
+  <text x="408" y="755" class="text-sub text-green">자동</text>
+
+  <rect x="460" y="740" width="150" height="52" rx="4" class="node-action-green"/>
+  <text x="535" y="758" class="text-main text-green" text-anchor="middle">자동 해제</text>
+  <text x="535" y="773" class="text-sub" text-anchor="middle">과정 종료 시 시스템 처리</text>
+  <text x="535" y="784" class="text-mono" text-anchor="middle">강의 이력 유지</text>
+
+  <!-- 공통: assigned_course_id = NULL -->
+  <line x1="110" y1="792" x2="110" y2="870" class="arrow"/>
+  <line x1="535" y1="792" x2="535" y2="840" x2="535" y2="870" class="arrow"/>
+  <line x1="535" y1="870" x2="290" y2="870" class="arrow"/>
+  <line x1="110" y1="870" x2="290" y2="870"/>
+
+  <rect x="190" y="870" width="200" height="44" rx="4" class="node-action"/>
+  <text x="290" y="888" class="text-main" text-anchor="middle">미배정 상태 전환</text>
+  <text x="290" y="903" class="text-mono text-accent" text-anchor="middle">assigned_course_id = NULL</text>
+
+  <!-- ==============================
+       SECTION 6: 계정 상태 관리
+  ============================== -->
+  <rect x="20" y="940" width="1120" height="400" rx="6" class="section-label"/>
+  <text x="30" y="958" class="section-title">06 · 계정 상태 관리</text>
+
+  <line x1="290" y1="914" x2="290" y2="980" class="arrow"/>
+
+  <!-- 상태 분기 -->
+  <polygon points="290,980 410,1016 290,1052 170,1016" class="node-diamond"/>
+  <text x="290" y="1011" class="text-main text-yellow" text-anchor="middle">관리</text>
+  <text x="290" y="1025" class="text-main text-yellow" text-anchor="middle">액션</text>
+
+  <!-- Branch 1: 비활성화 -->
+  <line x1="170" y1="1016" x2="100" y2="1016" class="arrow"/>
+  <text x="118" y="1009" class="text-sub" style="fill:#555">비활성화</text>
+
+  <rect x="30" y="994" width="130" height="44" rx="4" class="node-action-red"/>
+  <text x="95" y="1012" class="text-main text-red" text-anchor="middle">비활성화</text>
+  <text x="95" y="1027" class="text-sub" text-anchor="middle">탭 1 목록 제거</text>
+
+  <line x1="95" y1="1038" x2="95" y2="1080" class="arrow"/>
+
+  <rect x="30" y="1080" width="130" height="52" rx="4" class="node-disabled"/>
+  <text x="95" y="1098" class="text-main" text-anchor="middle" style="fill:#666">비활성 상태</text>
+  <text x="95" y="1113" class="text-sub" text-anchor="middle" style="fill:#555">배정 목록 미노출</text>
+  <text x="95" y="1124" class="text-mono" text-anchor="middle" style="fill:#444">활성화 / 삭제 가능</text>
+
+  <!-- Branch 2: 만료 -->
+  <line x1="290" y1="1052" x2="290" y2="1080" class="arrow-yellow"/>
+  <text x="298" y="1072" class="text-sub text-yellow">만료일 도달</text>
+
+  <rect x="210" y="1080" width="160" height="52" rx="4" class="node-action-yellow"/>
+  <text x="290" y="1098" class="text-main text-yellow" text-anchor="middle">만료 상태</text>
+  <text x="290" y="1113" class="text-sub" text-anchor="middle">D-30 → D-7 → D-3 → D-day</text>
+  <text x="290" y="1124" class="text-mono" text-anchor="middle">배지 단계별 색상 전환</text>
+
+  <line x1="290" y1="1132" x2="290" y2="1162" class="arrow"/>
+
+  <!-- 만료 처리 분기 -->
+  <polygon points="290,1162 370,1192 290,1222 210,1192" class="node-diamond"/>
+  <text x="290" y="1187" class="text-main text-yellow" text-anchor="middle">연장</text>
+  <text x="290" y="1201" class="text-main text-yellow" text-anchor="middle">여부</text>
+
+  <!-- 만료일 연장 → 활성 복원 -->
+  <line x1="370" y1="1192" x2="450" y2="1192" class="arrow-green"/>
+  <text x="393" y="1185" class="text-sub text-green">연장</text>
+
+  <rect x="450" y="1170" width="150" height="44" rx="4" class="node-action-purple"/>
+  <text x="525" y="1188" class="text-main text-purple" text-anchor="middle">만료일 수정 저장</text>
+  <text x="525" y="1203" class="text-sub" text-anchor="middle">활성 상태 자동 복원</text>
+
+  <!-- 연장 없이 삭제 -->
+  <line x1="290" y1="1222" x2="290" y2="1252" class="arrow-red"/>
+  <text x="298" y="1243" class="text-sub text-red">미연장</text>
+
+  <rect x="210" y="1252" width="160" height="44" rx="4" class="node-disabled"/>
+  <text x="290" y="1270" class="text-main" text-anchor="middle" style="fill:#666">삭제 대기</text>
+  <text x="290" y="1285" class="text-sub" text-anchor="middle" style="fill:#555">비활성 상태에서 삭제 가능</text>
+
+  <!-- Branch 3: 삭제 -->
+  <line x1="410" y1="1016" x2="700" y2="1016" class="arrow-red"/>
+  <text x="538" y="1009" class="text-sub text-red">삭제</text>
+
+  <rect x="700" y="994" width="160" height="44" rx="4" class="node-action-red"/>
+  <text x="780" y="1012" class="text-main text-red" text-anchor="middle">삭제 확인</text>
+  <text x="780" y="1027" class="text-sub" text-anchor="middle">system confirm 노출</text>
+
+  <line x1="780" y1="1038" x2="780" y2="1080" class="arrow-red"/>
+
+  <!-- 비활성 여부 분기 -->
+  <polygon points="780,1080 860,1112 780,1144 700,1112" class="node-diamond-red"/>
+  <text x="780" y="1107" class="text-main text-red" text-anchor="middle">비활성</text>
+  <text x="780" y="1121" class="text-main text-red" text-anchor="middle">상태?</text>
+
+  <!-- YES → 영구 삭제 -->
+  <line x1="780" y1="1144" x2="780" y2="1174" class="arrow-red"/>
+  <text x="788" y="1164" class="text-sub text-red">YES</text>
+
+  <rect x="700" y="1174" width="160" height="52" rx="4" class="node-action-red"/>
+  <text x="780" y="1192" class="text-main text-red" text-anchor="middle">계정 영구 삭제</text>
+  <text x="780" y="1207" class="text-sub" text-anchor="middle">모든 이력 함께 삭제</text>
+  <text x="780" y="1218" class="text-mono" text-anchor="middle">전체 카운트 -1</text>
+
+  <!-- NO → 비활성화 먼저 -->
+  <line x1="860" y1="1112" x2="940" y2="1112" class="arrow"/>
+  <text x="878" y="1105" class="text-sub" style="fill:#555">NO</text>
+
+  <rect x="940" y="1090" width="160" height="44" rx="4" class="node-disabled"/>
+  <text x="1020" y="1108" class="text-main" text-anchor="middle" style="fill:#666">삭제 불가</text>
+  <text x="1020" y="1123" class="text-sub" text-anchor="middle" style="fill:#555">비활성화 먼저 필요</text>
+
+  <!-- End -->
+  <ellipse cx="780" cy="1310" rx="50" ry="22" class="node-start"/>
+  <text x="780" y="1314" class="text-main" text-anchor="middle">종료</text>
+  <line x1="780" y1="1226" x2="780" y2="1288" class="arrow"/>
+
+</svg>
+</div>
+
+<div class="doc-footer">
+  <div class="footer-text">
+    zoom_admin_account_flow_v1.html · v1 · 2026-03-10<br>
+    Samsung SDS Multicampus — AI Studio × Zoom 연동
+  </div>
+  <div class="footer-link">
+    <a href="index.html">← 문서 인덱스</a>
+  </div>
+</div>
+
+</body>
+</html>
