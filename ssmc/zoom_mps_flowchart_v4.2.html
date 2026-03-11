@@ -116,6 +116,96 @@
     flex-wrap: wrap;
   }
   .confirmed-note span { color: var(--text3); margin-right: 4px; }
+
+  /* ── SUMMARY PANEL ── */
+  .summary-wrap {
+    max-width: 1400px;
+    margin: 32px auto 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+  }
+  .summary-block {
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .summary-block-header {
+    background: var(--surface2);
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .summary-block-dot {
+    width: 8px; height: 8px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+  .summary-block-title {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text2);
+  }
+  .summary-block-body { padding: 14px 16px; }
+  .summary-item {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .summary-item:last-child { border-bottom: none; padding-bottom: 0; }
+  .summary-item:first-child { padding-top: 0; }
+  .summary-item-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text3);
+    letter-spacing: 0.08em;
+  }
+  .summary-item-val {
+    font-family: var(--sans);
+    font-size: 12px;
+    color: var(--text2);
+    line-height: 1.5;
+  }
+  .summary-item-val code {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--accent);
+    background: rgba(74,158,255,0.08);
+    padding: 1px 5px;
+    border-radius: 2px;
+  }
+  .summary-item-val .tag-green {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--green);
+    background: rgba(62,207,142,0.08);
+    padding: 1px 5px;
+    border-radius: 2px;
+  }
+  .summary-item-val .tag-yellow {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--yellow);
+    background: rgba(245,166,35,0.08);
+    padding: 1px 5px;
+    border-radius: 2px;
+  }
+  .summary-section-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--text3);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin: 10px 0 6px;
+  }
+  .summary-section-label:first-child { margin-top: 0; }
 </style>
 </head>
 <body>
@@ -439,6 +529,111 @@
 <text x="850" y="1291" fill="#3ecf8e" font-family="IBM Plex Mono" font-size="8" text-anchor="middle">✓ DB = Source of Truth</text>
 
 </svg>
+</div>
+
+<!-- ===================== SUMMARY PANEL ===================== -->
+<div class="summary-wrap">
+
+  <!-- 블록 1: 관리자 자격증명 등록 -->
+  <div class="summary-block">
+    <div class="summary-block-header">
+      <div class="summary-block-dot" style="background:#a78bfa"></div>
+      <span class="summary-block-title">관리자 자격증명 등록</span>
+    </div>
+    <div class="summary-block-body">
+      <div class="summary-section-label">OAuth 앱 생성</div>
+      <div class="summary-item">
+        <span class="summary-item-label">앱 타입</span>
+        <span class="summary-item-val">Server-to-Server OAuth — Zoom Marketplace에서 생성</span>
+      </div>
+      <div class="summary-item">
+        <span class="summary-item-label">발급 정보</span>
+        <span class="summary-item-val"><code>Account ID</code> · <code>Client ID</code> · <code>Client Secret</code> → 서버 .env 저장</span>
+      </div>
+      <div class="summary-item">
+        <span class="summary-item-label">Scope</span>
+        <span class="summary-item-val"><code>meeting:write:admin</code> <code>user:read:admin</code></span>
+      </div>
+      <div class="summary-item">
+        <span class="summary-item-label">마스터 계정</span>
+        <span class="summary-item-val"><code>aistudio.service@multicampus.com</code></span>
+      </div>
+      <div class="summary-section-label">Token 자동화</div>
+      <div class="summary-item">
+        <span class="summary-item-label">갱신 주기</span>
+        <span class="summary-item-val">1시간 자동 갱신 <span class="tag-green">✓ 강의 도중 세션 중단 없음</span></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 블록 2: 강사 강의 개설 · 입장 -->
+  <div class="summary-block">
+    <div class="summary-block-header">
+      <div class="summary-block-dot" style="background:#4a9eff"></div>
+      <span class="summary-block-title">강사 — 강의 개설 · 입장</span>
+    </div>
+    <div class="summary-block-body">
+      <div class="summary-section-label">미팅 생성</div>
+      <div class="summary-item">
+        <span class="summary-item-label">API</span>
+        <span class="summary-item-val"><code>POST /v2/users/{zoom계정email}/meetings</code></span>
+      </div>
+      <div class="summary-item">
+        <span class="summary-item-label">계정 없을 시</span>
+        <span class="summary-item-val">에러 반환 + 관리자 알림</span>
+      </div>
+      <div class="summary-section-label">강사 입장</div>
+      <div class="summary-item">
+        <span class="summary-item-label">방식</span>
+        <span class="summary-item-val"><code>start_url</code> 새 탭 오픈 — ZAK 이미 포함, 응답값 그대로 사용 <span class="tag-green">✓ 별도 발급 불필요</span></span>
+      </div>
+      <div class="summary-item">
+        <span class="summary-item-label">앱 설치 시</span>
+        <span class="summary-item-val"><code>zoomus://</code> 딥링크 자동 실행 → 호스트 권한 즉시 획득</span>
+      </div>
+      <div class="summary-item">
+        <span class="summary-item-label">앱 미설치 시</span>
+        <span class="summary-item-val">설치 안내 모달 → 다운로드 링크 → [다시 시도] → <code>zoomus://</code> 재호출</span>
+      </div>
+      <div class="summary-item">
+        <span class="summary-item-label">수강생 활성화</span>
+        <span class="summary-item-val">강의 시작 후 <code>lecture_status = "active"</code> → 입장하기 버튼 자동 활성화</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 블록 3: 수강생 입장 · API 자동화 -->
+  <div class="summary-block">
+    <div class="summary-block-header">
+      <div class="summary-block-dot" style="background:#3ecf8e"></div>
+      <span class="summary-block-title">수강생 입장 · API 자동화</span>
+    </div>
+    <div class="summary-block-body">
+      <div class="summary-section-label">수강생 입장</div>
+      <div class="summary-item">
+        <span class="summary-item-label">방식</span>
+        <span class="summary-item-val"><code>join_url</code> 새 탭 → Zoom Web Client <span class="tag-green">✓ 단일 URL 공유 확정</span></span>
+      </div>
+      <div class="summary-item">
+        <span class="summary-item-label">앱 설치 시</span>
+        <span class="summary-item-val">브라우저 팝업 "Zoom 앱으로 열겠습니까?" → 앱/웹 선택 (자동실행 아님)</span>
+      </div>
+      <div class="summary-item">
+        <span class="summary-item-label">Signature</span>
+        <span class="summary-item-val">불필요 — Web Client는 <code>join_url</code>만으로 참가자 인증 <span class="tag-green">✓ 확정</span></span>
+      </div>
+      <div class="summary-item">
+        <span class="summary-item-label">ZAK</span>
+        <span class="summary-item-val">불필요 — 수강생은 호스트 권한 아님 <span class="tag-green">✓ 확정</span></span>
+      </div>
+      <div class="summary-section-label">Signature 참고</div>
+      <div class="summary-item">
+        <span class="summary-item-label">SDK 방식 (미채택)</span>
+        <span class="summary-item-val">HMAC-SHA256 기반 — 강사 role=1 / 수강생 role=0 구분. <span class="tag-yellow">SDK 임베딩 미채택으로 해당 없음</span></span>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <div class="doc-footer">
