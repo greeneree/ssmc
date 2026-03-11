@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zoom × AI Studio 전체 플로우차트 v4.1</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=IBM+Plex+Sans+KR:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0b0b0b;
+  --bg2: #111;
+  --bg3: #181818;
+  --bg4: #1e1e1e;
+  --border: #222;
+  --border-hi: #2e2e2e;
+  --text: #e0e0e0;
+  --text-dim: #888;
+  --text-muted: #444;
+  --accent: #5B8DEF;
+  --accent-soft: rgba(91,141,239,0.1);
+  --green: #5BEF8D;
+  --green-soft: rgba(91,239,141,0.09);
+  --yellow: #EFD05B;
+  --yellow-soft: rgba(239,208,91,0.09);
+  --red: #EF5B5B;
+  --red-soft: rgba(239,91,91,0.09);
+  --purple: #C084FC;
+  --purple-soft: rgba(192,132,252,0.09);
+  --mono: 'IBM Plex Mono', monospace;
+  --sans: 'IBM Plex Sans KR', sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+/* ── NAV ── */
+.nav {
+  position: sticky; top: 0; z-index: 200;
+  background: rgba(11,11,11,0.97);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 40px; height: 50px;
+}
+.nav-brand { font-family: var(--mono); font-size: 11px; color: var(--accent); letter-spacing: 0.12em; }
+.nav-links { display: flex; gap: 4px; }
+.nav-link {
+  font-family: var(--mono); font-size: 10px; color: var(--text-muted);
+  text-decoration: none; padding: 5px 10px; border-radius: 2px;
+  transition: all 0.15s; letter-spacing: 0.05em;
+}
+.nav-link:hover { color: var(--accent); background: var(--accent-soft); }
+.nav-meta { font-family: var(--mono); font-size: 10px; color: var(--text-muted); }
+
+/* ── PAGE ── */
+.page { max-width: 1100px; margin: 0 auto; padding: 48px 32px 100px; }
+
+/* ── HEADER ── */
+.doc-header { margin-bottom: 40px; }
+.doc-eyebrow { font-family: var(--mono); font-size: 10px; color: var(--accent); letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 10px; }
+.doc-title { font-family: var(--mono); font-size: 22px; font-weight: 600; margin-bottom: 6px; }
+.doc-sub { font-family: var(--mono); font-size: 12px; color: var(--text-dim); margin-bottom: 16px; }
+.meta-chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+.chip { font-family: var(--mono); font-size: 10px; padding: 4px 10px; border-radius: 2px; border: 1px solid var(--border-hi); color: var(--text-muted); background: var(--bg3); }
+.chip-accent { border-color: rgba(91,141,239,0.3); color: var(--accent); background: var(--accent-soft); }
+.chip-new { border-color: rgba(91,239,141,0.3); color: var(--green); background: var(--green-soft); }
+
+/* ── LEGEND ── */
+.legend {
+  display: flex; gap: 16px; flex-wrap: wrap;
+  padding: 14px 20px; background: var(--bg2);
+  border: 1px solid var(--border); border-radius: 3px;
+  margin-bottom: 32px;
+}
+.legend-item { display: flex; align-items: center; gap: 8px; font-family: var(--mono); font-size: 10px; color: var(--text-dim); }
+.legend-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+
+/* ── TBD NOTICES ── */
+.tbd-list { margin-bottom: 32px; display: flex; flex-direction: column; gap: 6px; }
+.tbd-item {
+  font-family: var(--mono); font-size: 11px; color: var(--yellow);
+  background: var(--yellow-soft); border: 1px solid rgba(239,208,91,0.15);
+  border-radius: 2px; padding: 8px 14px;
+}
+
+/* ── PHASE HEADER ── */
+.phase-header {
+  display: flex; align-items: center; gap: 14px;
+  margin: 40px 0 20px;
+}
+.phase-num {
+  font-family: var(--mono); font-size: 10px; color: var(--text-muted);
+  background: var(--bg3); border: 1px solid var(--border-hi);
+  padding: 4px 10px; border-radius: 2px; letter-spacing: 0.1em;
+}
+.phase-title { font-family: var(--mono); font-size: 13px; font-weight: 500; color: var(--text-dim); letter-spacing: 0.08em; text-transform: uppercase; }
+.phase-header::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+/* ── SWIMLANE ── */
+.swimlane {
+  display: grid;
+  grid-template-columns: 140px 1fr 1fr 1fr 1fr;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 12px;
+  background: var(--bg2);
+}
+.lane-label {
+  background: var(--bg3);
+  border-right: 1px solid var(--border);
+  padding: 16px 12px;
+  display: flex; align-items: flex-start;
+  font-family: var(--mono); font-size: 10px;
+  color: var(--text-muted); letter-spacing: 0.1em;
+  text-transform: uppercase; line-height: 1.4;
+  word-break: keep-all;
+}
+.lane-label span { display: block; }
+.lane-label .role-en { color: var(--text-muted); font-size: 9px; margin-bottom: 3px; }
+.lane-label .role-kr { color: var(--text-dim); font-size: 11px; }
+
+.lane-col {
+  border-right: 1px solid var(--border);
+  padding: 14px 12px;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.lane-col:last-child { border-right: none; }
+
+/* ── FLOW NODES ── */
+.node {
+  border-radius: 3px;
+  padding: 10px 12px;
+  font-size: 12px;
+  border: 1px solid transparent;
+  position: relative;
+}
+.node-title { font-family: var(--mono); font-size: 11px; font-weight: 500; margin-bottom: 4px; }
+.node-desc { font-size: 11px; color: var(--text-dim); line-height: 1.5; }
+.node-sub { font-family: var(--mono); font-size: 10px; color: var(--text-muted); margin-top: 5px; line-height: 1.4; }
+
+.node-action { background: var(--bg3); border-color: var(--border-hi); }
+.node-action .node-title { color: var(--text); }
+
+.node-system { background: var(--accent-soft); border-color: rgba(91,141,239,0.2); }
+.node-system .node-title { color: var(--accent); }
+
+.node-done { background: var(--green-soft); border-color: rgba(91,239,141,0.2); }
+.node-done .node-title { color: var(--green); }
+
+.node-warn { background: var(--yellow-soft); border-color: rgba(239,208,91,0.2); }
+.node-warn .node-title { color: var(--yellow); }
+
+.node-error { background: var(--red-soft); border-color: rgba(239,91,91,0.2); }
+.node-error .node-title { color: var(--red); }
+
+.node-branch { background: var(--purple-soft); border-color: rgba(192,132,252,0.2); }
+.node-branch .node-title { color: var(--purple); }
+
+.node-new { box-shadow: 0 0 0 1px var(--green); }
+.node-new::after {
+  content: 'NEW';
+  position: absolute; top: -1px; right: -1px;
+  font-family: var(--mono); font-size: 8px;
+  background: var(--green); color: #000;
+  padding: 2px 5px; border-radius: 0 2px 0 2px;
+  font-weight: 600; letter-spacing: 0.05em;
+}
+
+/* ── ARROW ── */
+.arrow {
+  font-family: var(--mono); font-size: 11px;
+  color: var(--text-muted); text-align: center;
+  padding: 3px 0;
+}
+.arrow-cross {
+  display: flex; align-items: center;
+  gap: 6px; color: var(--text-muted);
+  font-family: var(--mono); font-size: 10px;
+  padding: 4px 0;
+}
+.arrow-cross::before, .arrow-cross::after { content: ''; flex: 1; height: 1px; background: var(--border-hi); }
+
+/* ── BRANCH BLOCK ── */
+.branch-block {
+  border: 1px solid rgba(192,132,252,0.2);
+  border-radius: 3px;
+  background: var(--purple-soft);
+  padding: 10px 12px;
+}
+.branch-q {
+  font-family: var(--mono); font-size: 11px; color: var(--purple);
+  margin-bottom: 8px; font-weight: 500;
+}
+.branch-options { display: flex; flex-direction: column; gap: 5px; }
+.branch-opt {
+  font-family: var(--mono); font-size: 10px;
+  padding: 4px 8px; border-radius: 2px;
+  border: 1px solid transparent;
+}
+.branch-opt-yes { background: var(--green-soft); border-color: rgba(91,239,141,0.2); color: var(--green); }
+.branch-opt-no { background: var(--red-soft); border-color: rgba(239,91,91,0.2); color: var(--red); }
+.branch-opt-tbd { background: var(--yellow-soft); border-color: rgba(239,208,91,0.2); color: var(--yellow); }
+
+/* ── SINGLE LANE (full width) ── */
+.full-row {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 12px 16px;
+  margin-bottom: 8px;
+  display: flex; gap: 16px; align-items: flex-start; flex-wrap: wrap;
+}
+.full-row-label {
+  font-family: var(--mono); font-size: 10px; color: var(--text-muted);
+  letter-spacing: 0.1em; text-transform: uppercase;
+  min-width: 100px; padding-top: 2px;
+}
+
+/* ── STEP CONNECTOR ── */
+.step-connector {
+  display: flex; justify-content: center; align-items: center;
+  gap: 8px; padding: 4px 0;
+  font-family: var(--mono); font-size: 10px; color: var(--text-muted);
+}
+
+/* ── ADMIN SECTION ── */
+.admin-block {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 4px; padding: 20px; margin-bottom: 12px;
+}
+.admin-block-title {
+  font-family: var(--mono); font-size: 10px; color: var(--text-muted);
+  letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 14px;
+  display: flex; align-items: center; gap: 10px;
+}
+.admin-block-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+.admin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+/* ── FOOTER ── */
+.doc-footer {
+  border-top: 1px solid var(--border); padding-top: 20px; margin-top: 60px;
+  font-family: var(--mono); font-size: 10px; color: var(--text-muted);
+  display: flex; justify-content: space-between; align-items: center;
+}
+.footer-link { color: var(--accent); text-decoration: none; opacity: 0.7; }
+.footer-link:hover { opacity: 1; }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <span class="nav-brand">AI Studio × Zoom</span>
+  <div class="nav-links">
+    <a class="nav-link" href="#phase01">Phase 01</a>
+    <a class="nav-link" href="#phase02">Phase 02</a>
+    <a class="nav-link" href="#phase03">Phase 03</a>
+    <a class="nav-link" href="#phase04">Phase 04</a>
+    <a class="nav-link" href="#phase05">Phase 05</a>
+  </div>
+  <span class="nav-meta">v4.1 · 2026-03-11</span>
+</nav>
+
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="doc-header">
+    <div class="doc-eyebrow">Flowchart</div>
+    <div class="doc-title">Zoom × AI Studio 전체 플로우차트</div>
+    <div class="doc-sub">강사 · 수강생 · 어드민 역할별 실시간 강의 연동 전체 흐름 — 동적 계정 매핑 기준</div>
+    <div class="meta-chips">
+      <span class="chip chip-accent">v4.1</span>
+      <span class="chip">2026-03-11</span>
+      <span class="chip">동적 매핑 확정</span>
+      <span class="chip chip-new">계정 등록 프로세스 추가</span>
+      <span class="chip chip-new">링크복사 화면 플로우</span>
+      <span class="chip chip-new">학습자 강의중 UI</span>
+    </div>
+  </div>
+
+  <!-- LEGEND -->
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:#2e2e2e;border:1px solid #3a3a3a"></div> 액션</div>
+    <div class="legend-item"><div class="legend-dot" style="background:rgba(91,239,141,0.15);border:1px solid rgba(91,239,141,0.3)"></div> 완료</div>
+    <div class="legend-item"><div class="legend-dot" style="background:rgba(239,91,91,0.15);border:1px solid rgba(239,91,91,0.3)"></div> 차단/오류</div>
+    <div class="legend-item"><div class="legend-dot" style="background:rgba(239,208,91,0.15);border:1px solid rgba(239,208,91,0.3)"></div> 주의/TBD</div>
+    <div class="legend-item"><div class="legend-dot" style="background:rgba(192,132,252,0.15);border:1px solid rgba(192,132,252,0.3)"></div> 분기</div>
+    <div class="legend-item"><div class="legend-dot" style="background:rgba(91,141,239,0.15);border:1px solid rgba(91,141,239,0.3)"></div> 시스템 자동</div>
+  </div>
+
+  <!-- TBD -->
+  <div class="tbd-list">
+    <div class="tbd-item">⚠ TBD 웹훅 종료시간 수신 (meeting.ended) — 가능 시 사용이력 자동 기록</div>
+    <div class="tbd-item">⚠ TBD 녹화본 관리 정책 — 강의별 녹화 여부 설정 포함</div>
+    <div class="tbd-item">⚠ TBD 계정 부족 시 마스터 계정 추가 초대 프로세스 (개발팀 확인 후 어펜딕스)</div>
+    <div class="tbd-item">⚠ TBD 웹훅 미지원 시 동일 계정 연속 사용 타이밍 처리 기준</div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- PHASE 01 -->
+  <!-- ═══════════════════════════════════════════ -->
+  <div class="phase-header" id="phase01">
+    <span class="phase-num">PHASE 01</span>
+    <span class="phase-title">사전 준비 — 계정 등록</span>
+  </div>
+
+  <!-- Step 1-1: Zoom 조직 등록 -->
+  <div class="admin-block">
+    <div class="admin-block-title">STEP 1-1 · Zoom Marketplace — 물리적 계정 등록 (Zoom 측 작업)</div>
+    <div class="admin-grid">
+      <div class="node node-action">
+        <div class="node-title">Zoom 유료 Seat 구매</div>
+        <div class="node-desc">마스터 계정(aistudio.service@multicampus.com)으로 Pro 이상 Seat 구매</div>
+        <div class="node-sub">초기 2 Seats · 필요 시 추가 구매</div>
+      </div>
+      <div class="node node-action">
+        <div class="node-title">서브 계정 생성 및 초대</div>
+        <div class="node-desc">aistudio.service+zoom01@multicampus.com 등 이메일 형식으로 계정 생성 후 조직에 멤버로 초대</div>
+        <div class="node-sub">Licensed 상태 확인 필수 — User Management에서 Active 여부 체크</div>
+      </div>
+      <div class="node node-action">
+        <div class="node-title">Server-to-Server OAuth 앱 등록</div>
+        <div class="node-desc">Zoom Marketplace → Build App → Server-to-Server OAuth 선택</div>
+        <div class="node-sub">Scopes: meeting:write:admin · meeting:read:admin · user:read:admin</div>
+      </div>
+      <div class="node node-done">
+        <div class="node-title">자격증명 서버 등록</div>
+        <div class="node-desc">ZOOM_ACCOUNT_ID / ZOOM_CLIENT_ID / ZOOM_CLIENT_SECRET → 서버 .env 저장</div>
+        <div class="node-sub">DB 비저장 · 코드 비노출</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step-connector">↓ Zoom 측 등록 완료 후</div>
+
+  <!-- Step 1-2: AI Studio 어드민 등록 -->
+  <div class="admin-block">
+    <div class="admin-block-title">STEP 1-2 · AI Studio 어드민 — 계정 관리 탭 등록 (NEW)</div>
+    <div class="admin-grid">
+      <div class="node node-action node-new">
+        <div class="node-title">계정 정보 입력</div>
+        <div class="node-desc">어드민 → 계정 관리 탭 → 계정 추가</div>
+        <div class="node-sub">
+          · 계정 PK (직접 입력, 예: zoom01)<br>
+          · 연계 이메일 (aistudio.service+zoom01@...)<br>
+          · 만료일 (옵션 — 미입력 시 뱃지 미노출)
+        </div>
+      </div>
+      <div class="node node-system node-new">
+        <div class="node-title">DB 등록 및 가용 상태 전환</div>
+        <div class="node-desc">assigned_course_id = NULL → 가용(대기) 상태로 Pool 진입</div>
+        <div class="node-sub">이 시점부터 동적 배정 대상에 포함됨</div>
+      </div>
+      <div class="node node-system">
+        <div class="node-title">S2S OAuth 자동 인증</div>
+        <div class="node-desc">Access Token 발급 · 1시간 자동 갱신</div>
+        <div class="node-sub">강의 도중 세션 중단 없음</div>
+      </div>
+      <div class="node node-warn">
+        <div class="node-title">만료 뱃지 자동 표시</div>
+        <div class="node-desc">만료일 입력된 경우에만 노출</div>
+        <div class="node-sub">D-30 Yellow → D-7 Orange → D-3 Red → D-day Red Bold</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- PHASE 02 -->
+  <!-- ═══════════════════════════════════════════ -->
+  <div class="phase-header" id="phase02">
+    <span class="phase-num">PHASE 02</span>
+    <span class="phase-title">강의 개설 및 동적 배정</span>
+  </div>
+
+  <div class="swimlane">
+    <div class="lane-label"><span class="role-en">INSTRUCTOR</span><span class="role-kr">강사</span></div>
+    <div class="lane-col">
+      <div class="node node-action">
+        <div class="node-title">강의 시작 클릭</div>
+        <div class="node-desc">강의 목록(F-I-01)에서 강의 행 우측 [강의 시작] 버튼 클릭</div>
+        <div class="node-sub">예약 없음 · 즉석 개설</div>
+      </div>
+    </div>
+    <div class="lane-col">
+      <div class="node node-system">
+        <div class="node-title">동적 계정 배정</div>
+        <div class="node-desc">① type=live 확인 (보조)<br>② DB assigned_course_id 체크<br>③ 대기 계정 중 ID 낮은 순 우선<br>④ Master 계정 최하순 배정</div>
+      </div>
+      <div class="branch-block">
+        <div class="branch-q">가용 계정 있음?</div>
+        <div class="branch-options">
+          <div class="branch-opt branch-opt-yes">YES → Zoom Meeting 생성</div>
+          <div class="branch-opt branch-opt-no">NO → 계정 부족 안내 / 관리자 알림</div>
+        </div>
+      </div>
+    </div>
+    <div class="lane-col">
+      <div class="node node-system">
+        <div class="node-title">Zoom Meeting 생성</div>
+        <div class="node-desc">POST /v2/users/{email}/meetings</div>
+        <div class="node-sub">start_url · join_url · meeting_id → DB 저장</div>
+      </div>
+    </div>
+    <div class="lane-col">
+      <div class="node node-action node-new">
+        <div class="node-title">강의 생성 모달 노출</div>
+        <div class="node-desc">생성 완료 확인 모달 표시 (F-I-04 진입 전)</div>
+        <div class="node-sub">화면: 01_live_teacher_main_start_modal</div>
+      </div>
+      <div class="arrow">↓</div>
+      <div class="node node-action node-new">
+        <div class="node-title">링크 복사 화면 노출</div>
+        <div class="node-desc">join_url 표시 + 링크 복사 버튼 제공</div>
+        <div class="node-sub">화면: 02_live_teacher_main_start_modal_url<br>AI Studio 채팅 자동 발송 병행</div>
+      </div>
+    </div>
+    <div class="lane-col">
+      <div class="node node-action">
+        <div class="node-title">강의 입장</div>
+        <div class="node-desc">start_url 새 탭 오픈 (ZAK 포함)<br>zoomus:// 딥링크 → 호스트 권한 즉시</div>
+        <div class="node-sub">앱 미설치 시 설치 안내 모달 → [다시 시도]</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- PHASE 03 -->
+  <!-- ═══════════════════════════════════════════ -->
+  <div class="phase-header" id="phase03">
+    <span class="phase-num">PHASE 03</span>
+    <span class="phase-title">강의 진행</span>
+  </div>
+
+  <div class="swimlane">
+    <div class="lane-label"><span class="role-en">INSTRUCTOR</span><span class="role-kr">강사</span></div>
+    <div class="lane-col">
+      <div class="node node-done">
+        <div class="node-title">강의 실행 중</div>
+        <div class="node-desc">소회의실 · 투표 · 대기실 · 녹화 제어</div>
+        <div class="node-sub">화면: 04_live_teacher_main_live</div>
+      </div>
+    </div>
+    <div class="lane-col" style="grid-column: span 1;">
+      <div class="node node-system">
+        <div class="node-title">강의 상태 활성화</div>
+        <div class="node-desc">lecture_status = "active"<br>강사 입장 시점 기준</div>
+      </div>
+    </div>
+    <div class="lane-col" style="grid-column: span 2;">
+      <!-- 학습자 영역 -->
+    </div>
+    <div class="lane-col"></div>
+  </div>
+
+  <!-- 학습자 전용 강의중 플로우 -->
+  <div class="swimlane">
+    <div class="lane-label"><span class="role-en">STUDENT</span><span class="role-kr">수강생</span></div>
+    <div class="lane-col">
+      <div class="node node-action">
+        <div class="node-title">입장하기 버튼 대기</div>
+        <div class="node-desc">lecture_status ≠ active → 버튼 비활성</div>
+        <div class="node-sub">"강의 시작 예정입니다" 문구 표시</div>
+      </div>
+    </div>
+    <div class="lane-col">
+      <div class="node node-action node-new">
+        <div class="node-title">강의 진행 중 UI 노출</div>
+        <div class="node-desc">lecture_status = "active" 감지 시 강의 목록 내 해당 강의 행에 "강의 진행 중" 상태 영역 자동 노출</div>
+        <div class="node-sub">polling / 웹소켓 감지<br>입장하기 버튼 활성화 전환</div>
+      </div>
+    </div>
+    <div class="lane-col">
+      <div class="node node-action">
+        <div class="node-title">입장하기 버튼 활성화</div>
+        <div class="node-desc">lecture_status = "active" 감지 → 버튼 활성 전환</div>
+        <div class="node-sub">링크는 join_url (채팅 수신 또는 버튼)</div>
+      </div>
+    </div>
+    <div class="lane-col">
+      <div class="node node-action">
+        <div class="node-title">Zoom Web Client 입장</div>
+        <div class="node-desc">join_url 새 탭 오픈<br>앱 설치 시 브라우저 팝업 → 앱/웹 선택</div>
+        <div class="node-sub">Signature 불필요 · ZAK 불필요</div>
+      </div>
+    </div>
+    <div class="lane-col">
+      <div class="node node-done">
+        <div class="node-title">강의 참여 중</div>
+        <div class="node-desc">이모지 반응 · 손들기 · 오디오 설정</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- PHASE 04 -->
+  <!-- ═══════════════════════════════════════════ -->
+  <div class="phase-header" id="phase04">
+    <span class="phase-num">PHASE 04</span>
+    <span class="phase-title">강의 종료</span>
+  </div>
+
+  <div class="swimlane">
+    <div class="lane-label"><span class="role-en">SYSTEM</span><span class="role-kr">서버 / Zoom</span></div>
+    <div class="lane-col">
+      <div class="branch-block">
+        <div class="branch-q">meeting.ended 웹훅 수신?</div>
+        <div class="branch-options">
+          <div class="branch-opt branch-opt-yes">YES → 종료시간 자동 기록</div>
+          <div class="branch-opt branch-opt-tbd">NO → 수동 종료 or 타임아웃 (TBD)</div>
+        </div>
+      </div>
+    </div>
+    <div class="lane-col">
+      <div class="node node-system">
+        <div class="node-title">강의 종료 처리</div>
+        <div class="node-desc">lecture_status = "completed"<br>사용이력 종료시간 저장<br>계정 가용 상태 복귀 (assigned_course_id = NULL)</div>
+      </div>
+    </div>
+    <div class="lane-col">
+      <div class="node node-action">
+        <div class="node-title">강의 시작 버튼 재노출</div>
+        <div class="node-desc">meeting.ended 수신 시 강사 화면 버튼 활성 복구 (F-I-01)</div>
+        <div class="node-sub">동일 강의 재시작 가능</div>
+      </div>
+    </div>
+    <div class="lane-col">
+      <div class="node node-warn">
+        <div class="node-title">녹화 완료 처리 (TBD)</div>
+        <div class="node-desc">recording.completed 웹훅<br>Secret Token 검증 → share_url DB 저장</div>
+      </div>
+    </div>
+    <div class="lane-col">
+      <div class="node node-action">
+        <div class="node-title">다시보기 탭 노출</div>
+        <div class="node-desc">share_url 수신 후 자동 표시<br>공개범위 · 다운로드 설정 가능</div>
+        <div class="node-sub">F-I-08 TBD</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- PHASE 05 -->
+  <!-- ═══════════════════════════════════════════ -->
+  <div class="phase-header" id="phase05">
+    <span class="phase-num">PHASE 05</span>
+    <span class="phase-title">어드민 계정 관리</span>
+  </div>
+
+  <div class="admin-block">
+    <div class="admin-block-title">ADMIN · 계정 관리 탭 (단독 운영)</div>
+    <div class="admin-grid">
+      <div class="node node-action">
+        <div class="node-title">계정 관리</div>
+        <div class="node-desc">등록 · 수정 · 비활성화 · 삭제<br>만료일 입력 시 D-30/D-7/D-3/D-day 뱃지</div>
+        <div class="node-sub">배정관리 탭 제거 — 동적 배정으로 전환</div>
+      </div>
+      <div class="node node-action">
+        <div class="node-title">사용이력 조회</div>
+        <div class="node-desc">과정명 · 강의명 · 일시 · 상태</div>
+        <div class="node-sub">종료시간: 웹훅 수신 시 자동 · 미수신 시 TBD</div>
+      </div>
+      <div class="node node-warn">
+        <div class="node-title">[어펜딕스] 계정 부족 대응</div>
+        <div class="node-desc">마스터 계정 추가 초대 프로세스<br>개발팀 확인 후 반영 예정</div>
+        <div class="node-sub">TBD</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="doc-footer">
+    <span>zoom_mps_flowchart_v4.1.html · v4.1 · 2026-03-11 · 동적 매핑 확정 기준</span>
+    <a class="footer-link" href="index.html">← 문서 인덱스</a>
+  </div>
+
+</div>
+</body>
+</html>
