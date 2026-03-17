@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>기능 명세서 v3 — AI Studio × Zoom</title>
+<style>
+  :root {
+    --bg: #f5f4f0;
+    --surface: #ffffff;
+    --border: #e2e0d8;
+    --border2: #ccc9be;
+    --text: #1a1917;
+    --text-dim: #7a7670;
+    --teal: #1a7a5e;
+    --green: #2d8f3f;
+    --blue: #1a5fa8;
+    --warn: #a07800;
+    --warn-bg: rgba(212,168,0,0.07);
+    --warn-border: rgba(212,168,0,0.35);
+    --red: #c0392b;
+    --red-bg: rgba(192,57,43,0.06);
+    --mono: 'IBM Plex Mono', monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: var(--mono); min-height: 100vh; }
+  .wrap { max-width: 900px; margin: 0 auto; padding: 48px 24px 80px; }
+
+  /* home button */
+  .home-btn { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-dim); text-decoration: none; padding: 5px 10px; border: 1px solid var(--border); border-radius: 6px; margin-bottom: 36px; transition: all 0.15s; }
+  .home-btn:hover { color: var(--text); border-color: var(--border2); }
+
+  .doc-header { margin-bottom: 48px; }
+  .doc-header .eyebrow { font-size: 11px; color: var(--text-dim); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 10px; }
+  .doc-header h1 { font-size: 24px; font-weight: 400; }
+  .doc-header h1 span { color: var(--teal); }
+  .doc-header .meta { font-size: 11px; color: var(--text-dim); margin-top: 8px; }
+
+  h2 { font-size: 13px; font-weight: 500; color: var(--teal); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+  h3 { font-size: 12px; font-weight: 500; color: var(--text); margin: 20px 0 10px; }
+
+  .section { margin-bottom: 48px; }
+
+  p { font-size: 12px; line-height: 1.8; color: var(--text-dim); }
+
+  table { width: 100%; border-collapse: collapse; font-size: 11px; margin: 12px 0; }
+  th { text-align: left; padding: 8px 10px; background: var(--bg); color: var(--text-dim); border-bottom: 1px solid var(--border); font-weight: 500; }
+  td { padding: 9px 10px; border-bottom: 1px solid var(--border); color: var(--text-dim); vertical-align: top; line-height: 1.6; }
+  tr:last-child td { border-bottom: none; }
+  td.key { color: var(--text); white-space: nowrap; }
+  td code { background: var(--bg); padding: 1px 5px; border-radius: 3px; font-size: 10px; border: 1px solid var(--border); color: var(--teal); }
+
+  .badge { display: inline-block; font-size: 10px; padding: 1px 7px; border-radius: 10px; font-family: var(--mono); }
+  .badge.confirmed { background: rgba(26,122,94,0.08); color: var(--teal); border: 1px solid rgba(26,122,94,0.3); }
+  .badge.tbd { background: var(--warn-bg); color: var(--warn); border: 1px solid var(--warn-border); }
+  .badge.rejected { background: var(--red-bg); color: var(--red); border: 1px solid rgba(192,57,43,0.25); text-decoration: line-through; }
+
+  .notice { font-size: 11px; padding: 12px 14px; border-radius: 6px; border-left: 3px solid; line-height: 1.7; margin: 12px 0; }
+  .notice.warn { background: var(--warn-bg); border-color: var(--warn); color: var(--warn); }
+  .notice.info { background: rgba(26,122,94,0.06); border-color: var(--teal); color: var(--teal); }
+
+  ul { font-size: 11px; color: var(--text-dim); padding-left: 16px; line-height: 2; }
+
+  .footer { margin-top: 64px; padding-top: 20px; border-top: 1px solid var(--border); font-size: 11px; color: var(--text-dim); display: flex; justify-content: space-between; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <a class="home-btn" href="../index.html">← 인덱스로</a>
+
+  <header class="doc-header">
+    <div class="eyebrow">Samsung SDS Multicampus · AI Studio × Zoom</div>
+    <h1>기능 명세서 <span>v3</span></h1>
+    <div class="meta">2026-03-18 | 담당: Jink</div>
+  </header>
+
+  <!-- 1. 프로젝트 개요 -->
+  <section class="section">
+    <h2>1. 프로젝트 개요</h2>
+    <table>
+      <tr><td class="key">목적</td><td>AI Studio LMS에 Zoom 기반 실시간 강의 기능 통합. 강사 화면 공유 및 실시간 상호작용 환경 제공.</td></tr>
+      <tr><td class="key">인증 방식</td><td><code>Server-to-Server OAuth</code> — 마스터 계정 단일 앱 <span class="badge confirmed">확정</span></td></tr>
+      <tr><td class="key">마스터 계정</td><td><code>aistudio.service@multicampus.com</code></td></tr>
+      <tr><td class="key">자격증명</td><td>서버 <code>.env</code> — <code>ZOOM_ACCOUNT_ID</code> / <code>ZOOM_CLIENT_ID</code> / <code>ZOOM_CLIENT_SECRET</code></td></tr>
+      <tr><td class="key">API Scope</td><td><code>meeting:write:admin</code>, <code>user:read:admin</code></td></tr>
+      <tr><td class="key">사용자 역할</td><td>강사 / 운영자 / 수강생 / 어드민</td></tr>
+    </table>
+  </section>
+
+  <!-- 2. 확정 기술 결정사항 -->
+  <section class="section">
+    <h2>2. 확정 기술 결정사항</h2>
+
+    <h3>인증 & Token</h3>
+    <table>
+      <tr><th>항목</th><th>결정</th><th>상태</th></tr>
+      <tr><td class="key">OAuth Token 갱신</td><td>1시간 주기 자동 갱신 — 강의 도중 세션 중단 없음</td><td><span class="badge confirmed">확정</span></td></tr>
+      <tr><td class="key">ZAK Token 별도 발급</td><td><span class="badge rejected">폐기</span> — <code>start_url</code> 응답에 이미 포함</td><td><span class="badge confirmed">확정</span></td></tr>
+    </table>
+
+    <h3>API 엔드포인트</h3>
+    <table>
+      <tr><th>용도</th><th>엔드포인트</th><th>비고</th></tr>
+      <tr><td class="key">미팅 생성</td><td><code>POST /v2/users/{zoom계정email}/meetings</code></td><td><code>/me/</code> 아님 주의</td></tr>
+      <tr><td class="key">계정 가용성</td><td><code>type=live</code> (보조 참고용)</td><td>DB가 Source of Truth</td></tr>
+    </table>
+
+    <h3>강사 입장 방식</h3>
+    <table>
+      <tr><th>조건</th><th>동작</th></tr>
+      <tr><td>Zoom 앱 설치됨</td><td><code>zoomus://</code> 딥링크 → 호스트 권한 즉시 획득</td></tr>
+      <tr><td>Zoom 앱 미설치</td><td>설치 안내 모달 → [다시 시도] → <code>zoomus://</code> 재호출</td></tr>
+      <tr><td>강의 종료 후</td><td>강의 시작 버튼 재노출 (<code>meeting.ended</code> 웹훅 수신 시)</td></tr>
+    </table>
+
+    <h3>수강생 입장 방식</h3>
+    <table>
+      <tr><th>항목</th><th>결정</th><th>상태</th></tr>
+      <tr><td class="key">SDK 임베딩</td><td><span class="badge rejected">미채택</span></td><td><span class="badge confirmed">확정</span></td></tr>
+      <tr><td class="key">입장 방식</td><td><code>join_url</code> 새 탭 → Zoom Web Client (앱 설치 불필요)</td><td><span class="badge confirmed">확정</span></td></tr>
+      <tr><td class="key">Signature</td><td>생성 불필요</td><td><span class="badge confirmed">확정</span></td></tr>
+    </table>
+
+    <h3>계정 매핑 방식</h3>
+    <table>
+      <tr><th>항목</th><th>내용</th><th>상태</th></tr>
+      <tr><td class="key">방식</td><td>시나리오 2 — 동적 Pool 배정</td><td><span class="badge confirmed">확정</span></td></tr>
+      <tr><td class="key">배정 우선순위</td><td>대기 계정 중 ID 낮은 순 → 마스터 계정 최하순</td><td><span class="badge confirmed">확정</span></td></tr>
+      <tr><td class="key">Fallback</td><td>현업 운영 상황에 따라 시나리오 1 (1:1 고정) 전환 가능성 열려있음</td><td><span class="badge tbd">조건부</span></td></tr>
+      <tr><td class="key">DB 기준</td><td><code>assigned_course_id</code> 체크 — DB가 Source of Truth</td><td><span class="badge confirmed">확정</span></td></tr>
+    </table>
+  </section>
+
+  <!-- 3. 강의 모드 -->
+  <section class="section">
+    <h2>3. 강의 모드 (2026-03-17 확정)</h2>
+
+    <h3>실시간 모드</h3>
+    <table>
+      <tr><th>단계</th><th>내용</th></tr>
+      <tr><td class="key">트리거</td><td>강사 [지금 시작] 클릭</td></tr>
+      <tr><td class="key">처리</td><td>가용 계정 즉시 배정 → <code>start_url</code> 즉시 발급</td></tr>
+      <tr><td class="key">버퍼</td><td>없음 — 즉시 시작, 즉시 반납</td></tr>
+      <tr><td class="key">예외</td><td>가용 계정 없을 시: "현재 사용 가능한 계정이 없습니다" 인라인 에러</td></tr>
+    </table>
+
+    <h3>예약 모드</h3>
+    <table>
+      <tr><th>단계</th><th>내용</th></tr>
+      <tr><td class="key">트리거</td><td>강사 [예약하기] 클릭</td></tr>
+      <tr><td class="key">범위 (1차)</td><td>당일 예약만 — 날짜 선택 불가 (고정)</td></tr>
+      <tr><td class="key">입력</td><td>강의명 / 시작 시간 select / 종료 시간 select</td></tr>
+      <tr><td class="key">시간 단위</td><td>30분 단위 (개발팀 협의)</td></tr>
+      <tr><td class="key">최소 강의 시간</td><td>1시간 — 종료 시간은 시작 + 1시간 이상만 활성화</td></tr>
+      <tr><td class="key">버퍼 정책</td><td>앞뒤 각 30분 서버 자동 확보 (UI 노출 안 함)</td></tr>
+      <tr><td class="key">슬롯 가용성</td><td>서버 API가 가능/불가 시간 계산 → 프론트는 disabled 처리만</td></tr>
+    </table>
+
+    <div class="notice info">원활한 강의 진행을 위해 시작 30분 전·종료 30분 후 시간이 자동으로 예약됩니다. (강사 안내 문구 확정)</div>
+
+    <h3>예외처리 케이스</h3>
+    <table>
+      <tr><th>케이스</th><th>처리</th></tr>
+      <tr><td class="key">버퍼 충돌</td><td>"해당 시간 예약 가능한 계정이 없습니다" 인라인 에러</td></tr>
+      <tr><td class="key">가용 계정 없음</td><td>"현재 예약 가능한 계정이 없습니다 + 관리자 문의 안내"</td></tr>
+      <tr><td class="key">동시 신청 충돌</td><td>DB 낙관적 락 → 늦은 쪽 "방금 다른 강의가 배정됐습니다. 시간을 다시 선택해주세요"</td></tr>
+      <tr><td class="key">자동연장 충돌</td><td>운영자에게 push 알림 발송</td></tr>
+      <tr><td class="key">예약 취소</td><td>버퍼 포함 계정 즉시 반납 → 슬롯 재렌더링</td></tr>
+      <tr><td class="key">강제종료 정책</td><td><span class="badge tbd">TBD</span> — 현업 운영자 미팅 후 확정</td></tr>
+    </table>
+  </section>
+
+  <!-- 4. 녹화 & 다시보기 -->
+  <section class="section">
+    <h2>4. 녹화 & 다시보기</h2>
+    <table>
+      <tr><th>항목</th><th>결정</th><th>상태</th></tr>
+      <tr><td class="key">저장 방식</td><td>Zoom 클라우드 저장 유지 (강제 녹화 설정)</td><td><span class="badge confirmed">확정</span></td></tr>
+      <tr><td class="key">S3 이관</td><td>개발팀 확인 중 (만료 케이스 한정 검토)</td><td><span class="badge tbd">확인 중</span></td></tr>
+      <tr><td class="key">다시보기 방식</td><td>Zoom 클라우드 링크(<code>share_url</code>)로 이동 — 임베딩 안 함</td><td><span class="badge confirmed">확정</span></td></tr>
+      <tr><td class="key">Webhook 흐름</td><td><code>recording.completed</code> → Secret Token 검증 → <code>share_url</code> DB 저장 → 강사 지난강의 목록에 노출</td><td><span class="badge confirmed">확정</span></td></tr>
+      <tr><td class="key">녹화 미완료 케이스</td><td>용량 초과 등 예외 케이스 — 1차 범위 제외</td><td><span class="badge confirmed">확정</span></td></tr>
+      <tr><td class="key">클라우드 용량</td><td>Pro/Business 기준 계정당 10GB — 관리 정책 별도 수립 필요</td><td><span class="badge tbd">정책 필요</span></td></tr>
+    </table>
+  </section>
+
+  <!-- 5. DB 저장 항목 -->
+  <section class="section">
+    <h2>5. DB 저장 항목</h2>
+    <table>
+      <tr><th>컬럼</th><th>비고</th></tr>
+      <tr><td><code>meeting_id</code></td><td>기존</td></tr>
+      <tr><td><code>join_url</code></td><td>기존</td></tr>
+      <tr><td><code>password</code></td><td>기존</td></tr>
+      <tr><td><code>start_url</code></td><td>호스트 전용 — 노출 금지</td></tr>
+      <tr><td><code>course_id</code></td><td>레코딩 귀속</td></tr>
+      <tr><td><code>lecture_id</code></td><td>레코딩 귀속</td></tr>
+      <tr><td><code>share_url</code></td><td>다시보기 URL — <code>recording.completed</code> 수신 시 저장</td></tr>
+      <tr><td><code>reserved_start</code></td><td>예약 시작 시간 (실제 강의 기준)</td></tr>
+      <tr><td><code>reserved_end</code></td><td>예약 종료 시간 (실제 강의 기준)</td></tr>
+      <tr><td><code>buffer_start</code></td><td>버퍼 포함 점유 시작 (reserved_start - 30분)</td></tr>
+      <tr><td><code>buffer_end</code></td><td>버퍼 포함 점유 종료 (reserved_end + 30분)</td></tr>
+    </table>
+  </section>
+
+  <!-- 6. 성능 & 제약사항 -->
+  <section class="section">
+    <h2>6. 성능 & 제약사항</h2>
+    <table>
+      <tr><th>항목</th><th>내용</th></tr>
+      <tr><td class="key">동시 접속자</td><td>라이선스 유형별 100~300명. 대규모 세미나는 Webinar 라이선스 별도 필요.</td></tr>
+      <tr><td class="key">강의 시간 제한</td><td>Pro 이상: 단일 세션 최대 30시간 (사실상 무제한)</td></tr>
+      <tr><td class="key">네트워크 대역폭</td><td>720p 기준 1.5~2.5 Mbps 업/다운 권장. 수강생 비디오 기본 Off 권장.</td></tr>
+      <tr><td class="key">브라우저 호환</td><td>Chrome / Edge / Firefox 최신 버전</td></tr>
+      <tr><td class="key">SharedArrayBuffer</td><td>가상배경 · 고해상도 처리 시 Cross-Origin Isolation 헤더 설정 필요 — 영향범위 개발팀 확인 중</td></tr>
+      <tr><td class="key">동시 회의 수</td><td>Pro: 1개 / Business: 2개 / Concurrent 애드온: 최대 20개 (Zoom 영업팀 별도 신청)</td></tr>
+    </table>
+  </section>
+
+  <!-- 7. 라이선스 비용 -->
+  <section class="section">
+    <h2>7. 라이선스 비용 참고</h2>
+    <table>
+      <tr><th>요금제</th><th>월간</th><th>연간</th><th>동시 회의</th><th>녹화 용량</th></tr>
+      <tr><td class="key">Basic</td><td>무료</td><td>무료</td><td>1개 (40분 제한)</td><td>로컬만</td></tr>
+      <tr><td class="key">Pro</td><td>$16.99</td><td>$13.33/월</td><td>1개</td><td>10GB</td></tr>
+      <tr><td class="key">Business</td><td>$21.99</td><td>$18.33/월</td><td>2개</td><td>10GB</td></tr>
+      <tr><td class="key">Enterprise</td><td colspan="4">별도 문의 / 무제한 녹화</td></tr>
+    </table>
+    <div class="notice warn">⚠️ Zoom 10:1 Basic 계정 생성 정책 (유료 10개당 Basic 1개 무료) — 개발팀 확인 중</div>
+  </section>
+
+  <!-- 8. 용어 정의 -->
+  <section class="section">
+    <h2>8. 용어 정의 (확정)</h2>
+    <table>
+      <tr><th>용어</th><th>의미</th><th>ID</th></tr>
+      <tr><td class="key">과정 / 강좌</td><td>전체 커리큘럼 묶음</td><td><code>course_id</code></td></tr>
+      <tr><td class="key">강의</td><td>개별 수업 1회</td><td><code>lecture_id</code></td></tr>
+      <tr><td class="key">실시간 강의</td><td>구: "강사 미러링" → 통일된 용어</td><td>—</td></tr>
+      <tr><td class="key">어드민 Admin</td><td>구: "MPS Server" → 통일된 용어</td><td>—</td></tr>
+    </table>
+  </section>
+
+  <!-- 9. 미결 사항 -->
+  <section class="section">
+    <h2>9. 미결 사항</h2>
+    <table>
+      <tr><th>항목</th><th>우선순위</th></tr>
+      <tr><td class="key">강제종료 정책 — 현업 운영자 미팅 후 확정</td><td>🔴 최우선</td></tr>
+      <tr><td class="key">계정 Fix 전환 여부 — 현업 미팅 후</td><td>🔴 최우선</td></tr>
+      <tr><td class="key">S3 이관 (만료 케이스 한정) — 개발팀 확인 중</td><td>🟡</td></tr>
+      <tr><td class="key">다시보기 share_url 만료/접근 제한 POC</td><td>🟡</td></tr>
+      <tr><td class="key">수강생 Web Client 기능 범위</td><td>🟡</td></tr>
+      <tr><td class="key">SharedArrayBuffer 서버 헤더 영향 범위 개발팀 검토</td><td>🟡</td></tr>
+      <tr><td class="key">녹화 용량 관리 정책 (10GB 한도 대응)</td><td>🟡</td></tr>
+      <tr><td class="key">Zoom 10:1 Basic 계정 정책 확인</td><td>🟡</td></tr>
+      <tr><td class="key">AI 문항 자동생성/채점 (4G큐브 협의)</td><td>🟢</td></tr>
+    </table>
+  </section>
+
+  <footer class="footer">
+    <span>Samsung SDS Multicampus · AI Studio × Zoom · 기능명세서 v3</span>
+    <span>2026-03-18</span>
+  </footer>
+
+</div>
+</body>
+</html>
