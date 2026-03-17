@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zoom × AI Studio 전체 플로우차트 v4.3</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&family=IBM+Plex+Sans+KR:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --surface: #131313;
+    --surface2: #181818;
+    --surface3: #1e1e1e;
+    --border: #252525;
+    --border2: #2e2e2e;
+    --text: #e4e4e4;
+    --text2: #888;
+    --text3: #4a4a4a;
+    --accent: #4a9eff;
+    --green: #3ecf8e;
+    --yellow: #f5a623;
+    --red: #ff5b5b;
+    --orange: #ff8c42;
+    --purple: #a78bfa;
+    --teal: #2dd4bf;
+    --mono: 'IBM Plex Mono', monospace;
+    --sans: 'IBM Plex Sans KR', sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 13px;
+    padding: 40px 32px 60px;
+  }
+  .doc-header {
+    max-width: 1400px;
+    margin: 0 auto 32px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border2);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .doc-meta {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--text3);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .doc-title { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
+  .doc-title span { color: var(--accent); }
+  .doc-desc { color: var(--text2); font-size: 12px; }
+  .badges { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+  .badge {
+    font-family: var(--mono);
+    font-size: 9px;
+    padding: 2px 8px;
+    border-radius: 2px;
+    letter-spacing: 0.06em;
+  }
+  .badge-blue { background: rgba(74,158,255,0.1); color: var(--accent); border: 1px solid rgba(74,158,255,0.2); }
+  .badge-green { background: rgba(62,207,142,0.1); color: var(--green); border: 1px solid rgba(62,207,142,0.2); }
+  .badge-yellow { background: rgba(245,166,35,0.1); color: var(--yellow); border: 1px solid rgba(245,166,35,0.2); }
+  .badge-gray { background: rgba(255,255,255,0.05); color: var(--text3); border: 1px solid var(--border); }
+  .badge-red { background: rgba(255,91,91,0.1); color: var(--red); border: 1px solid rgba(255,91,91,0.2); }
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; align-items: center; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 10px; color: var(--text2); font-family: var(--mono); }
+  .leg-box { width: 12px; height: 12px; border-radius: 2px; flex-shrink: 0; }
+  .leg-dia { width: 10px; height: 10px; transform: rotate(45deg); flex-shrink: 0; }
+  .flow-wrap { max-width: 1400px; margin: 0 auto; overflow-x: auto; }
+  .doc-footer {
+    max-width: 1400px;
+    margin: 32px auto 0;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text3);
+  }
+  .doc-footer a { color: var(--accent); text-decoration: none; }
+  .tbd-note {
+    max-width: 1400px;
+    margin: 0 auto 24px;
+    background: rgba(245,166,35,0.06);
+    border: 1px solid rgba(245,166,35,0.15);
+    border-radius: 4px;
+    padding: 10px 16px;
+    font-size: 11px;
+    color: var(--yellow);
+    font-family: var(--mono);
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .tbd-note span { color: var(--text3); margin-right: 4px; }
+  .confirmed-note {
+    max-width: 1400px;
+    margin: 0 auto 12px;
+    background: rgba(62,207,142,0.06);
+    border: 1px solid rgba(62,207,142,0.15);
+    border-radius: 4px;
+    padding: 10px 16px;
+    font-size: 11px;
+    color: var(--green);
+    font-family: var(--mono);
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .confirmed-note span { color: var(--text3); margin-right: 4px; }
+
+  /* ── SUMMARY PANEL ── */
+  .summary-wrap {
+    max-width: 1400px;
+    margin: 32px auto 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+  }
+  .summary-block {
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .summary-block-header {
+    background: var(--surface2);
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .summary-block-dot {
+    width: 8px; height: 8px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+  .summary-block-title {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text2);
+  }
+  .summary-block-body { padding: 14px 16px; }
+  .summary-item {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .summary-item:last-child { border-bottom: none; padding-bottom: 0; }
+  .summary-item:first-child { padding-top: 0; }
+  .summary-item-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text3);
+    letter-spacing: 0.08em;
+  }
+  .summary-item-val {
+    font-family: var(--sans);
+    font-size: 12px;
+    color: var(--text2);
+    line-height: 1.5;
+  }
+  .summary-item-val code {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--accent);
+    background: rgba(74,158,255,0.08);
+    padding: 1px 5px;
+    border-radius: 2px;
+  }
+  .summary-item-val .tag-green {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--green);
+    background: rgba(62,207,142,0.08);
+    padding: 1px 5px;
+    border-radius: 2px;
+  }
+  .summary-item-val .tag-yellow {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--yellow);
+    background: rgba(245,166,35,0.08);
+    padding: 1px 5px;
+    border-radius: 2px;
+  }
+  .summary-section-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--text3);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin: 10px 0 6px;
+  }
+  .summary-section-label:first-child { margin-top: 0; }
+</style>
+</head>
+<body>
+
+<div class="doc-header">
+  <div class="doc-header-left">
+    <div class="doc-meta">Samsung SDS Multicampus · AI Studio LMS · Flowchart</div>
+    <h1 class="doc-title">Zoom × AI Studio <span>전체 플로우차트</span></h1>
+    <p class="doc-desc">강사 · 수강생 · 어드민 역할별 실시간 강의 연동 전체 흐름 — 동적 계정 매핑 기준</p>
+    <div class="badges">
+      <span class="badge badge-blue">v4.3</span>
+      <span class="badge badge-gray">2026-03-17</span>
+      <span class="badge badge-green">동적 매핑 확정</span>
+      <span class="badge badge-green">meeting.ended 웹훅 지원 확정</span>
+      <span class="badge badge-green">join_url 단일 방식 확정</span>
+      <span class="badge badge-green">강사 계정 편입 미채택 확정</span>
+      <span class="badge badge-yellow">예약 버퍼 30분 합의 (수치 TBD)</span>
+      <span class="badge badge-yellow">강제종료 정책 TBD</span>
+    </div>
+  </div>
+  <div class="legend">
+    <div class="legend-item"><div class="leg-box" style="background:#1a2a3a;border:1px solid #4a9eff"></div>액션</div>
+    <div class="legend-item"><div class="leg-box" style="background:#1a2e25;border:1px solid #3ecf8e"></div>완료/확정</div>
+    <div class="legend-item"><div class="leg-box" style="background:#2e1a1a;border:1px solid #ff5b5b"></div>차단/오류</div>
+    <div class="legend-item"><div class="leg-box" style="background:#2e2510;border:1px solid #f5a623"></div>주의/TBD</div>
+    <div class="legend-item"><div class="leg-dia" style="background:#1e1e10;border:1px solid #f5a623"></div>분기</div>
+    <div class="legend-item"><div class="leg-box" style="background:#0e1e2e;border:1px dashed #2d5a8e"></div>시스템 자동</div>
+  </div>
+</div>
+
+<!-- 확정 사항 -->
+<div class="confirmed-note">
+  <div><span>✓ 확정</span> 동적 배정 — index 테이블 기준 zoom id 등록 순차로 우선순위 발동</div>
+  <div><span>✓ 확정</span> 수강생 URL — join_url 단일 공유 방식 (Registrant 등록 방식 미채택)</div>
+  <div><span>✓ 확정</span> meeting.ended 웹훅 지원 — 미지원 시 강의중 UI 1시간 노출 후 비노출 처리</div>
+  <div><span>✓ 확정</span> 강사 계정 편입 미채택 — Pool 배정 방식 단독 운영</div>
+  <div><span>✓ 합의</span> 예약 버퍼 — 서버 내부에서 앞뒤 30분 자동 확보 (예: 14~15시 예약 → 13:30~15:30 계정 점유)</div>
+</div>
+
+<!-- TBD 사항 -->
+<div class="tbd-note">
+  <div><span>⚠ TBD</span> 강제종료 정책 — 종료시간 초과 + 다음 예약 존재 시 강제종료 여부 (현업 운영자 미팅 후 확정)</div>
+  <div><span>⚠ TBD</span> 버퍼 수치 최종 확정 — 현재 30분 합의, 운영 정책 확정 전까지 변경 가능</div>
+  <div><span>⚠ TBD</span> 계정 구조 전환 가능성 — 운영 리스크 크다 판단 시 과정↔계정 Fix(시나리오 1)로 전환</div>
+  <div><span>⚠ TBD</span> 녹화본 관리 정책 — 강의별 녹화 여부 설정 포함</div>
+</div>
+
+<div class="flow-wrap">
+<svg width="1360" height="1720" viewBox="0 0 1360 1720" xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <marker id="arr" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#4a4a4a"/></marker>
+  <marker id="arr-g" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#3ecf8e"/></marker>
+  <marker id="arr-r" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#ff5b5b"/></marker>
+  <marker id="arr-y" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#f5a623"/></marker>
+  <marker id="arr-b" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#4a9eff"/></marker>
+  <marker id="arr-p" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#a78bfa"/></marker>
+</defs>
+
+<!-- ===================== LANE BACKGROUNDS ===================== -->
+<rect x="0" y="60" width="340" height="1620" fill="#0d1520" rx="0"/>
+<rect x="0" y="60" width="340" height="36" fill="#0f1e30"/>
+<text x="170" y="83" fill="#4a9eff" font-family="IBM Plex Mono" font-size="11" text-anchor="middle" letter-spacing="0.08em">INSTRUCTOR · 강사</text>
+
+<rect x="340" y="60" width="340" height="1620" fill="#0d1a10" rx="0"/>
+<rect x="340" y="60" width="340" height="36" fill="#0f2218"/>
+<text x="510" y="83" fill="#3ecf8e" font-family="IBM Plex Mono" font-size="11" text-anchor="middle" letter-spacing="0.08em">STUDENT · 수강생</text>
+
+<rect x="680" y="60" width="340" height="1620" fill="#141008" rx="0"/>
+<rect x="680" y="60" width="340" height="36" fill="#1c1500"/>
+<text x="850" y="83" fill="#f5a623" font-family="IBM Plex Mono" font-size="11" text-anchor="middle" letter-spacing="0.08em">SYSTEM · 서버 / Zoom API</text>
+
+<rect x="1020" y="60" width="340" height="1620" fill="#12101a" rx="0"/>
+<rect x="1020" y="60" width="340" height="36" fill="#1a1525"/>
+<text x="1190" y="83" fill="#a78bfa" font-family="IBM Plex Mono" font-size="11" text-anchor="middle" letter-spacing="0.08em">ADMIN · 시스템 관리자</text>
+
+<line x1="340" y1="60" x2="340" y2="1680" stroke="#1e1e1e" stroke-width="1"/>
+<line x1="680" y1="60" x2="680" y2="1680" stroke="#1e1e1e" stroke-width="1"/>
+<line x1="1020" y1="60" x2="1020" y2="1680" stroke="#1e1e1e" stroke-width="1"/>
+
+<!-- ===================== PHASE LABELS ===================== -->
+<line x1="0" y1="130" x2="1360" y2="130" stroke="#1e1e1e" stroke-width="1" stroke-dasharray="4,4"/>
+<text x="8" y="125" fill="#2a2a2a" font-family="IBM Plex Mono" font-size="9" letter-spacing="0.1em">PHASE 01 · 사전 준비</text>
+
+<line x1="0" y1="290" x2="1360" y2="290" stroke="#1e1e1e" stroke-width="1" stroke-dasharray="4,4"/>
+<text x="8" y="285" fill="#2a2a2a" font-family="IBM Plex Mono" font-size="9" letter-spacing="0.1em">PHASE 02 · 강의 개설 및 동적 배정</text>
+
+<line x1="0" y1="560" x2="1360" y2="560" stroke="#1e1e1e" stroke-width="1" stroke-dasharray="4,4"/>
+<text x="8" y="555" fill="#2a2a2a" font-family="IBM Plex Mono" font-size="9" letter-spacing="0.1em">PHASE 03 · 강의 진행</text>
+
+<line x1="0" y1="920" x2="1360" y2="920" stroke="#1e1e1e" stroke-width="1" stroke-dasharray="4,4"/>
+<text x="8" y="915" fill="#2a2a2a" font-family="IBM Plex Mono" font-size="9" letter-spacing="0.1em">PHASE 04 · 강의 종료</text>
+
+<line x1="0" y1="1200" x2="1360" y2="1200" stroke="#1e1e1e" stroke-width="1" stroke-dasharray="4,4"/>
+<text x="8" y="1195" fill="#2a2a2a" font-family="IBM Plex Mono" font-size="9" letter-spacing="0.1em">PHASE 05 · 어드민 계정 관리</text>
+
+<!-- ===================== PHASE 01: 사전 준비 ===================== -->
+
+<!-- 어드민: 계정 등록 -->
+<rect x="1050" y="142" width="280" height="64" rx="4" fill="#1a1530" stroke="#a78bfa" stroke-width="1.5"/>
+<text x="1190" y="163" fill="#e4e4e4" font-family="IBM Plex Sans KR" font-size="11" font-weight="500" text-anchor="middle">Zoom 계정 등록</text>
+<text x="1190" y="178" fill="#888" font-family="IBM Plex Sans KR" font-size="9" text-anchor="middle">계정 ID · 이메일 · 시작일 · 만료일</text>
+<text x="1190" y="191" fill="#4a4a4a" font-family="IBM Plex Mono" font-size="8" text-anchor="middle">탭: 계정 관리 (단독 운영)</text>
+<text x="1190" y="201" fill="#3ecf8e" font-family="IBM Plex Mono" font-size="8" text-anchor="middle">Zoom 조직 멤버 초대 완료 후 등록</text>
+
+<!-- 시스템: S2S OAuth -->
+<rect x="710" y="142" width="280" height="64" rx="4" fill="#1a1500" stroke="#f5a623" stroke-width="1.5" stroke-dasharray="5,3"/>
+<text x="850" y="163" fill="#e4e4e4" font-family="IBM Plex Sans KR" font-size="11" font-weight="500" text-anchor="middle">S2S OAuth 자동 인증</text>
+<text x="850" y="178" fill="#888" font-family="IBM Plex Sans KR" font-size="9" text-anchor="middle">Access Token 발급 · 1시간 자동 갱신</text>
+<text x="850" y="191" fill="#4a4a4a" font-family="IBM Plex Mono" font-size="8" text-anchor="middle">ZOOM_ACCOUNT_ID / CLIENT_ID / SECRET</text>
+<text x="850" y="201" fill="#4a4a4a" font-family="IBM Plex Mono" font-size="8" text-anchor="middle">강의 도중 세션 중단 없음</text>
+
+<!-- 확정: 강사 계정 편입 미채택 -->
+<rect x="30" y="142" width="280" height="64" rx="4" fill="#1a2e25" stroke="#3ecf8e" stroke-width="1.5"/>
+<text x="170" y="163" fill="#3ecf8e" font-family="IBM Plex Sans KR" font-size="11" font-weight="500" text-anchor="middle">강사 계정 편입 미채택 확정</text>
+<text x="170" y="178" fill="#888" font-family="IBM Plex Sans KR" font-size="9" text-anchor="middle">강사 개인 계정 → 마스터 조직 편입 안 함</text>
+<text x="170" y="191" fill="#3ecf8e" font-family="IBM Plex Mono" font-size="8" text-anchor="middle">✓ Pool 배정 방식 단독 운영 확정</text>
+<text x="170" y="201" fill="#4a4a4a" font-family="IBM Plex Mono" font-size="8" text-anchor="middle">Pool 계정만 사용 · 강사 개인 계정 없음</text>
+
+<!-- Arrow: 어드민→시스템 -->
+<line x1="1050" y1="174" x2="990" y2="174" stroke="#a78bfa" stroke-width="1.5" marker-end="url(#arr)"/>
+
+<!-- ===================== PHASE 02: 강의 개설 및 동적 배정 ===================== -->
+
+<!-- 강사: 실시간 강의 시작 클릭 -->
+<rect x="30" y="306" width="280" height="76" rx="4" fill="#1a2a3a" stroke="#4a9eff" stroke-width="1.5"/>
+<text x="170" y="327" fill="#e4e4e4" font-family="IBM Plex Sans KR" font-size="11" font-weight="500" text-anchor="middle">실시간 강의 시작 클릭</text>
+<text x="170" y="342" fill="#888" font-family="IBM Plex Sans KR" font-size="9" text-anchor="middle">강의 목록(F-I-01) 강의 행 우측 버튼</text>
+<text x="170" y="355" fill="#888" font-family="IBM Plex Sans KR" font-size="9" text-anchor="middle">시작시간 / 종료시간 입력 (당일 예약)</text>
+<text x="170" y="365" fill="#f5a623" font-family="IBM Plex Mono" font-size="8" text-anchor="middle">종료시간 필수 — 미입력 시 진행 불가</text>
+
+<!-- 시스템: 동적 계정 배정 -->
+<rect x="710" y="306" width="280" height="116" rx="4" fill="#1a1500" stroke="#f5a623" stroke-width="1.5" stroke-dasharray="5,3"/>
+<text x="850" y="327" fill="#e4e4e4" font-family="IBM Plex Sans KR" font-size="11" font-weight="500" text-anchor="middle">동적 계정 배정</text>
+<text x="850" y="342" fill="#888" font-family="IBM Plex Sans KR" font-size="9" text-anchor="middle">① timetable overlap 체크</text>
+<text x="850" y="355" fill="#888" font-family="IBM Plex Sans KR" font-size="9" text-anchor="middle">② DB assigned_course_id 체크</text>
+<text x="850" y="368" fill="#3ecf8e" font-family="IBM Plex Sans KR" font-size="9" text-anchor="middle">③ index 테이블 기준 zoom id 순 우선</text>
+<text x="850" y="381" fill="#888" font-family="IBM Plex Sans KR" font-size="9" text-anchor="middle">④ Master 계정 최하순 배정</text>
+<text x="850" y="394" fill="#f5a623" font-family="IBM Plex Sans KR" font-size="9" text-anchor="middle">⑤ 버퍼 확보: 예약±30분 서버 내부 점유</text>
+<text x="850" y="407" fill="#3ecf8e" font-family="IBM Plex Mono" font-size="8" text-anchor="middle">✓ 배정 우선순위 확정 · overlap = 요청시작&lt;기존종료 AND 요청종료&gt;기존시작</text>
+
+<!-- Arrow: 강사→시스템 -->
+<line x1="310" y1="332" x2="710" y2="332" stroke="#4a9eff" stroke-width="1.5" marker-end="url(#arr-b)"/>
+
+<!-- 분기: 가용 계정 있음? -->
+<polygon points="850,436 930,466 850,496 770,466" fill="#1e1e10" stroke="#f5a623" stroke-width="1.5"/>
+<text x="850" y="460" fill="#f5a623" font-family="IBM Plex Sans KR" font-size="10" font-weight="500" text-anchor="middle">가용 계정</text>
+<text x="850" y="474" fill="#f5a623" font-family="IBM Plex Sans KR" font-size="10" font-weight="500" text-anchor="middle">있음?</text>
+<line x1="850" y1="422" x2="850" y2="436" stroke="#f5a623" stroke-width="1.5" marker-end="url(#arr-y)"/>
+
+<!-- NO -->
+<line x1="930" y1="466" x2="1010" y2="466" stroke="#ff5b5b" stroke-width="1.5" marker-end="url(#arr-r)"/>
+<text x="962" y="459" fill="#ff5b5b" font-family="IBM Plex Mono" font-size="9">NO</text>
+<rect x="1010" y="444" width="280" height="44" rx="4" fill="#2e1a1a" stroke="#ff5b5b" stroke-width="1.5"/>
+<text x="1150" y="462" fill="#ff5b5b" font-family="IBM Plex Sans KR" font-size="11" font-weight="500" text-anchor="middle">계정 부족 안내</text>
+<text x="1150" y="477" fill="#888" font-family="IBM Plex Sans KR" font-size="9" text-anchor="middle">강사에게 오류 반환 · 관리자 알림</text>
+
+<!-- YES -->
+<line x1="850" y1="496" x2="850" y2="518" stroke="#3ecf8e" stroke-width="1.5" marker-end="url(#arr-g)"/>
+<text x="858" y="511" fill="#3ecf8e" font-family="IBM Plex Mono" font-size="9">YES</text>
+
+<!-- 시스템: Zoom Meeting 생성 -->
+<rect x="710" y="518" width="280" height="52" rx="4" fill="#1a1500" stroke="#f5a623" stroke-width="1.5" stroke-dasharray="5,3"/>
+<text x="850" y="539" fill="#e4e4e4" font-family="IBM Plex Sans KR" font-size="11" font-weight="500" text-anchor="middle">Zoom Meeting 생성</text>
+<text x="850" y="554" fill="#888" font-family="IBM Plex Sans KR" font-size="9" text-anchor="middle">POST /v2/users/{email}/meetings</text>
+<text x="850" y="565" fill="#4a4a4a" font-family="IBM Plex Mono" font-size="8" text-anchor="middle">start_url · join_url · meeting_id → DB 저장</text>
+
+<!-- ===================== PHASE 03: 강의 진행 ===================== -->
+
+<!-- 강사: 입장 -->
+<rect x="30" y="576" width="280" height="76" rx="4" fill="#1a2a3a" stroke="#4a9eff" stroke-width="1.5"/>
+<text x="170" y="597" fill="#e4e4e4" font-family="IBM Plex Sans KR" font-size="11" font-weight="500" text-anchor="middle">강의 입장</text>
+<text x="170" y="612" fill="#888" font-family="IBM Plex Sans KR" font-size="9" text-anchor="middle">start_url 새 탭 오픈 (ZAK 포함)</text>
+<text x="170" y="625" fill="#888" font-family="IBM Plex Sans KR" font-size="9" text-anchor="middle">zoomus:// 딥링크 → 호스트 권한 즉시</text>
+<text x="170" y="638" fill="#4a4a4a" font-family="IBM Plex Mono" font-size="8" text-anchor="middle">앱 미설치 시 설치 안내 모달 → [다시 시도]</text>
+<text x="170" y="648" fill="#3ecf8e" font-family="IBM Plex Mono" font-size="8" text-anchor="middle">✓ ZAK 별도 발급 불필요 (start_url 내 포함)</text>
+
+<!-- Arrow: 시스템→강사 -->
+<line x1="710" y1="544" x2="310" y2="590" stroke="#f5a623" stroke-width="1.5" marker-end="url(#arr)"/>
+
+<!-- 강사: URL 공유 -->
+<rect x="30" y="668" width="280" height="64" rx="4" fill="#1a2a3a" stroke="#4a9eff" stroke-width="1.5"/>
+<text x="170" y="689" fill="#e4e4e4" font-family="IBM Plex Sans KR" font-size="11" font-weight="500" text-anchor="middle">수강생에게 URL 공유</text>
+<text x="170" y="704" fill="#888" font-family="IBM Plex Sans KR" font-size="9" text-anchor="middle">AI Studio 채팅란 자동 발송</text>
+<text x="170" y="717" fill="#888" font-family="IBM Plex Sans KR" font-size="9" text-anchor="middle">join_url 링크 복사 버튼 함께 제공</text>
+<text x="170" y="728" fill="#3ecf8e" font-family="IBM Plex Mono" font-size="8" text-anchor="middle">✓ 단일 join_url 공유 방식 확정</text>
+<line x1="170" y1="652" x2="170" y2="668" stroke="#4a9eff" stroke-width="1.5" marker-end="url(#arr-b)"/>
+
+<!-- 시스템: lecture_status = active -->
+<rect x="710" y="576" width="280" height="64" rx="4" fill="#1a1500" stroke="#f5a623" stroke-width="1.5" stroke-dasharray="5,3"/>
+<text x="850" y="597" fill="#e4e4e4" font-family="IBM Plex Sans KR" font-size="11" font-weight="500" text-anchor="middle">강의 상태 활성화</text>
+<text x="850" y="612" fill="#888" font-family="IBM Plex Sans KR" font-size="9" text-anchor="middle">lecture_status = "active"</text>
+<text x="850" y="625" fill="#4a4a4a" font-family="IBM Plex Mono" font-size="8" text-anchor="middle">강사 입장 시점 기준</text>
+<text x="850" y="635" fill="#3ecf8e" font-family="IBM Plex Mono" font-size="8" text-anchor="middle">→ 수강생 입장하기 버튼 활성화 트리거</text>
+
+<!-- Arrow: 강사 입장→시스템 -->
+<line x1="310" y1="600" x2="710" y2="600" stroke="#4a9eff" stroke-width="1.5" marker-end="url(#arr)"/>
+
+<!-- 수강생: 입장 대기 -->
+<rect x="370" y="576" width="280" height="64" rx="4" fill="#0d1e15" stroke="#3ecf8e" stroke-width="1.5"/>
+<text x="510" y="597" fill="#e4e4e4" font-family="IBM Plex Sans KR" font-size="11" font-weight="500" text-anchor="middle">입장하기 버튼 대기</text>
+<text x="510" y="612" fill="#888" font-family="IBM Plex Sans KR" font-size="9" text-anchor="middle">lecture_status ≠ active → 비활성</text>
+<text x="510" y="625" fill="#4a4a4a" font-family="IBM Plex Mono" font-size="8" text-anchor="middle">"강의 시작 예정입니다" 문구</text>
+<text x="510" y="635" fill="#888" font-family="IBM Plex Mono" font-size="8" text-anchor="middle">채팅 or 버튼으로 join_url 수신 대기</text>
+
+<!-- Arrow: 시스템→수강생 -->
+<line x1="710" y1="608" x2="650" y2="608" stroke="#3ecf8e" stroke-width="1.5" marker-end="url(#arr-g)"/>
+
+<!-- 수강생: 활성화 -->
+<rect x="370" y="656" width="280" height="64" rx="4" fill="#0d1e15" stroke="#3ecf8e" stroke-width="1.5"/>
+<text x="510" y="677" fill="#e4e4e4" font-family="IBM Plex Sans KR" font-size="11" font-weight="500" text-anchor="middle">입장하기 버튼 활성화</text>
+<text x="510" y="692" fill="#3ecf8e" font-family="IBM Plex Sans KR" font-size="9" text-anchor="middle">lecture_status = "active" 감지</text>
+<text x="510" y="705" fill="#4a4a4a" font-family="IBM Plex Mono" font-size="8" text-anchor="middle">polling / 웹소켓 감지</text>
+<text x="510" y="715" fill="#3ecf8e" font-family="IBM Plex Mono" font-size="8" text-anchor="middle">✓ join_url 단일 공유 확정</text>
+<line x1="510" y1="640" x2="510" y2="656" stroke="#3ecf8e" stroke-width="1.5" marker-end="url(#arr-g)"/>
+
+<!-- 수강생: Zoom Web Client 입장 -->
+<rect x="370" y="736" width="280" height="76" rx="4" fill="#0d1e15" stroke="#3ecf8e" stroke-width="1.5"/>
+<text x="510" y="757" fill="#e4e4e4" font-family="IBM Plex Sans KR" font-size="11" font-weight="500" text-anchor="middle">Zoom Web Client 입장</text>
+<text x="510" y="772" fill="#888" font-family="IBM Plex Sans KR" font-size="9" text-anchor="middle">join_url 새 탭 오픈</text>
+<text x="510" y="785" fill="#888" font-family="IBM Plex Sans KR" font-size="9" text-anchor="middle">앱 설치 시 브라우저 팝업 → 앱/웹 선택</text>
+<text x="510" y="798" fill="#3ecf8e" font-family="IBM Plex Mono" font-size="8" text-anchor="middle">✓ Registrant 등록 방식 미채택</text>
+<text x="510" y="808" fill="#4a4a4a" font-family="IBM Plex Mono" font-size="8" text-anchor="middle">Signature 불필요 · ZAK 불필요</text>
+<line x1="510" y1="720" x2="510" y2="736" stroke="#3ecf8e" stroke-width="1.5" marker-end="url(#arr-g)"/>
+
+<!-- 강의 진행 중 공통 박스 -->
+<rect x="30" y="828" width="620" height="52" rx="4" fill="#101a10" stroke="#3ecf8e" stroke-width="1" stroke-dasharray="6,3"/>
+<text x="340" y="849" fill="#3ecf8e" font-family="IBM Plex Sans KR" font-size="11" font-weight="500" text-anchor="middle">강의 진행 중</text>
+<text x="340" y="864" fill="#555" font-family="IBM Plex Sans KR" font-size="9" text-anchor="middle">강사: 소회의실 · 투표 · 대기실 · 녹화 제어 | 수강생: 이모지 반응 · 손들기 · 오디오 설정</text>
+<line x1="170" y1="732" x2="170" y2="828" stroke="#4a9eff" stroke-width="1.5" marker-end="url(#arr-b)"/>
+<line x1="510" y1="812" x2="510" y2="828" stroke="#3ecf8e" stroke-width="1.5" marker-end="url(#arr-g)"/>
+
+<!-- ===================== PHASE 04: 강의 종료 ===================== -->
+
+<line x1="340" y1="880" x2="340" y2="936" stroke="#888" stroke-width="1.5" marker-end="url(#arr)"/>
+
+<!-- 분기: meeting.ended 웹훅 -->
+<polygon points="850,936 940,968 850,1000 760,968" fill="#1e1e10" stroke="#f5a623" stroke-width="1.5"/>
+<text x="850" y="962" fill="#f5a623" font-family="IBM Plex Sans KR" font-size="10" font-weight="500" text-anchor="middle">meeting.ended</text>
+<text x="850" y="976" fill="#f5a623" font-family="IBM Plex Sans KR" font-size="10" font-weight="500" text-anchor="middle">웹훅 수신?</text>
+
+<!-- 시스템 종료 처리 -->
+<rect x="710" y="936" width="280" height="44" rx="4" fill="#1a1500" stroke="#f5a623" stroke-width="1.5" stroke-dasharray="5,3"/>
+<text x="850" y="954" fill="#e4e4e4" font-family="IBM Plex Sans KR" font-size="11" font-weight="500" text-anchor="middle">강의 종료 처리</text>
+<text x="850" y="969" fill="#888" font-family="IBM Plex Sans KR" font-size="9" text-anchor="middle">lecture_status = "completed"</text>
+
+<line x1="340" y1="936" x2="760" y2="968" stroke="#888" stroke-width="1.5" marker-end="url(#arr)"/>
+
+<!-- YES: 웹훅 수신 성공 -->
+<line x1="850" y1="1000" x2="850" y2="1030" stroke="#3ecf8e" stroke-width="1.5" marker-end="url(#arr-g)"/>
+<text x="858" y="1018" fill="#3ecf8e" font-family="IBM Plex Mono" font-size="9">YES</text>
+<rect x="710" y="1030" width="280" height="64" rx="4" fill="#1a2e25" stroke="#3ecf8e" stroke-width="1.5"/>
+<text x="850" y="1051" fill="#e4e4e4" font-family="IBM Plex Sans KR" font-size="11" font-weight="500" text-anchor="middle">종료 자동 처리</text>
+<text x="850" y="1066" fill="#888" font-family="IBM Plex Sans KR" font-size="9" text-anchor="middle">종료시간 저장 · 계정 가용 상태 복귀</text>
+<text x="850" y="1079" fill="#3ecf8e" font-family="IBM Plex Mono" font-size="8" text-anchor="middle">assigned_course_id = NULL</text>
+<text x="850" y="1089" fill="#3ecf8e" font-family="IBM Plex Mono" font-size="8" text-anchor="middle">✓ meeting.ended 웹훅 지원 확정</text>
+
+<!-- NO: 웹훅 미지원 fallback -->
+<line x1="940" y1="968" x2="1010" y2="968" stroke="#ff5b5b" stroke-width="1.5" marker-end="url(#arr-r)"/>
+<text x="962" y="961" fill="#ff5b5b" font-family="IBM Plex Mono" font-size="9">NO</text>
+<rect x="1010" y="946" width="280" height="76" rx="4" fill="#2e2510" stroke="#f5a623" stroke-width="1.5"/>
+<text x="1150" y="967" fill="#f5a623" font-family="IBM Plex Sans KR" font-size="11" font-weight="500" text-anchor="middle">Fallback 처리</text>
+<text x="1150" y="982" fill="#888" font-family="IBM Plex Sans KR" font-size="9" text-anchor="middle">강의중 UI 1시간 노출 후 비노출</text>
+<text x="1150" y="995" fill="#888" font-family="IBM Plex Sans KR" font-size="9" text-anchor="middle">수강생 / 강사 화면 진행중 안내 영역</text>
+<text x="1150" y="1008" fill="#3ecf8e" font-family="IBM Plex Mono" font-size="8" text-anchor="middle">✓ 개발자 협의 확정</text>
+<text x="1150" y="1018" fill="#4a4a4a" font-family="IBM Plex Mono" font-size="8" text-anchor="middle">1시간 경과 후 자동 비노출</text>
+
+<!-- 강사: 시작 버튼 재노출 -->
+<rect x="30" y="1030" width="280" height="64" rx="4" fill="#1a2a3a" stroke="#4a9eff" stroke-width="1.5"/>
+<text x="170" y="1051" fill="#e4e4e4" font-family="IBM Plex Sans KR" font-size="11" font-weight="500" text-anchor="middle">강의 시작 버튼 재노출</text>
+<text x="170" y="1066" fill="#888" font-family="IBM Plex Sans KR" font-size="9" text-anchor="middle">meeting.ended 수신 시 버튼 활성 복구</text>
+<text x="170" y="1079" fill="#888" font-family="IBM Plex Sans KR" font-size="9" text-anchor="middle">동일 강의 재시작 가능 (반복 지원)</text>
+<text x="170" y="1090" fill="#3ecf8e" font-family="IBM Plex Mono" font-size="8" text-anchor="middle">✓ F-I-01 강의 목록 반영</text>
+
+<!-- Arrow: 시스템→강사 버튼 재노출 -->
+<line x1="710" y1="1060" x2="310" y2="1060" stroke="#3ecf8e" stroke-width="1.5" marker-end="url(#arr-g)"/>
+
+<!-- 녹화 완료 -->
+<rect x="710" y="1110" width="280" height="64" rx="4" fill="#1a1500" stroke="#f5a623" stroke-width="1.5" stroke-dasharray="5,3"/>
+<text x="850" y="1131" fill="#e4e4e4" font-family="IBM Plex Sans KR" font-size="11" font-weight="500" text-anchor="middle">녹화 완료 처리 (TBD)</text>
+<text x="850" y="1146" fill="#888" font-family="IBM Plex Sans KR" font-size="9" text-anchor="middle">recording.completed 웹훅</text>
+<text x="850" y="1159" fill="#4a4a4a" font-family="IBM Plex Mono" font-size="8" text-anchor="middle">Secret Token 검증 → share_url DB 저장</text>
+<text x="850" y="1169" fill="#4a4a4a" font-family="IBM Plex Mono" font-size="8" text-anchor="middle">녹화 관리 정책 TBD</text>
+<line x1="850" y1="1094" x2="850" y2="1110" stroke="#3ecf8e" stroke-width="1.5" marker-end="url(#arr)"/>
+
+<!-- 강사: 다시보기 -->
+<rect x="30" y="1110" width="280" height="64" rx="4" fill="#1a2a3a" stroke="#4a9eff" stroke-width="1.5"/>
+<text x="170" y="1131" fill="#e4e4e4" font-family="IBM Plex Sans KR" font-size="11" font-weight="500" text-anchor="middle">다시보기 탭 노출</text>
+<text x="170" y="1146" fill="#888" font-family="IBM Plex Sans KR" font-size="9" text-anchor="middle">share_url 수신 후 자동 표시</text>
+<text x="170" y="1159" fill="#888" font-family="IBM Plex Sans KR" font-size="9" text-anchor="middle">공개범위 · 다운로드 설정 가능</text>
+<text x="170" y="1170" fill="#f5a623" font-family="IBM Plex Mono" font-size="8" text-anchor="middle">F-I-08 TBD</text>
+<line x1="710" y1="1142" x2="310" y2="1142" stroke="#f5a623" stroke-width="1.5" marker-end="url(#arr)"/>
+
+<!-- ===================== PHASE 05: 어드민 계정 관리 ===================== -->
+
+<!-- 어드민: 계정 관리 -->
+<rect x="1050" y="1216" width="280" height="90" rx="4" fill="#1a1530" stroke="#a78bfa" stroke-width="1.5"/>
+<text x="1190" y="1237" fill="#e4e4e4" font-family="IBM Plex Sans KR" font-size="11" font-weight="500" text-anchor="middle">계정 관리 (탭 단독 운영)</text>
+<text x="1190" y="1252" fill="#888" font-family="IBM Plex Sans KR" font-size="9" text-anchor="middle">등록 · 수정 · 비활성화 · 삭제</text>
+<text x="1190" y="1265" fill="#888" font-family="IBM Plex Sans KR" font-size="9" text-anchor="middle">만료 D-30/D-7/D-3/D-day 뱃지</text>
+<text x="1190" y="1278" fill="#3ecf8e" font-family="IBM Plex Mono" font-size="8" text-anchor="middle">✓ 배정관리 탭 제거 확정</text>
+<text x="1190" y="1291" fill="#4a4a4a" font-family="IBM Plex Mono" font-size="8" text-anchor="middle">Zoom 조직 등록 완료 계정만 풀 진입 가능</text>
+<text x="1190" y="1301" fill="#4a4a4a" font-family="IBM Plex Mono" font-size="8" text-anchor="middle">User Management → Active 상태 확인 필수</text>
+
+<!-- 어드민: 사용이력 -->
+<rect x="1050" y="1322" width="280" height="64" rx="4" fill="#1a1530" stroke="#a78bfa" stroke-width="1.5"/>
+<text x="1190" y="1343" fill="#e4e4e4" font-family="IBM Plex Sans KR" font-size="11" font-weight="500" text-anchor="middle">사용이력 조회</text>
+<text x="1190" y="1358" fill="#888" font-family="IBM Plex Sans KR" font-size="9" text-anchor="middle">과정명 · 강의명 · 일시 · 상태</text>
+<text x="1190" y="1371" fill="#3ecf8e" font-family="IBM Plex Mono" font-size="8" text-anchor="middle">✓ 종료시간 웹훅 자동 기록</text>
+<text x="1190" y="1381" fill="#4a4a4a" font-family="IBM Plex Mono" font-size="8" text-anchor="middle">미수신 시 1시간 Fallback</text>
+<line x1="1190" y1="1306" x2="1190" y2="1322" stroke="#a78bfa" stroke-width="1.5" marker-end="url(#arr)"/>
+
+<!-- 계정 부족 어펜딕스 -->
+<rect x="1050" y="1402" width="280" height="76" rx="4" fill="#1e1e10" stroke="#f5a623" stroke-width="1" stroke-dasharray="5,3"/>
+<text x="1190" y="1423" fill="#f5a623" font-family="IBM Plex Sans KR" font-size="11" font-weight="500" text-anchor="middle">[어펜딕스] 계정 부족 대응</text>
+<text x="1190" y="1438" fill="#888" font-family="IBM Plex Sans KR" font-size="9" text-anchor="middle">마스터 계정 추가 초대 프로세스</text>
+<text x="1190" y="1451" fill="#888" font-family="IBM Plex Sans KR" font-size="9" text-anchor="middle">개발팀 확인 후 반영 예정</text>
+<text x="1190" y="1464" fill="#f5a623" font-family="IBM Plex Mono" font-size="8" text-anchor="middle">TBD</text>
+<text x="1190" y="1474" fill="#4a4a4a" font-family="IBM Plex Mono" font-size="8" text-anchor="middle">강사 계정 편입 방식 확정 후 연동</text>
+<line x1="1190" y1="1386" x2="1190" y2="1402" stroke="#f5a623" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arr-y)"/>
+
+<!-- 시스템: 배정 로직 상세 -->
+<rect x="710" y="1216" width="280" height="76" rx="4" fill="#1a1500" stroke="#f5a623" stroke-width="1.5" stroke-dasharray="5,3"/>
+<text x="850" y="1237" fill="#e4e4e4" font-family="IBM Plex Sans KR" font-size="11" font-weight="500" text-anchor="middle">동적 배정 로직 (DB 기준)</text>
+<text x="850" y="1252" fill="#3ecf8e" font-family="IBM Plex Sans KR" font-size="9" text-anchor="middle">index 테이블 zoom_id 등록 순 우선</text>
+<text x="850" y="1265" fill="#888" font-family="IBM Plex Sans KR" font-size="9" text-anchor="middle">가용: assigned_course_id = NULL</text>
+<text x="850" y="1278" fill="#888" font-family="IBM Plex Sans KR" font-size="9" text-anchor="middle">점유: assigned_course_id = 강좌 ID</text>
+<text x="850" y="1291" fill="#3ecf8e" font-family="IBM Plex Mono" font-size="8" text-anchor="middle">✓ DB = Source of Truth</text>
+
+</svg>
+</div>
+
+<!-- ===================== SUMMARY PANEL ===================== -->
+<div class="summary-wrap">
+
+  <!-- 블록 1: 관리자 자격증명 등록 -->
+  <div class="summary-block">
+    <div class="summary-block-header">
+      <div class="summary-block-dot" style="background:#a78bfa"></div>
+      <span class="summary-block-title">관리자 자격증명 등록</span>
+    </div>
+    <div class="summary-block-body">
+      <div class="summary-section-label">OAuth 앱 생성</div>
+      <div class="summary-item">
+        <span class="summary-item-label">앱 타입</span>
+        <span class="summary-item-val">Server-to-Server OAuth — Zoom Marketplace에서 생성</span>
+      </div>
+      <div class="summary-item">
+        <span class="summary-item-label">발급 정보</span>
+        <span class="summary-item-val"><code>Account ID</code> · <code>Client ID</code> · <code>Client Secret</code> → 서버 .env 저장</span>
+      </div>
+      <div class="summary-item">
+        <span class="summary-item-label">Scope</span>
+        <span class="summary-item-val"><code>meeting:write:admin</code> <code>user:read:admin</code></span>
+      </div>
+      <div class="summary-item">
+        <span class="summary-item-label">마스터 계정</span>
+        <span class="summary-item-val"><code><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="ee8f879d9a9b8a8781c09d8b9c98878d8bae839b829a878d8f839e9b9dc08d8183">[email&#160;protected]</a></code></span>
+      </div>
+      <div class="summary-section-label">Token 자동화</div>
+      <div class="summary-item">
+        <span class="summary-item-label">갱신 주기</span>
+        <span class="summary-item-val">1시간 자동 갱신 <span class="tag-green">✓ 강의 도중 세션 중단 없음</span></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 블록 2: 강사 강의 개설 · 입장 -->
+  <div class="summary-block">
+    <div class="summary-block-header">
+      <div class="summary-block-dot" style="background:#4a9eff"></div>
+      <span class="summary-block-title">강사 — 강의 개설 · 입장</span>
+    </div>
+    <div class="summary-block-body">
+      <div class="summary-section-label">미팅 생성</div>
+      <div class="summary-item">
+        <span class="summary-item-label">API</span>
+        <span class="summary-item-val"><code>POST /v2/users/{zoom계정email}/meetings</code></span>
+      </div>
+      <div class="summary-item">
+        <span class="summary-item-label">계정 없을 시</span>
+        <span class="summary-item-val">에러 반환 + 관리자 알림</span>
+      </div>
+      <div class="summary-section-label">강사 입장</div>
+      <div class="summary-item">
+        <span class="summary-item-label">방식</span>
+        <span class="summary-item-val"><code>start_url</code> 새 탭 오픈 — ZAK 이미 포함, 응답값 그대로 사용 <span class="tag-green">✓ 별도 발급 불필요</span></span>
+      </div>
+      <div class="summary-item">
+        <span class="summary-item-label">앱 설치 시</span>
+        <span class="summary-item-val"><code>zoomus://</code> 딥링크 자동 실행 → 호스트 권한 즉시 획득</span>
+      </div>
+      <div class="summary-item">
+        <span class="summary-item-label">앱 미설치 시</span>
+        <span class="summary-item-val">설치 안내 모달 → 다운로드 링크 → [다시 시도] → <code>zoomus://</code> 재호출</span>
+      </div>
+      <div class="summary-item">
+        <span class="summary-item-label">수강생 활성화</span>
+        <span class="summary-item-val">강의 시작 후 <code>lecture_status = "active"</code> → 입장하기 버튼 자동 활성화</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 블록 3: 수강생 입장 · API 자동화 -->
+  <div class="summary-block">
+    <div class="summary-block-header">
+      <div class="summary-block-dot" style="background:#3ecf8e"></div>
+      <span class="summary-block-title">수강생 입장 · API 자동화</span>
+    </div>
+    <div class="summary-block-body">
+      <div class="summary-section-label">수강생 입장</div>
+      <div class="summary-item">
+        <span class="summary-item-label">방식</span>
+        <span class="summary-item-val"><code>join_url</code> 새 탭 → Zoom Web Client <span class="tag-green">✓ 단일 URL 공유 확정</span></span>
+      </div>
+      <div class="summary-item">
+        <span class="summary-item-label">앱 설치 시</span>
+        <span class="summary-item-val">브라우저 팝업 "Zoom 앱으로 열겠습니까?" → 앱/웹 선택 (자동실행 아님)</span>
+      </div>
+      <div class="summary-item">
+        <span class="summary-item-label">Signature</span>
+        <span class="summary-item-val">불필요 — Web Client는 <code>join_url</code>만으로 참가자 인증 <span class="tag-green">✓ 확정</span></span>
+      </div>
+      <div class="summary-item">
+        <span class="summary-item-label">ZAK</span>
+        <span class="summary-item-val">불필요 — 수강생은 호스트 권한 아님 <span class="tag-green">✓ 확정</span></span>
+      </div>
+      <div class="summary-section-label">Signature 참고</div>
+      <div class="summary-item">
+        <span class="summary-item-label">SDK 방식 (미채택)</span>
+        <span class="summary-item-val">HMAC-SHA256 기반 — 강사 role=1 / 수강생 role=0 구분. <span class="tag-yellow">SDK 임베딩 미채택으로 해당 없음</span></span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="doc-footer">
+  <div>zoom_mps_flowchart_v4.3.html · v4.3 · 2026-03-17 · 예약 버퍼 30분 정책 반영 · 강사 계정 편입 미채택 확정</div>
