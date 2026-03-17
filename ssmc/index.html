@@ -6,15 +6,16 @@
 <title>AI Studio × Zoom — 문서 인덱스</title>
 <style>
   :root {
-    --bg: #0d1117;
-    --surface: #161b22;
-    --border: #21262d;
-    --border2: #30363d;
-    --text: #e6edf3;
-    --text-dim: #7d8590;
-    --teal: #2ea87e;
-    --green: #3fb950;
-    --blue: #58a6ff;
+    --bg: #f5f4f0;
+    --surface: #ffffff;
+    --surface2: #f0efe9;
+    --border: #e2e0d8;
+    --border2: #ccc9be;
+    --text: #1a1917;
+    --text-dim: #7a7670;
+    --teal: #1a7a5e;
+    --green: #2d8f3f;
+    --blue: #1a5fa8;
     --mono: 'IBM Plex Mono', monospace;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -22,7 +23,6 @@
 
   .wrap { max-width: 860px; margin: 0 auto; padding: 60px 24px 80px; }
 
-  /* header */
   .site-header { margin-bottom: 56px; }
   .site-header .eyebrow { font-size: 11px; color: var(--text-dim); letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 12px; }
   .site-header h1 { font-size: 28px; font-weight: 400; line-height: 1.2; }
@@ -30,31 +30,30 @@
   .site-header .sub { font-size: 12px; color: var(--text-dim); margin-top: 8px; }
   .meta-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
   .chip { font-size: 11px; padding: 3px 10px; border-radius: 20px; border: 1px solid var(--border2); color: var(--text-dim); }
-  .chip.green { border-color: rgba(63,185,80,0.4); color: var(--green); background: rgba(63,185,80,0.06); }
-  .chip.teal  { border-color: rgba(46,168,126,0.4); color: var(--teal); background: rgba(46,168,126,0.06); }
-  .chip.blue  { border-color: rgba(88,166,255,0.4); color: var(--blue); background: rgba(88,166,255,0.06); }
+  .chip.green { border-color: rgba(45,143,63,0.4); color: var(--green); background: rgba(45,143,63,0.06); }
+  .chip.teal  { border-color: rgba(26,122,94,0.4); color: var(--teal); background: rgba(26,122,94,0.06); }
+  .chip.blue  { border-color: rgba(26,95,168,0.4); color: var(--blue); background: rgba(26,95,168,0.06); }
   .chip.date  { border-color: var(--border); color: var(--text-dim); }
 
-  /* section */
   .section { margin-bottom: 48px; }
   .section-label { font-size: 11px; color: var(--text-dim); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
 
-  /* card grid */
   .cards { display: grid; gap: 12px; }
   .cards.col2 { grid-template-columns: 1fr 1fr; }
   @media (max-width: 600px) { .cards.col2 { grid-template-columns: 1fr; } }
 
-  .card { display: block; text-decoration: none; border: 1px solid var(--border); border-radius: 8px; padding: 18px 20px; background: var(--surface); transition: border-color 0.15s, background 0.15s; }
-  .card:hover { border-color: var(--border2); background: #1c2128; }
+  .card { display: block; text-decoration: none; border: 1px solid var(--border); border-radius: 8px; padding: 18px 20px; background: var(--surface); transition: border-color 0.15s, box-shadow 0.15s; }
+  .card:hover { border-color: var(--border2); box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+  .card.hold { opacity: 0.5; pointer-events: none; cursor: default; }
   .card .card-title { font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 5px; display: flex; align-items: center; justify-content: space-between; }
   .card .card-title .arrow { color: var(--text-dim); font-size: 11px; }
   .card .card-desc { font-size: 11px; color: var(--text-dim); line-height: 1.6; }
   .card .card-meta { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
   .card .tag { font-size: 10px; padding: 2px 8px; border-radius: 12px; border: 1px solid var(--border2); color: var(--text-dim); }
-  .card .tag.new { border-color: rgba(46,168,126,0.5); color: var(--teal); background: rgba(46,168,126,0.06); }
-  .card .tag.updated { border-color: rgba(88,166,255,0.4); color: var(--blue); background: rgba(88,166,255,0.06); }
+  .card .tag.new { border-color: rgba(26,122,94,0.5); color: var(--teal); background: rgba(26,122,94,0.06); }
+  .card .tag.updated { border-color: rgba(26,95,168,0.4); color: var(--blue); background: rgba(26,95,168,0.06); }
+  .card .tag.hold { border-color: #d4a800; color: #a07800; background: rgba(212,168,0,0.06); }
 
-  /* changelog */
   .changelog { width: 100%; border-collapse: collapse; }
   .changelog tr { border-bottom: 1px solid var(--border); }
   .changelog tr:last-child { border-bottom: none; }
@@ -63,7 +62,6 @@
   .changelog td:nth-child(2) { color: var(--text-dim); width: 90px; white-space: nowrap; }
   .changelog td:last-child { color: var(--text-dim); line-height: 1.6; }
 
-  /* footer */
   .footer { margin-top: 64px; padding-top: 20px; border-top: 1px solid var(--border); font-size: 11px; color: var(--text-dim); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
   .footer a { color: var(--text-dim); text-decoration: none; }
   .footer a:hover { color: var(--text); }
@@ -72,17 +70,17 @@
 <body>
 <div class="wrap">
 
-  <!-- Header -->
   <header class="site-header">
     <div class="eyebrow">Samsung SDS Multicampus — 기획 산출물 모음</div>
     <h1>AI Studio <span>×</span> Zoom<br>실시간 강의 연동</h1>
-    <div class="sub">문서 인덱스 v9 · 2026-03-17</div>
+    <div class="sub">문서 인덱스 v10 · 2026-03-18</div>
     <div class="meta-chips">
       <span class="chip green">Server-to-Server OAuth</span>
       <span class="chip teal">시나리오 2 확정</span>
-      <span class="chip teal">meeting.ended 웹훅 확정</span>
-      <span class="chip blue">join_url 단일 확정</span>
-      <span class="chip date">2026-03-17</span>
+      <span class="chip teal">동적 Pool 배정</span>
+      <span class="chip teal">실시간 + 예약 병행</span>
+      <span class="chip blue">버퍼 앞뒤 30분 확정</span>
+      <span class="chip date">2026-03-18</span>
     </div>
   </header>
 
@@ -90,11 +88,11 @@
   <section class="section">
     <div class="section-label">화면 검토</div>
     <div class="cards">
-      <a class="card" href="./teacher_0310.html">
+      <a class="card hold" href="#">
         <div class="card-title">강사 화면 — 실시간 강의 <span class="arrow">→</span></div>
-        <div class="card-desc">강사 메인 · 강의 생성 모달 · 링크 생성 · 강의 중 (4개 화면)</div>
+        <div class="card-desc">강의 시작/예약 모달 · 실시간 탭 분리 · 기 예약 목록 포함</div>
         <div class="card-meta">
-          <span class="tag">2026-03-10</span>
+          <span class="tag hold">금일 업데이트 예정 · 홀드</span>
         </div>
       </a>
     </div>
@@ -106,25 +104,16 @@
     <div class="cards col2">
       <a class="card" href="./zoom_mps_flowchart_v4.3.html">
         <div class="card-title">전체 플로우차트 <span class="arrow">→</span></div>
-        <div class="card-desc">예약 버퍼 30분 정책 · 강사 계정 편입 미채택 확정 · 강제종료 TBD 반영</div>
+        <div class="card-desc">버퍼 30분 정책 · 강사 계정 편입 미채택 · 강제종료 TBD · 실시간+예약 병행</div>
         <div class="card-meta">
-          <span class="tag new">v4.3 · NEW</span>
-          <span class="tag">2026-03-17</span>
+          <span class="tag updated">v4.3 · 2026-03-17</span>
         </div>
       </a>
-      <a class="card" href="./ecture_start_flow_v5.html">
+      <a class="card" href="./lecture_start_flow_v5.html">
         <div class="card-title">강의 시작 프로세스 <span class="arrow">→</span></div>
         <div class="card-desc">계정 배정 로직 · 당일 예약 · timetable overlap · 자동연장</div>
         <div class="card-meta">
-          <span class="tag new">v5 · NEW</span>
-          <span class="tag">2026-03-17</span>
-        </div>
-      </a>
-      <a class="card" href="./zoom_lecture_flowchart_v3.html">
-        <div class="card-title">강의 개설 플로우 <span class="arrow">→</span></div>
-        <div class="card-desc">강의 개설 단독 뷰</div>
-        <div class="card-meta">
-          <span class="tag">v3</span>
+          <span class="tag updated">v5 · 2026-03-17</span>
         </div>
       </a>
     </div>
@@ -134,29 +123,24 @@
   <section class="section">
     <div class="section-label">기획 문서</div>
     <div class="cards col2">
-      <a class="card" href="./zoom_mps_spec.html">
+      <a class="card" href="./zoom_mps_spec_v3.html">
         <div class="card-title">기능 명세서 <span class="arrow">→</span></div>
-        <div class="card-desc">전체 기능 요구사항 · API 연동 · 상태 관리</div>
-        <div class="card-meta"><span class="tag">v2</span></div>
+        <div class="card-desc">전체 기능 요구사항 · 확정 기술 결정 · 예약/실시간 병행 · 버퍼정책 반영</div>
+        <div class="card-meta">
+          <span class="tag new">v3 · NEW · 2026-03-18</span>
+        </div>
       </a>
-      <a class="card" href="./zoom_screen_list_v2.html">
+      <a class="card" href="./zoom_screen_list_v3.html">
         <div class="card-title">화면 목록 <span class="arrow">→</span></div>
-        <div class="card-desc">강사 / 운영자 / 수강생 / 어드민 — Confluence 반영</div>
-        <div class="card-meta"><span class="tag">v2</span></div>
+        <div class="card-desc">관리자 / 강사 / 학습자 — 모달팝업 포함 전체 목록</div>
+        <div class="card-meta">
+          <span class="tag new">v3 · NEW · 2026-03-18</span>
+        </div>
       </a>
       <a class="card" href="./checklist_0317.html">
         <div class="card-title">잔여 확인사항 체크리스트 <span class="arrow">→</span></div>
         <div class="card-desc">정책 미확정 · 개발 확인 · 화면 설계 필요 항목 전체</div>
         <div class="card-meta">
-          <span class="tag new">NEW</span>
-          <span class="tag">2026-03-17</span>
-        </div>
-      </a>
-      <a class="card" href="./figma_make_request_0317.html">
-        <div class="card-title">Figma Make 수정 요청서 <span class="arrow">→</span></div>
-        <div class="card-desc">관리자 타임테이블 · 강사 종료시간 필드 · 버퍼 안내 UX</div>
-        <div class="card-meta">
-          <span class="tag new">NEW</span>
           <span class="tag">2026-03-17</span>
         </div>
       </a>
@@ -167,11 +151,12 @@
   <section class="section">
     <div class="section-label">인덱스 변경 이력</div>
     <table class="changelog">
-      <tr><td>v9</td><td>2026-03-17</td><td>전체 플로우차트 v4.3 추가 · 체크리스트 추가 · Figma Make 수정 요청서 추가</td></tr>
+      <tr><td>v10</td><td>2026-03-18</td><td>라이트모드 전환 · 기능명세서 v3 · 화면목록 v3 추가 · 구 플로우차트/시나리오 문서 제거 · 화면검토 홀드 처리</td></tr>
+      <tr><td>v9</td><td>2026-03-17</td><td>전체 플로우차트 v4.3 · 체크리스트 · Figma Make 수정 요청서 추가</td></tr>
       <tr><td>v8</td><td>2026-03-17</td><td>강의 시작 프로세스 v5 추가 — 당일 예약 · timetable overlap · 자동연장 로직 반영</td></tr>
       <tr><td>v7</td><td>2026-03-11</td><td>플로우차트 v4.2 추가 — 개발자 협의 확정 내용 반영</td></tr>
       <tr><td>v6</td><td>2026-03-11</td><td>전체 플로우차트 v4.1 추가</td></tr>
-      <tr><td>v5</td><td>2026-03-10</td><td>teacher_0310 추가, 전체 플로우차트 v3·계정 매핑 시나리오 제거</td></tr>
+      <tr><td>v5</td><td>2026-03-10</td><td>teacher_0310 추가, 전체 플로우차트 v3 반영</td></tr>
       <tr><td>v4</td><td>2026-03-05</td><td>화면 목록 v2 반영, changelog 섹션 추가</td></tr>
     </table>
   </section>
