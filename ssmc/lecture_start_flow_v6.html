@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>강의 시작 프로세스 v6</title>
+<style>
+  :root {
+    --bg: #f5f4f0;
+    --surface: #ffffff;
+    --border: #e2e0d8;
+    --text: #1a1917;
+    --text-dim: #7a7670;
+    --teal: #1a7a5e;
+    --blue: #1a5fa8;
+    --orange: #b05a1a;
+    --red: #c0392b;
+    --purple: #6b4fbb;
+    --mono: 'IBM Plex Mono', monospace;
+
+    /* node colors */
+    --node-start:   #e8f5f0;
+    --node-start-b: #1a7a5e;
+    --node-input:   #eef3fa;
+    --node-input-b: #1a5fa8;
+    --node-cond:    #fff8e8;
+    --node-cond-b:  #b08000;
+    --node-action:  #f0f0f8;
+    --node-action-b:#6b4fbb;
+    --node-live:    #f5eef8;
+    --node-live-b:  #8e44ad;
+    --node-error:   #fdf0ee;
+    --node-error-b: #c0392b;
+    --node-end:     #f0f0f0;
+    --node-end-b:   #888;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: var(--mono); }
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 48px 24px 80px; }
+
+  .home-btn { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-dim); text-decoration: none; padding: 5px 10px; border: 1px solid var(--border); border-radius: 6px; margin-bottom: 36px; transition: all 0.15s; }
+  .home-btn:hover { color: var(--text); border-color: #aaa; }
+
+  .doc-header { margin-bottom: 40px; }
+  .doc-header .eyebrow { font-size: 11px; color: var(--text-dim); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 10px; }
+  .doc-header h1 { font-size: 22px; font-weight: 400; }
+  .doc-header h1 span { color: var(--teal); }
+  .doc-header .meta { font-size: 11px; color: var(--text-dim); margin-top: 6px; }
+
+  /* ── SVG flowchart wrapper ── */
+  .chart-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 32px; overflow-x: auto; }
+  svg { display: block; margin: 0 auto; }
+
+  /* legend */
+  .legend { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 24px; padding: 16px 20px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; }
+  .legend-item { display: flex; align-items: center; gap: 7px; font-size: 11px; color: var(--text-dim); }
+  .legend-box { width: 14px; height: 14px; border-radius: 3px; border: 1.5px solid; flex-shrink: 0; }
+
+  /* sideeffect notice */
+  .notice { margin-top: 20px; font-size: 11px; padding: 12px 16px; border-radius: 6px; border-left: 3px solid var(--orange); background: rgba(176,90,26,0.06); color: var(--orange); line-height: 1.8; }
+  .notice strong { color: var(--orange); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <a class="home-btn" href="./index.html">← 인덱스로</a>
+
+  <header class="doc-header">
+    <div class="eyebrow">Samsung SDS Multicampus · AI Studio × Zoom</div>
+    <h1>강의 시작 프로세스 <span>v6</span></h1>
+    <div class="meta">2026-03-18 | 즉시 시작 / 예약 분기 · 버퍼 정책 분리 반영</div>
+  </header>
+
+  <div class="chart-wrap">
+    <svg viewBox="0 0 1040 980" width="1040" xmlns="http://www.w3.org/2000/svg" font-family="'IBM Plex Mono', monospace" font-size="11">
+      <defs>
+        <marker id="arr" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+          <polygon points="0 0, 8 3, 0 6" fill="#999"/>
+        </marker>
+        <marker id="arr-teal" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+          <polygon points="0 0, 8 3, 0 6" fill="#1a7a5e"/>
+        </marker>
+        <marker id="arr-blue" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+          <polygon points="0 0, 8 3, 0 6" fill="#1a5fa8"/>
+        </marker>
+        <marker id="arr-red" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+          <polygon points="0 0, 8 3, 0 6" fill="#c0392b"/>
+        </marker>
+      </defs>
+
+      <!-- ══════════════════════════════════════
+           ROW 0: 시작
+      ══════════════════════════════════════ -->
+      <!-- START -->
+      <rect x="420" y="20" width="200" height="44" rx="22" fill="#e8f5f0" stroke="#1a7a5e" stroke-width="1.5"/>
+      <text x="520" y="37" text-anchor="middle" fill="#1a7a5e" font-weight="500">강사</text>
+      <text x="520" y="52" text-anchor="middle" fill="#1a7a5e">[강의 시작] 클릭</text>
+
+      <!-- ROW 1: 분기 — 즉시/예약 -->
+      <line x1="520" y1="64" x2="520" y2="100" stroke="#999" stroke-width="1.2" marker-end="url(#arr)"/>
+      <!-- diamond -->
+      <polygon points="520,100 640,136 520,172 400,136" fill="#fff8e8" stroke="#b08000" stroke-width="1.5"/>
+      <text x="520" y="130" text-anchor="middle" fill="#7a5800" font-weight="500">모드 선택</text>
+      <text x="520" y="147" text-anchor="middle" fill="#7a5800">즉시 시작 / 예약?</text>
+
+      <!-- ══════════════════════════════════════
+           LEFT BRANCH: 즉시 시작
+      ══════════════════════════════════════ -->
+      <!-- diamond → left -->
+      <line x1="400" y1="136" x2="220" y2="136" stroke="#1a7a5e" stroke-width="1.2" marker-end="url(#arr-teal)"/>
+      <text x="310" y="128" text-anchor="middle" fill="#1a7a5e" font-size="10">즉시 시작</text>
+
+      <!-- [즉시] 계정 가용 확인 -->
+      <polygon points="220,180 300,210 220,240 140,210" fill="#fff8e8" stroke="#b08000" stroke-width="1.5"/>
+      <text x="220" y="205" text-anchor="middle" fill="#7a5800">가용 계정</text>
+      <text x="220" y="220" text-anchor="middle" fill="#7a5800">있음?</text>
+
+      <!-- N: 에러 -->
+      <line x1="140" y1="210" x2="60" y2="210" stroke="#c0392b" stroke-width="1.2" marker-end="url(#arr-red)"/>
+      <text x="100" y="203" text-anchor="middle" fill="#c0392b" font-size="10">N</text>
+      <rect x="10" y="190" width="50" height="40" rx="4" fill="#fdf0ee" stroke="#c0392b" stroke-width="1.2"/>
+      <text x="35" y="207" text-anchor="middle" fill="#c0392b" font-size="10">계정</text>
+      <text x="35" y="220" text-anchor="middle" fill="#c0392b" font-size="10">없음 에러</text>
+
+      <!-- Y: 계정 배정 -->
+      <line x1="220" y1="240" x2="220" y2="275" stroke="#1a7a5e" stroke-width="1.2" marker-end="url(#arr-teal)"/>
+      <text x="230" y="262" fill="#1a7a5e" font-size="10">Y</text>
+      <rect x="150" y="275" width="140" height="50" rx="6" fill="#eef3fa" stroke="#1a5fa8" stroke-width="1.5"/>
+      <text x="220" y="295" text-anchor="middle" fill="#1a5fa8" font-weight="500">계정 즉시 배정</text>
+      <text x="220" y="311" text-anchor="middle" fill="#1a5fa8">start_url 발급</text>
+
+      <!-- 버퍼 안내 박스 (즉시) -->
+      <line x1="220" y1="325" x2="220" y2="360" stroke="#1a7a5e" stroke-width="1.2" marker-end="url(#arr-teal)"/>
+      <rect x="140" y="360" width="160" height="50" rx="6" fill="#f0f8f4" stroke="#1a7a5e" stroke-width="1.2" stroke-dasharray="4,3"/>
+      <text x="220" y="379" text-anchor="middle" fill="#1a7a5e" font-size="10">버퍼: 종료 후 30분만</text>
+      <text x="220" y="394" text-anchor="middle" fill="#1a7a5e" font-size="10">(앞 버퍼 없음)</text>
+
+      <!-- 강의 진행 (즉시) -->
+      <line x1="220" y1="410" x2="220" y2="445" stroke="#1a7a5e" stroke-width="1.2" marker-end="url(#arr-teal)"/>
+      <rect x="150" y="445" width="140" height="44" rx="22" fill="#e8f5f0" stroke="#1a7a5e" stroke-width="1.5"/>
+      <text x="220" y="462" text-anchor="middle" fill="#1a7a5e" font-weight="500">강의 진행</text>
+      <text x="220" y="477" text-anchor="middle" fill="#1a7a5e">(Zoom 실시간)</text>
+
+      <!-- 강의 종료 (즉시) -->
+      <line x1="220" y1="489" x2="220" y2="524" stroke="#999" stroke-width="1.2" marker-end="url(#arr)"/>
+      <polygon points="220,524 320,556 220,588 120,556" fill="#fff8e8" stroke="#b08000" stroke-width="1.5"/>
+      <text x="220" y="550" text-anchor="middle" fill="#7a5800">강의 종료?</text>
+      <text x="220" y="566" text-anchor="middle" fill="#7a5800">meeting.ended</text>
+
+      <!-- N: type=live 확인 -->
+      <line x1="120" y1="556" x2="60" y2="556" stroke="#999" stroke-width="1.2" marker-end="url(#arr)"/>
+      <text x="90" y="549" text-anchor="middle" fill="#888" font-size="10">N</text>
+      <rect x="5" y="536" width="55" height="40" rx="4" fill="#f5eef8" stroke="#8e44ad" stroke-width="1.2"/>
+      <text x="32" y="553" text-anchor="middle" fill="#8e44ad" font-size="10">type=live</text>
+      <text x="32" y="566" text-anchor="middle" fill="#8e44ad" font-size="10">폴링</text>
+
+      <!-- Y: 버퍼 30분 후 계정 반납 -->
+      <line x1="220" y1="588" x2="220" y2="623" stroke="#1a7a5e" stroke-width="1.2" marker-end="url(#arr-teal)"/>
+      <text x="230" y="610" fill="#1a7a5e" font-size="10">Y</text>
+      <rect x="140" y="623" width="160" height="50" rx="6" fill="#eef3fa" stroke="#1a5fa8" stroke-width="1.5"/>
+      <text x="220" y="643" text-anchor="middle" fill="#1a5fa8" font-weight="500">30분 후</text>
+      <text x="220" y="659" text-anchor="middle" fill="#1a5fa8">계정 반납 · 풀 갱신</text>
+
+      <!-- END 즉시 -->
+      <line x1="220" y1="673" x2="220" y2="706" stroke="#999" stroke-width="1.2" marker-end="url(#arr)"/>
+      <rect x="170" y="706" width="100" height="36" rx="18" fill="#f0f0f0" stroke="#888" stroke-width="1.2"/>
+      <text x="220" y="729" text-anchor="middle" fill="#888">End</text>
+
+      <!-- ══════════════════════════════════════
+           RIGHT BRANCH: 예약
+      ══════════════════════════════════════ -->
+      <!-- diamond → right -->
+      <line x1="640" y1="136" x2="820" y2="136" stroke="#1a5fa8" stroke-width="1.2" marker-end="url(#arr-blue)"/>
+      <text x="730" y="128" text-anchor="middle" fill="#1a5fa8" font-size="10">예약하기</text>
+
+      <!-- 시간 입력 -->
+      <rect x="740" y="110" width="160" height="52" rx="6" fill="#eef3fa" stroke="#1a5fa8" stroke-width="1.5"/>
+      <text x="820" y="130" text-anchor="middle" fill="#1a5fa8" font-weight="500">강의명 · 시작/종료</text>
+      <text x="820" y="146" text-anchor="middle" fill="#1a5fa8">시간 입력 (당일)</text>
+      <text x="820" y="160" text-anchor="middle" fill="#1a5fa8" font-size="10">최소 1시간 단위</text>
+
+      <!-- 버퍼 계산 -->
+      <line x1="820" y1="162" x2="820" y2="197" stroke="#1a5fa8" stroke-width="1.2" marker-end="url(#arr-blue)"/>
+      <rect x="730" y="197" width="180" height="50" rx="6" fill="#f0f8f4" stroke="#1a7a5e" stroke-width="1.2" stroke-dasharray="4,3"/>
+      <text x="820" y="216" text-anchor="middle" fill="#1a7a5e" font-size="10">서버: 버퍼 계산</text>
+      <text x="820" y="231" text-anchor="middle" fill="#1a7a5e" font-size="10">점유 = 시작-30분 ~ 종료+30분</text>
+
+      <!-- timetable overlap 확인 -->
+      <line x1="820" y1="247" x2="820" y2="282" stroke="#999" stroke-width="1.2" marker-end="url(#arr)"/>
+      <polygon points="820,282 920,314 820,346 720,314" fill="#fff8e8" stroke="#b08000" stroke-width="1.5"/>
+      <text x="820" y="308" text-anchor="middle" fill="#7a5800">시간 충돌?</text>
+      <text x="820" y="324" text-anchor="middle" fill="#7a5800">timetable overlap</text>
+
+      <!-- Y: 에러 -->
+      <line x1="920" y1="314" x2="980" y2="314" stroke="#c0392b" stroke-width="1.2" marker-end="url(#arr-red)"/>
+      <text x="950" y="306" text-anchor="middle" fill="#c0392b" font-size="10">Y</text>
+      <rect x="980" y="294" width="55" height="40" rx="4" fill="#fdf0ee" stroke="#c0392b" stroke-width="1.2"/>
+      <text x="1007" y="311" text-anchor="middle" fill="#c0392b" font-size="10">예약불가</text>
+      <text x="1007" y="324" text-anchor="middle" fill="#c0392b" font-size="10">에러 반환</text>
+
+      <!-- N: 계정 가용 확인 -->
+      <line x1="820" y1="346" x2="820" y2="381" stroke="#999" stroke-width="1.2" marker-end="url(#arr)"/>
+      <text x="832" y="368" fill="#888" font-size="10">N</text>
+      <polygon points="820,381 920,413 820,445 720,413" fill="#fff8e8" stroke="#b08000" stroke-width="1.5"/>
+      <text x="820" y="407" text-anchor="middle" fill="#7a5800">가용 계정</text>
+      <text x="820" y="423" text-anchor="middle" fill="#7a5800">있음?</text>
+
+      <!-- N: 관리자 알림 -->
+      <line x1="920" y1="413" x2="980" y2="413" stroke="#c0392b" stroke-width="1.2" marker-end="url(#arr-red)"/>
+      <text x="950" y="405" text-anchor="middle" fill="#c0392b" font-size="10">N</text>
+      <rect x="980" y="393" width="55" height="40" rx="4" fill="#fdf0ee" stroke="#c0392b" stroke-width="1.2"/>
+      <text x="1007" y="410" text-anchor="middle" fill="#c0392b" font-size="10">관리자</text>
+      <text x="1007" y="423" text-anchor="middle" fill="#c0392b" font-size="10">알림 발송</text>
+
+      <!-- Y: 예약 DB 등록 -->
+      <line x1="820" y1="445" x2="820" y2="480" stroke="#1a5fa8" stroke-width="1.2" marker-end="url(#arr-blue)"/>
+      <text x="832" y="467" fill="#1a5fa8" font-size="10">Y</text>
+      <rect x="740" y="480" width="160" height="50" rx="6" fill="#eef3fa" stroke="#1a5fa8" stroke-width="1.5"/>
+      <text x="820" y="500" text-anchor="middle" fill="#1a5fa8" font-weight="500">예약 DB 등록</text>
+      <text x="820" y="516" text-anchor="middle" fill="#1a5fa8">계정 점유 시작-30분</text>
+
+      <!-- 시작 시간 됐을 때 start_url 발급 -->
+      <line x1="820" y1="530" x2="820" y2="565" stroke="#1a5fa8" stroke-width="1.2" marker-end="url(#arr-blue)"/>
+      <rect x="740" y="565" width="160" height="50" rx="6" fill="#eef3fa" stroke="#1a5fa8" stroke-width="1.5"/>
+      <text x="820" y="585" text-anchor="middle" fill="#1a5fa8" font-weight="500">시작 시간 도달</text>
+      <text x="820" y="601" text-anchor="middle" fill="#1a5fa8">start_url 발급</text>
+
+      <!-- 강의 진행 (예약) -->
+      <line x1="820" y1="615" x2="820" y2="650" stroke="#1a7a5e" stroke-width="1.2" marker-end="url(#arr-teal)"/>
+      <rect x="750" y="650" width="140" height="44" rx="22" fill="#e8f5f0" stroke="#1a7a5e" stroke-width="1.5"/>
+      <text x="820" y="667" text-anchor="middle" fill="#1a7a5e" font-weight="500">강의 진행</text>
+      <text x="820" y="682" text-anchor="middle" fill="#1a7a5e">(Zoom 실시간)</text>
+
+      <!-- 종료 분기 (예약) -->
+      <line x1="820" y1="694" x2="820" y2="729" stroke="#999" stroke-width="1.2" marker-end="url(#arr)"/>
+      <polygon points="820,729 920,761 820,793 720,761" fill="#fff8e8" stroke="#b08000" stroke-width="1.5"/>
+      <text x="820" y="755" text-anchor="middle" fill="#7a5800">강의 종료?</text>
+      <text x="820" y="771" text-anchor="middle" fill="#7a5800">meeting.ended</text>
+
+      <!-- N: type=live -->
+      <line x1="720" y1="761" x2="660" y2="761" stroke="#999" stroke-width="1.2" marker-end="url(#arr)"/>
+      <text x="690" y="753" text-anchor="middle" fill="#888" font-size="10">N</text>
+      <rect x="600" y="741" width="60" height="40" rx="4" fill="#f5eef8" stroke="#8e44ad" stroke-width="1.2"/>
+      <text x="630" y="758" text-anchor="middle" fill="#8e44ad" font-size="10">type=live</text>
+      <text x="630" y="771" text-anchor="middle" fill="#8e44ad" font-size="10">폴링</text>
+
+      <!-- Y: 다음 예약 확인 -->
+      <line x1="820" y1="793" x2="820" y2="828" stroke="#999" stroke-width="1.2" marker-end="url(#arr)"/>
+      <text x="832" y="815" fill="#888" font-size="10">Y</text>
+      <polygon points="820,828 920,860 820,892 720,860" fill="#fff8e8" stroke="#b08000" stroke-width="1.5"/>
+      <text x="820" y="854" text-anchor="middle" fill="#7a5800">다음 예약</text>
+      <text x="820" y="870" text-anchor="middle" fill="#7a5800">있음?</text>
+
+      <!-- Y: 강제종료 경고 -->
+      <line x1="920" y1="860" x2="980" y2="860" stroke="#c0392b" stroke-width="1.2" marker-end="url(#arr-red)"/>
+      <text x="950" y="852" text-anchor="middle" fill="#c0392b" font-size="10">Y</text>
+      <rect x="980" y="840" width="55" height="40" rx="4" fill="#fdf0ee" stroke="#c0392b" stroke-width="1.2"/>
+      <text x="1007" y="857" text-anchor="middle" fill="#c0392b" font-size="10">강사 알림</text>
+      <text x="1007" y="870" text-anchor="middle" fill="#c0392b" font-size="10">TBD</text>
+
+      <!-- N: 자동연장 허용 -->
+      <line x1="820" y1="892" x2="820" y2="927" stroke="#1a7a5e" stroke-width="1.2" marker-end="url(#arr-teal)"/>
+      <text x="832" y="914" fill="#1a7a5e" font-size="10">N</text>
+      <rect x="740" y="927" width="160" height="38" rx="6" fill="#e8f5f0" stroke="#1a7a5e" stroke-width="1.5"/>
+      <text x="820" y="946" text-anchor="middle" fill="#1a7a5e" font-size="10">자동연장 허용</text>
+      <text x="820" y="960" text-anchor="middle" fill="#1a7a5e" font-size="10">다음 예약 없음</text>
+
+    </svg>
+  </div>
+
+  <!-- legend -->
+  <div class="legend">
+    <div class="legend-item"><div class="legend-box" style="background:#e8f5f0;border-color:#1a7a5e"></div> 시작 / 강의 진행 / 종료</div>
+    <div class="legend-item"><div class="legend-box" style="background:#eef3fa;border-color:#1a5fa8"></div> 입력 / 계정 배정 / DB 등록</div>
+    <div class="legend-item"><div class="legend-box" style="background:#fff8e8;border-color:#b08000"></div> 분기 조건</div>
+    <div class="legend-item"><div class="legend-box" style="background:#f0f8f4;border-color:#1a7a5e;border-style:dashed"></div> 버퍼 정책 (서버 처리)</div>
+    <div class="legend-item"><div class="legend-box" style="background:#f5eef8;border-color:#8e44ad"></div> type=live 폴링</div>
+    <div class="legend-item"><div class="legend-box" style="background:#fdf0ee;border-color:#c0392b"></div> 에러 / 알림</div>
+  </div>
+
+  <!-- side effects notice -->
+  <div class="notice">
+    <strong>⚠️ 사이드이펙트 고려사항</strong><br>
+    즉시 시작 시 앞 버퍼 없음 → 직전에 종료된 예약 강의의 뒤 버퍼(30분)와 겹칠 수 있음.<br>
+    예: 예약 강의가 14:00 종료 → 버퍼 14:30까지 점유 중인데, 즉시 시작 시도 시 14:00~14:30 구간 충돌 발생 가능.<br>
+    → 계정 가용 판단 시 즉시 시작도 <strong>현재 시각 기준 buffer_end 이후 계정만 배정</strong>하는 로직 필요. 개발팀 확인 요망.
+  </div>
+
+  <footer style="margin-top:48px;padding-top:16px;border-top:1px solid var(--border);font-size:11px;color:var(--text-dim);display:flex;justify-content:space-between;">
+    <span>Samsung SDS Multicampus · AI Studio × Zoom · 강의 시작 프로세스 v6</span>
+    <span>2026-03-18</span>
+  </footer>
+
+</div>
+</body>
+</html>
