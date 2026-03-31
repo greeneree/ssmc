@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>실시간 강의 관리 - 강사</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { font-family: 'Noto Sans KR', sans-serif; box-sizing: border-box; }
+    body { background: #f5f6f8; overflow-x: hidden; }
+
+    /* Toggle */
+    .toggle { position: relative; width: 44px; height: 24px; border-radius: 9999px; cursor: pointer; transition: background 0.2s; flex-shrink: 0; }
+    .toggle.off { background: #d1d5dc; }
+    .toggle.on  { background: #10b981; }
+    .toggle .knob { position: absolute; top: 2px; width: 20px; height: 20px; border-radius: 9999px; background: white; transition: left 0.2s; }
+    .toggle.off .knob { left: 2px; }
+    .toggle.on  .knob { left: 22px; }
+
+    /* Radio */
+    .radio-btn { width: 18px; height: 18px; border-radius: 9999px; border: 2px solid #d1d5dc; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; transition: border-color 0.15s; }
+    .radio-btn.active { border-color: #10b981; }
+    .radio-btn.active::after { content: ''; width: 9px; height: 9px; border-radius: 9999px; background: #10b981; }
+
+    /* Input */
+    .input-base { background: white; border: 1px solid rgba(0,0,0,0.1); border-radius: 10px; height: 42px; padding: 0 12px; display: flex; align-items: center; width: 100%; cursor: pointer; transition: border-color 0.15s; }
+    .input-base:hover { border-color: #10b981; }
+    .input-base.active { border-color: #10b981; box-shadow: 0 0 0 2px rgba(16,185,129,0.15); }
+    .select-base { background: white; border: 1px solid rgba(0,0,0,0.1); border-radius: 10px; height: 42px; padding: 0 32px 0 12px; width: 100%; font-size: 14px; color: #030213; outline: none; appearance: none; background-image: url("data:image/svg+xml,%3Csvg width='16' height='16' viewBox='0 0 16 16' fill='none'%3E%3Cpath d='M4 6l4 4 4-4' stroke='%239ca3af' stroke-width='1.2' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; cursor: pointer; }
+
+    /* Day btn */
+    .day-btn { width: 36px; height: 36px; border-radius: 9999px; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 500; cursor: pointer; border: 1.5px solid rgba(0,0,0,0.08); color: #374151; transition: all 0.15s; }
+    .day-btn.selected { background: #10b981; color: white; border-color: #10b981; }
+    .day-btn:hover:not(.selected) { border-color: #10b981; color: #10b981; }
+
+    /* Picker */
+    .picker-dropdown { background: white; border: 1px solid rgba(0,0,0,0.1); border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.12); overflow: hidden; z-index: 200; }
+    .cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 2px; }
+    .cal-day { height: 32px; display: flex; align-items: center; justify-content: center; font-size: 13px; cursor: pointer; border-radius: 9999px; transition: all 0.15s; }
+    .cal-day:hover:not(.empty):not(.selected) { background: #f0fdf4; color: #10b981; }
+    .cal-day.selected { background: #10b981; color: white; font-weight: 600; }
+    .cal-day.today { color: #10b981; font-weight: 600; }
+    .cal-day.empty { cursor: default; }
+    .cal-header { font-size: 11px; color: #9ca3af; font-weight: 500; display: flex; align-items: center; justify-content: center; height: 28px; }
+    .time-scroll { height: 180px; overflow-y: scroll; scrollbar-width: none; }
+    .time-scroll::-webkit-scrollbar { display: none; }
+    .time-item { height: 36px; display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; border-radius: 8px; transition: all 0.15s; }
+    .time-item:hover { background: #f0fdf4; color: #10b981; }
+    .time-item.selected { background: #10b981; color: white; font-weight: 600; }
+
+    /* Num input */
+    .num-input { width: 64px; height: 36px; border: 1px solid rgba(0,0,0,0.1); border-radius: 8px; text-align: center; font-size: 14px; font-weight: 500; outline: none; }
+
+    /* Section label */
+    .section-label { font-size: 14px; font-weight: 500; color: #030213; display: flex; align-items: center; gap: 4px; }
+    .required { color: #fb2c36; }
+    .hint-text { color: #717182; font-size: 11px; margin-top: 4px; }
+    .error-text { color: #fb2c36; font-size: 11px; margin-top: 4px; }
+
+    /* Tab */
+    .tab-btn { flex: 1; height: 36px; border-radius: 10px; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.15s; }
+    .tab-btn.active { background: white; box-shadow: 0 1px 4px rgba(0,0,0,0.1); color: #030213; }
+    .tab-btn.inactive { color: #717182; }
+
+    /* Table */
+    .tbl-row { border-bottom: 1px solid rgba(0,0,0,0.05); transition: background 0.12s; }
+    .tbl-row:hover { background: #fafafa; }
+
+    /* Sort btn */
+    .sort-btn { padding: 4px 10px; border-radius: 9999px; font-size: 12px; font-weight: 500; cursor: pointer; border: 1px solid rgba(0,0,0,0.1); background: white; color: #717182; transition: all 0.15s; }
+    .sort-btn.active { background: #030213; color: white; border-color: #030213; }
+
+    /* Toast */
+    .toast { position: fixed; top: 24px; left: 50%; transform: translateX(-50%) translateY(-20px); background: #030213; color: white; padding: 12px 20px; border-radius: 10px; font-size: 14px; font-weight: 500; opacity: 0; transition: all 0.3s; z-index: 999; display: flex; align-items: center; gap-8px; white-space: nowrap; }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* Pagination */
+    .page-btn { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid rgba(0,0,0,0.1); background: white; color: #374151; transition: all 0.15s; }
+    .page-btn.active { background: #030213; color: white; border-color: #030213; }
+    .page-btn:hover:not(.active) { border-color: #10b981; color: #10b981; }
+
+    /* Fade */
+    .fade-in { animation: fadeIn 0.18s ease; }
+    @keyframes fadeIn { from { opacity:0; transform:translateY(-4px); } to { opacity:1; transform:translateY(0); } }
+
+    /* Overlay */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 100; display: flex; align-items: flex-start; justify-content: center; padding-top: 40px; overflow-y: auto; }
+  </style>
+</head>
+<body class="min-h-screen">
+
+  <!-- Toast -->
+  <div id="toast" class="toast">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" class="mr-2 flex-shrink-0"><circle cx="8" cy="8" r="7" stroke="#10b981" stroke-width="1.5"/><path d="M5 8l2 2 4-4" stroke="#10b981" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    강의 예약이 완료되었습니다.
+  </div>
+
+  <!-- Sidebar + Main layout -->
+  <div class="flex min-h-screen">
+
+    <!-- Sidebar -->
+    <div class="w-[200px] bg-white border-r border-[rgba(0,0,0,0.06)] flex flex-col flex-shrink-0">
+      <div class="px-4 py-4 border-b border-[rgba(0,0,0,0.06)]">
+        <div class="flex items-center gap-2">
+          <div class="w-7 h-7 bg-[#6366f1] rounded-lg flex items-center justify-center">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2.5 7h9M7 2.5v9" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg>
+          </div>
+          <span class="text-[14px] font-semibold text-[#030213]">AI Studio</span>
+        </div>
+      </div>
+      <nav class="px-3 py-4 flex flex-col gap-1 text-[13px]">
+        <div class="px-3 py-2 text-[#9ca3af] font-medium">학습자</div>
+        <div class="px-3 py-2 rounded-lg text-[#717182] cursor-pointer hover:bg-gray-50">AI갤러리</div>
+        <div class="px-3 py-2 rounded-lg text-[#717182] cursor-pointer hover:bg-gray-50">코드편집기</div>
+        <div class="px-3 py-2 rounded-lg text-[#030213] bg-[#f0fdf4] font-semibold cursor-pointer flex items-center gap-2">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="2" width="12" height="10" rx="2" stroke="#10b981" stroke-width="1.2"/><circle cx="4.5" cy="7" r="1.5" fill="#10b981"/><path d="M10 5v4M8 6.5v1" stroke="#10b981" stroke-width="1.2" stroke-linecap="round"/></svg>
+          실시간 강의
+        </div>
+        <div class="mt-4 px-3 py-2 text-[#9ca3af] font-medium">콘텐츠관리</div>
+        <div class="px-3 py-2 rounded-lg text-[#717182] cursor-pointer hover:bg-gray-50">학습자료</div>
+        <div class="px-3 py-2 rounded-lg text-[#717182] cursor-pointer hover:bg-gray-50">과제</div>
+        <div class="px-3 py-2 rounded-lg text-[#717182] cursor-pointer hover:bg-gray-50">평가</div>
+      </nav>
+    </div>
+
+    <!-- Main -->
+    <div class="flex-1 flex flex-col">
+
+      <!-- Top bar -->
+      <div class="bg-white border-b border-[rgba(0,0,0,0.06)] px-6 py-3 flex items-center justify-between">
+        <div>
+          <div class="text-[12px] text-[#9ca3af]">LLM 파인튜닝 실습</div>
+          <div class="text-[15px] font-semibold text-[#030213]">실시간 강의 관리</div>
+        </div>
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-full bg-[#6366f1] flex items-center justify-center text-white text-[12px] font-bold">김</div>
+        </div>
+      </div>
+
+      <!-- Content -->
+      <div class="px-6 py-5 flex-1" id="mainContent">
+
+        <!-- Empty state (초기) -->
+        <div id="emptyState" class="flex flex-col items-center justify-center py-24">
+          <div class="w-16 h-16 rounded-2xl bg-[#f0fdf4] flex items-center justify-center mb-4">
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><rect x="4" y="6" width="24" height="20" rx="3" stroke="#10b981" stroke-width="1.5"/><path d="M20 14l4 3-4 3V14z" fill="#10b981"/><line x1="4" y1="13" x2="28" y2="13" stroke="#10b981" stroke-width="1.5"/></svg>
+          </div>
+          <p class="text-[16px] font-semibold text-[#030213] mb-1">등록된 강의가 없습니다.</p>
+          <p class="text-[13px] text-[#9ca3af] mb-6">강의를 생성하여 실시간 수업을 시작해 보세요.</p>
+          <button onclick="openModal()" class="h-[42px] px-6 bg-[#10b981] rounded-[10px] text-[14px] font-semibold text-white hover:bg-[#0d9e6e] transition-colors flex items-center gap-2">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1v12M1 7h12" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg>
+            강의 생성
+          </button>
+        </div>
+
+        <!-- Lecture list (생성 후) -->
+        <div id="lectureListArea" style="display:none;">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h2 class="text-[17px] font-semibold text-[#030213]">강의 내역</h2>
+            </div>
+            <div class="flex items-center gap-2">
+              <button class="sort-btn active" id="sortLatest" onclick="setSort('latest',this)">최신순</button>
+              <button class="sort-btn" id="sortOldest" onclick="setSort('oldest',this)">등록일순</button>
+              <button onclick="openModal()" class="h-[36px] px-4 bg-[#10b981] rounded-[10px] text-[13px] font-semibold text-white hover:bg-[#0d9e6e] transition-colors flex items-center gap-1.5">
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1v10M1 6h10" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg>
+                강의 생성
+              </button>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-2xl border border-[rgba(0,0,0,0.06)] overflow-hidden">
+            <table class="w-full" style="border-collapse:collapse;">
+              <thead>
+                <tr style="background:#fafafa; border-bottom:1px solid rgba(0,0,0,0.07);">
+                  <th class="text-left px-5 py-3 text-[12px] text-[#6b7280] font-medium">강의</th>
+                  <th class="text-left px-4 py-3 text-[12px] text-[#6b7280] font-medium">예약 설정</th>
+                  <th class="text-left px-4 py-3 text-[12px] text-[#6b7280] font-medium">반복</th>
+                  <th class="text-left px-4 py-3 text-[12px] text-[#6b7280] font-medium">강의 진행 시간</th>
+                  <th class="text-left px-4 py-3 text-[12px] text-[#6b7280] font-medium">다시보기 제공</th>
+                  <th class="text-left px-4 py-3 text-[12px] text-[#6b7280] font-medium">액션</th>
+                </tr>
+              </thead>
+              <tbody id="lectureTableBody"></tbody>
+            </table>
+          </div>
+
+          <!-- Pagination -->
+          <div class="flex items-center justify-center gap-1.5 mt-4" id="pagination"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Overlay -->
+  <div id="modalOverlay" class="modal-overlay" style="display:none;" onclick="handleOverlayClick(event)">
+    <div class="bg-white rounded-2xl shadow-2xl w-[520px] mb-10" onclick="event.stopPropagation()">
+
+      <!-- Modal header tabs -->
+      <div class="flex border-b border-[rgba(0,0,0,0.08)] px-6 pt-5">
+        <button class="flex-1 h-[38px] font-medium text-[14px] border-b-2 border-[#10b981] text-[#030213] bg-none cursor-pointer" style="background:none;">강의 생성</button>
+        <span class="text-[12px] text-[#717182] self-center ml-auto pb-1"><span class="text-[#fb2c36]">*</span> 필수입력</span>
+      </div>
+
+      <div class="px-6 pt-5 pb-6">
+
+        <!-- 예약/즉시 탭 -->
+        <div class="bg-[#f3f4f6] rounded-[14px] p-1 flex mb-5">
+          <button class="tab-btn active">예약하기</button>
+          <button class="tab-btn inactive">지금 시작</button>
+        </div>
+
+        <div class="flex flex-col gap-5" style="max-height:65vh; overflow-y:auto; padding-right:4px;">
+
+          <!-- 강좌 선택 -->
+          <div class="flex flex-col gap-2">
+            <label class="section-label">강좌 선택 <span class="required">*</span></label>
+            <select class="select-base" style="color:#030213;">
+              <option>LLM 파인튜닝 실습</option>
+            </select>
+          </div>
+
+          <!-- 강사 선택 -->
+          <div class="flex flex-col gap-2">
+            <label class="section-label">강사 선택 <span class="required">*</span></label>
+            <select class="select-base" style="color:#030213;">
+              <option>김강사</option>
+              <option>이강사</option>
+            </select>
+          </div>
+
+          <!-- 강의명 -->
+          <div class="flex flex-col gap-2">
+            <label class="section-label">강의명 <span class="required">*</span></label>
+            <div class="input-base" style="cursor:text;">
+              <input id="lectureNameInput" type="text" placeholder="강의명을 입력해 주세요"
+                class="w-full bg-transparent outline-none text-[14px] placeholder-[rgba(10,10,10,0.4)]" style="color:#030213;" />
+            </div>
+          </div>
+
+          <!-- 반복 회의 ON -->
+          <div class="flex items-center justify-between">
+            <div class="section-label">반복 회의 <span class="required">*</span></div>
+            <div class="toggle on" id="repeatToggle">
+              <div class="knob"></div>
+            </div>
+          </div>
+
+          <!-- 강의 운영 시간 -->
+          <div class="flex items-center gap-3">
+            <span class="text-[12px] font-semibold text-[#10b981] whitespace-nowrap">강의 운영 시간</span>
+            <div class="flex-1 h-px bg-[rgba(0,0,0,0.06)]"></div>
+          </div>
+
+          <div class="flex flex-col gap-2">
+            <label class="section-label">강의 시작·종료 시간 <span class="required">*</span></label>
+            <div class="flex gap-2 items-center">
+              <div class="input-base flex-1" id="lectureStartTime_box" onclick="openPicker('lectureStartTime')">
+                <svg class="mr-2 flex-shrink-0" width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="#9ca3af" stroke-width="1.2"/><line x1="8" y1="5" x2="8" y2="8" stroke="#9ca3af" stroke-width="1.2" stroke-linecap="round"/><line x1="8" y1="8" x2="10.5" y2="10" stroke="#9ca3af" stroke-width="1.2" stroke-linecap="round"/></svg>
+                <span class="text-[14px]" id="lectureStartTime_val" style="color:rgba(10,10,10,0.4)">시작</span>
+              </div>
+              <span class="text-[#9ca3af] text-[13px] flex-shrink-0">~</span>
+              <div class="input-base flex-1" id="lectureEndTime_box" onclick="openPicker('lectureEndTime')">
+                <svg class="mr-2 flex-shrink-0" width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="#9ca3af" stroke-width="1.2"/><line x1="8" y1="5" x2="8" y2="8" stroke="#9ca3af" stroke-width="1.2" stroke-linecap="round"/><line x1="8" y1="8" x2="10.5" y2="10" stroke="#9ca3af" stroke-width="1.2" stroke-linecap="round"/></svg>
+                <span class="text-[14px]" id="lectureEndTime_val" style="color:rgba(10,10,10,0.4)">종료</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 반복 설정 -->
+          <div class="flex items-center gap-3">
+            <span class="text-[12px] font-semibold text-[#10b981] whitespace-nowrap">반복 설정</span>
+            <div class="flex-1 h-px bg-[rgba(0,0,0,0.06)]"></div>
+          </div>
+
+          <!-- 반복 유형 -->
+          <div class="flex flex-col gap-2">
+            <label class="section-label">반복 유형 <span class="required">*</span></label>
+            <div class="input-base" style="justify-content:space-between; cursor:pointer; color:#030213; font-size:14px;">
+              <span>매주</span>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="#9ca3af" stroke-width="1.2" stroke-linecap="round"/></svg>
+            </div>
+          </div>
+
+          <!-- 반복 간격 -->
+          <div class="flex flex-col gap-2">
+            <label class="section-label">반복 간격</label>
+            <div class="flex items-center gap-3">
+              <span class="text-[14px] text-[#717182]">매</span>
+              <input type="number" min="1" max="10" value="1" class="num-input" />
+              <span class="text-[14px] text-[#717182]">주마다 반복</span>
+            </div>
+          </div>
+
+          <!-- 요일 선택 -->
+          <div class="flex flex-col gap-2">
+            <label class="section-label">요일 선택 <span class="required">*</span></label>
+            <div class="flex gap-2">
+              <div class="day-btn" onclick="toggleDay(this)">일</div>
+              <div class="day-btn selected" onclick="toggleDay(this)">월</div>
+              <div class="day-btn" onclick="toggleDay(this)">화</div>
+              <div class="day-btn selected" onclick="toggleDay(this)">수</div>
+              <div class="day-btn" onclick="toggleDay(this)">목</div>
+              <div class="day-btn" onclick="toggleDay(this)">금</div>
+              <div class="day-btn" onclick="toggleDay(this)">토</div>
+            </div>
+          </div>
+
+          <!-- 반복 기간 -->
+          <div class="flex items-center gap-3">
+            <span class="text-[12px] font-semibold text-[#10b981] whitespace-nowrap">반복 기간</span>
+            <div class="flex-1 h-px bg-[rgba(0,0,0,0.06)]"></div>
+          </div>
+
+          <!-- 시작일 -->
+          <div class="flex flex-col gap-2">
+            <label class="section-label">시작일 <span class="required">*</span></label>
+            <div class="input-base" id="rStartDate_box" onclick="openPicker('rStartDate')">
+              <svg class="mr-2 flex-shrink-0" width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="2" stroke="#9ca3af" stroke-width="1.2"/><line x1="2" y1="6.5" x2="14" y2="6.5" stroke="#9ca3af" stroke-width="1.2"/><line x1="5" y1="1.5" x2="5" y2="4.5" stroke="#9ca3af" stroke-width="1.2" stroke-linecap="round"/><line x1="11" y1="1.5" x2="11" y2="4.5" stroke="#9ca3af" stroke-width="1.2" stroke-linecap="round"/></svg>
+              <span class="text-[14px]" id="rStartDate_val" style="color:rgba(10,10,10,0.4)">시작 날짜 선택</span>
+            </div>
+          </div>
+
+          <!-- 종료 조건 -->
+          <div class="flex flex-col gap-3">
+            <label class="section-label">종료 조건 <span class="required">*</span></label>
+            <div class="flex items-center gap-3 cursor-pointer" onclick="setEndCond('date')">
+              <div class="radio-btn active" id="radio_date"></div>
+              <span class="text-[14px] text-[#030213]">종료일 지정</span>
+            </div>
+            <div id="endDateArea" class="pl-7">
+              <div class="input-base" id="rEndDate_box" onclick="openPicker('rEndDate')">
+                <svg class="mr-2 flex-shrink-0" width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="2" stroke="#9ca3af" stroke-width="1.2"/><line x1="2" y1="6.5" x2="14" y2="6.5" stroke="#9ca3af" stroke-width="1.2"/><line x1="5" y1="1.5" x2="5" y2="4.5" stroke="#9ca3af" stroke-width="1.2" stroke-linecap="round"/><line x1="11" y1="1.5" x2="11" y2="4.5" stroke="#9ca3af" stroke-width="1.2" stroke-linecap="round"/></svg>
+                <span class="text-[14px]" id="rEndDate_val" style="color:rgba(10,10,10,0.4)">종료 날짜 선택</span>
+              </div>
+            </div>
+            <div class="flex items-center gap-3 cursor-pointer" onclick="setEndCond('count')">
+              <div class="radio-btn" id="radio_count"></div>
+              <span class="text-[14px] text-[#030213]">종료 횟수 지정</span>
+            </div>
+            <div id="endCountArea" class="flex flex-col gap-1 pl-7" style="display:none;">
+              <div class="flex items-center gap-2">
+                <input type="number" min="1" max="50" value="1" class="num-input" />
+                <span class="text-[14px] text-[#717182]">회</span>
+              </div>
+              <div class="hint-text">* 최대 50회까지 설정 가능합니다.</div>
+            </div>
+          </div>
+
+          <!-- 보안 -->
+          <div class="flex flex-col gap-2">
+            <div class="section-label">보안 <span class="required">*</span></div>
+            <div class="input-base" style="cursor:text;">
+              <input type="text" placeholder="비밀번호를 입력해 주세요."
+                class="w-full bg-transparent outline-none text-[14px] placeholder-[rgba(10,10,10,0.4)]" style="color:#030213;" />
+            </div>
+            <div class="flex items-center justify-between mt-1">
+              <span class="text-[12px] text-[#717182]">대기실</span>
+              <div class="toggle on"><div class="knob"></div></div>
+            </div>
+          </div>
+
+          <!-- 비디오 설정 -->
+          <div class="flex flex-col gap-2">
+            <label class="section-label">비디오 설정</label>
+            <div class="flex flex-col gap-2">
+              <div class="flex items-center justify-between">
+                <span class="text-[12px] text-[#717182]">호스트</span>
+                <div class="toggle on"><div class="knob"></div></div>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-[12px] text-[#717182]">참가자</span>
+                <div class="toggle off"><div class="knob"></div></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Footer -->
+        <div class="flex gap-3 mt-5">
+          <button onclick="closeModal()" class="flex-1 h-[42px] border border-[rgba(0,0,0,0.1)] rounded-[10px] text-[14px] font-medium text-[#717182] hover:bg-gray-50">취소</button>
+          <button onclick="submitReservation()" class="flex-1 h-[42px] bg-[#10b981] rounded-[10px] text-[14px] font-medium text-white hover:bg-[#0d9e6e] transition-colors">예약하기</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Picker Overlay -->
+  <div id="pickerOverlay" onclick="closePicker()" style="display:none; position:fixed; inset:0; z-index:150;"></div>
+  <div id="pickerPanel" class="picker-dropdown" style="display:none; position:fixed; z-index:200; padding:16px;">
+    <div id="pickerContent"></div>
+  </div>
+
+  <script>
+    // ── Picker state ──
+    let currentPicker = null;
+    const selectedDates = {};
+    const selectedTimes = {};
+    const today = new Date();
+    let calMonth = { y: today.getFullYear(), m: today.getMonth() };
+
+    function openPicker(id) {
+      currentPicker = id;
+      const box = document.getElementById(id + '_box');
+      const rect = box.getBoundingClientRect();
+      const panel = document.getElementById('pickerPanel');
+      box.classList.add('active');
+      panel.style.top = (rect.bottom + 6) + 'px';
+      panel.style.left = rect.left + 'px';
+      if (id.includes('Time')) { renderTimePicker(id); panel.style.width = '160px'; }
+      else { renderCalendar(id); panel.style.width = '300px'; }
+      panel.style.display = '';
+      document.getElementById('pickerOverlay').style.display = '';
+    }
+
+    function closePicker() {
+      if (currentPicker) { const b = document.getElementById(currentPicker+'_box'); if(b) b.classList.remove('active'); }
+      document.getElementById('pickerPanel').style.display = 'none';
+      document.getElementById('pickerOverlay').style.display = 'none';
+      currentPicker = null;
+    }
+
+    function renderCalendar(id) {
+      const {y,m} = calMonth;
+      const firstDay = new Date(y,m,1).getDay();
+      const days = new Date(y,m+1,0).getDate();
+      const mNames = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
+      const sel = selectedDates[id];
+      let html = `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <button onclick="chMonth(-1)" style="width:28px;height:28px;border-radius:9999px;border:none;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;" onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='none'"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 12l-4-4 4-4" stroke="#374151" stroke-width="1.4" stroke-linecap="round"/></svg></button>
+        <span style="font-size:14px;font-weight:600;color:#030213;">${y}년 ${mNames[m]}</span>
+        <button onclick="chMonth(1)" style="width:28px;height:28px;border-radius:9999px;border:none;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;" onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='none'"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="#374151" stroke-width="1.4" stroke-linecap="round"/></svg></button>
+      </div>
+      <div class="cal-grid" style="margin-bottom:4px;">${['일','월','화','수','목','금','토'].map(d=>`<div class="cal-header">${d}</div>`).join('')}</div>
+      <div class="cal-grid">`;
+      for(let i=0;i<firstDay;i++) html+=`<div class="cal-day empty"></div>`;
+      for(let d=1;d<=days;d++){
+        const ds=`${y}.${String(m+1).padStart(2,'0')}.${String(d).padStart(2,'0')}`;
+        const iT=d===today.getDate()&&m===today.getMonth()&&y===today.getFullYear();
+        const iS=sel===ds;
+        html+=`<div class="cal-day ${iT&&!iS?'today':''} ${iS?'selected':''}" onclick="selDate('${ds}')">${d}</div>`;
+      }
+      html+=`</div>`;
+      document.getElementById('pickerContent').innerHTML=html;
+    }
+
+    function chMonth(dir){
+      calMonth.m+=dir;
+      if(calMonth.m>11){calMonth.m=0;calMonth.y++;}
+      if(calMonth.m<0){calMonth.m=11;calMonth.y--;}
+      renderCalendar(currentPicker);
+    }
+
+    function selDate(ds){
+      selectedDates[currentPicker]=ds;
+      const v=document.getElementById(currentPicker+'_val');
+      v.textContent=ds; v.style.color='#030213';
+      closePicker();
+    }
+
+    function renderTimePicker(id){
+      const times=[];
+      for(let h=0;h<24;h++) for(let min of[0,30]) times.push(`${String(h).padStart(2,'0')}:${String(min).padStart(2,'0')}`);
+      const sel=selectedTimes[id]||'';
+      let html=`<div class="time-scroll" id="tScroll">`;
+      times.forEach(t=>{ html+=`<div class="time-item ${t===sel?'selected':''}" onclick="selTime('${t}')">${t}</div>`; });
+      html+=`</div>`;
+      document.getElementById('pickerContent').innerHTML=html;
+      setTimeout(()=>{
+        const sc=document.getElementById('tScroll');
+        const s=sc.querySelector('.selected');
+        if(s) s.scrollIntoView({block:'center'}); else sc.scrollTop=9*36;
+      },10);
+    }
+
+    function selTime(t){
+      selectedTimes[currentPicker]=t;
+      const v=document.getElementById(currentPicker+'_val');
+      v.textContent=t; v.style.color='#030213';
+      closePicker();
+    }
+
+    // ── End condition ──
+    function setEndCond(c){
+      document.getElementById('radio_date').classList.toggle('active',c==='date');
+      document.getElementById('radio_count').classList.toggle('active',c==='count');
+      document.getElementById('endDateArea').style.display=c==='date'?'':'none';
+      document.getElementById('endCountArea').style.display=c==='count'?'':'none';
+    }
+
+    function toggleDay(el){ el.classList.toggle('selected'); }
+
+    // ── Modal ──
+    function openModal(){
+      document.getElementById('modalOverlay').style.display='flex';
+    }
+    function closeModal(){
+      document.getElementById('modalOverlay').style.display='none';
+    }
+    function handleOverlayClick(e){
+      if(e.target===document.getElementById('modalOverlay')) closeModal();
+    }
+
+    // ── Generate lecture list ──
+    function generateLectures(){
+      const lectures = [];
+      // 2026.04.06 ~ 2026.07.31 매주 월(1), 수(3)
+      const start = new Date(2026, 3, 6); // April 6
+      const end = new Date(2026, 6, 31);  // July 31
+      const targetDays = [1, 3]; // 월, 수
+      const dayNames = ['일','월','화','수','목','금','토'];
+
+      let cur = new Date(start);
+      let idx = 1;
+      while(cur <= end){
+        if(targetDays.includes(cur.getDay())){
+          const y = cur.getFullYear();
+          const m = String(cur.getMonth()+1).padStart(2,'0');
+          const d = String(cur.getDate()).padStart(2,'0');
+          const day = dayNames[cur.getDay()];
+          lectures.push({
+            id: idx,
+            name: `LLM 파인튜닝 실습 실시간 강의`,
+            date: `${y}.${m}.${d} (${day})`,
+            period: '2026.04.06 ~ 2026.07.31',
+            repeat: '매주 월·수',
+            time: '10:00 - 14:00',
+            replay: '-',
+          });
+          idx++;
+        }
+        cur.setDate(cur.getDate()+1);
+      }
+      return lectures;
+    }
+
+    // ── Pagination & render ──
+    const PAGE_SIZE = 10;
+    let allLectures = [];
+    let currentPage = 1;
+    let sortOrder = 'latest';
+
+    function setSort(order, btn){
+      sortOrder = order;
+      document.querySelectorAll('.sort-btn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      currentPage = 1;
+      renderPage();
+    }
+
+    function renderPage(){
+      const sorted = sortOrder === 'latest' ? [...allLectures].reverse() : [...allLectures];
+      const total = sorted.length;
+      const totalPages = Math.ceil(total / PAGE_SIZE);
+      const start = (currentPage-1)*PAGE_SIZE;
+      const pageData = sorted.slice(start, start+PAGE_SIZE);
+
+      const tbody = document.getElementById('lectureTableBody');
+      tbody.innerHTML = pageData.map(l => `
+        <tr class="tbl-row">
+          <td class="px-5 py-3">
+            <div class="text-[13px] font-semibold text-[#030213]">${l.name}</div>
+          </td>
+          <td class="px-4 py-3 text-[12px] text-[#717182]">${l.period}<br/></td>
+          <td class="px-4 py-3 text-[12px] text-[#717182]">${l.repeat}</td>
+          <td class="px-4 py-3 text-[12px] text-[#717182]">${l.date} ${l.time}</td>
+          <td class="px-4 py-3 text-[12px] text-[#9ca3af]">${l.replay}</td>
+          <td class="px-4 py-3">
+            <div class="flex items-center gap-2">
+              <button class="text-[12px] font-medium text-[#374151] hover:text-[#10b981] transition-colors" onclick="alert('수정')">수정</button>
+              <span class="text-[#d1d5db]">|</span>
+              <button class="text-[12px] font-medium text-[#374151] hover:text-[#ef4444] transition-colors" onclick="alert('삭제')">삭제</button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+
+      // Pagination
+      const pg = document.getElementById('pagination');
+      pg.innerHTML = '';
+      if(totalPages <= 1) return;
+
+      const addBtn = (label, page, isActive=false, disabled=false) => {
+        const btn = document.createElement('button');
+        btn.className = 'page-btn' + (isActive?' active':'');
+        btn.textContent = label;
+        if(disabled){ btn.style.opacity='0.4'; btn.style.cursor='default'; }
+        else btn.onclick = ()=>{ currentPage=page; renderPage(); };
+        pg.appendChild(btn);
+      };
+
+      addBtn('이전', currentPage-1, false, currentPage===1);
+      for(let i=1;i<=totalPages;i++) addBtn(String(i), i, i===currentPage);
+      addBtn('다음', currentPage+1, false, currentPage===totalPages);
+    }
+
+    // ── Submit ──
+    function submitReservation(){
+      closeModal();
+      // Show lecture list
+      document.getElementById('emptyState').style.display='none';
+      document.getElementById('lectureListArea').style.display='';
+      allLectures = generateLectures();
+      currentPage = 1;
+      renderPage();
+      // Toast
+      const t = document.getElementById('toast');
+      t.classList.add('show');
+      setTimeout(()=>t.classList.remove('show'), 3000);
+    }
+
+    // init
+    setEndCond('date');
+  </script>
+</body>
+</html>
