@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>강의 배너 상태 로직 스펙</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface2: #1c2128;
+    --border: #30363d;
+    --text: #e6edf3;
+    --muted: #7d8590;
+    --admin: #f78166;
+    --admin-bg: rgba(247,129,102,0.08);
+    --admin-border: rgba(247,129,102,0.25);
+    --instructor: #79c0ff;
+    --instructor-bg: rgba(121,192,255,0.08);
+    --instructor-border: rgba(121,192,255,0.25);
+    --student: #56d364;
+    --student-bg: rgba(86,211,100,0.08);
+    --student-border: rgba(86,211,100,0.25);
+    --warning: #e3b341;
+    --warning-bg: rgba(227,179,65,0.08);
+    --tag-before: #388bfd;
+    --tag-after: #56d364;
+    --tag-end: #6e7681;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  .header {
+    border-bottom: 1px solid var(--border);
+    padding: 2rem 2.5rem 1.5rem;
+    background: var(--surface);
+  }
+  .header-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .doc-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    margin-bottom: 0.6rem;
+  }
+  .header h1 {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: -0.02em;
+  }
+  .header-meta {
+    display: flex;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+    margin-top: 0.8rem;
+  }
+  .meta-chip {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.7rem;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* OPINION BOX */
+  .container { max-width: 960px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+
+  .opinion-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--warning);
+    border-radius: 6px;
+    padding: 1.2rem 1.5rem;
+    margin-bottom: 2rem;
+  }
+  .opinion-box .label {
+    font-size: 0.68rem;
+    color: var(--warning);
+    letter-spacing: 0.12em;
+    font-family: 'JetBrains Mono', monospace;
+    margin-bottom: 0.7rem;
+    font-weight: 600;
+  }
+  .opinion-box p {
+    font-size: 0.85rem;
+    color: #c9d1d9;
+    line-height: 1.75;
+  }
+  .opinion-box strong { color: var(--text); }
+  .opinion-box .diff {
+    margin-top: 1rem;
+    padding: 0.8rem 1rem;
+    background: var(--surface2);
+    border-radius: 4px;
+    border: 1px solid var(--border);
+  }
+  .diff-row {
+    display: grid;
+    grid-template-columns: 90px 1fr;
+    gap: 0.5rem;
+    padding: 0.4rem 0;
+    font-size: 0.82rem;
+    border-bottom: 1px solid var(--border);
+    align-items: flex-start;
+  }
+  .diff-row:last-child { border-bottom: none; }
+  .diff-label { color: var(--muted); font-size: 0.72rem; font-family: 'JetBrains Mono', monospace; padding-top: 2px; }
+  .diff-val { color: var(--text); }
+  .diff-val.mine { color: var(--student); }
+
+  /* SECTION */
+  .section-title {
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* TRIGGER LOGIC */
+  .trigger-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  .trigger-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1.2rem;
+  }
+  .trigger-card h4 {
+    font-size: 0.78rem;
+    font-weight: 600;
+    margin-bottom: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+  .dot.green { background: var(--student); }
+  .dot.blue { background: var(--instructor); }
+  .trigger-card ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .trigger-card li {
+    font-size: 0.8rem;
+    color: #c9d1d9;
+    padding-left: 0.8rem;
+    border-left: 2px solid var(--border);
+    line-height: 1.5;
+  }
+  .trigger-card li strong { color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; }
+  .trigger-card .highlight {
+    margin-top: 0.8rem;
+    padding: 0.6rem 0.8rem;
+    background: var(--surface2);
+    border-radius: 4px;
+    font-size: 0.75rem;
+    color: var(--student);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* ROLE TABS */
+  .role-tabs {
+    display: flex;
+    gap: 0;
+    border: 1px solid var(--border);
+    border-radius: 6px 6px 0 0;
+    overflow: hidden;
+    margin-bottom: 0;
+  }
+  .role-tab {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    border: none;
+    background: var(--surface2);
+    cursor: pointer;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--muted);
+    transition: all 0.15s;
+    border-right: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+  }
+  .role-tab:last-child { border-right: none; }
+  .role-tab.active-admin { background: var(--admin-bg); color: var(--admin); border-bottom: 2px solid var(--admin); }
+  .role-tab.active-instructor { background: var(--instructor-bg); color: var(--instructor); border-bottom: 2px solid var(--instructor); }
+  .role-tab.active-student { background: var(--student-bg); color: var(--student); border-bottom: 2px solid var(--student); }
+
+  .role-pane { display: none; }
+  .role-pane.active { display: block; }
+
+  /* STATE CARDS */
+  .state-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top: none;
+    border-radius: 0 0 6px 6px;
+    overflow: hidden;
+    margin-bottom: 2rem;
+  }
+  .state-row {
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    border-bottom: 1px solid var(--border);
+  }
+  .state-row:last-child { border-bottom: none; }
+  .state-phase {
+    padding: 1.2rem 1rem;
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    background: var(--surface2);
+    align-items: flex-start;
+    justify-content: flex-start;
+  }
+  .phase-tag {
+    font-size: 0.65rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+  }
+  .phase-tag.before { background: rgba(56,139,253,0.15); color: var(--tag-before); border: 1px solid rgba(56,139,253,0.3); }
+  .phase-tag.after { background: rgba(86,211,100,0.12); color: var(--tag-after); border: 1px solid rgba(86,211,100,0.3); }
+  .phase-tag.end { background: rgba(110,118,129,0.15); color: var(--tag-end); border: 1px solid rgba(110,118,129,0.3); }
+  .phase-desc { font-size: 0.7rem; color: var(--muted); line-height: 1.4; }
+
+  .state-content { padding: 1.2rem 1.5rem; }
+  .state-content .banner-text {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+  }
+  .state-content .banner-sub {
+    font-size: 0.78rem;
+    color: var(--muted);
+    margin-bottom: 0.8rem;
+    line-height: 1.5;
+  }
+  .action-chips {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+  }
+  .action-chip {
+    font-size: 0.68rem;
+    padding: 0.25rem 0.65rem;
+    border-radius: 4px;
+    font-weight: 500;
+    font-family: 'JetBrains Mono', monospace;
+    border: 1px solid;
+  }
+  .chip-primary { background: rgba(56,139,253,0.12); color: #79c0ff; border-color: rgba(56,139,253,0.3); }
+  .chip-danger { background: rgba(248,81,73,0.1); color: #ff7b72; border-color: rgba(248,81,73,0.3); }
+  .chip-warn { background: rgba(227,179,65,0.1); color: var(--warning); border-color: rgba(227,179,65,0.3); }
+  .chip-muted { background: rgba(110,118,129,0.1); color: var(--muted); border-color: rgba(110,118,129,0.2); }
+  .chip-green { background: rgba(86,211,100,0.1); color: var(--student); border-color: rgba(86,211,100,0.3); }
+
+  .note {
+    margin-top: 0.7rem;
+    font-size: 0.72rem;
+    color: var(--muted);
+    padding: 0.5rem 0.7rem;
+    background: var(--surface2);
+    border-radius: 4px;
+    border-left: 2px solid var(--border);
+    line-height: 1.6;
+  }
+  .note strong { color: var(--warning); }
+
+  /* SUMMARY TABLE */
+  .summary-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.78rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 2rem;
+  }
+  .summary-table th {
+    padding: 0.7rem 1rem;
+    background: var(--surface2);
+    color: var(--muted);
+    font-weight: 500;
+    font-size: 0.7rem;
+    letter-spacing: 0.05em;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  .summary-table td {
+    padding: 0.8rem 1rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    line-height: 1.5;
+    color: #c9d1d9;
+  }
+  .summary-table tr:last-child td { border-bottom: none; }
+  .summary-table tr:hover td { background: var(--surface2); }
+  .role-label {
+    font-weight: 600;
+    font-size: 0.75rem;
+    white-space: nowrap;
+  }
+  .role-label.admin { color: var(--admin); }
+  .role-label.instructor { color: var(--instructor); }
+  .role-label.student { color: var(--student); }
+
+  /* OPEN ISSUES */
+  .issue-list {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 2rem;
+  }
+  .issue-item {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem 1.2rem;
+    border-bottom: 1px solid var(--border);
+    align-items: flex-start;
+  }
+  .issue-item:last-child { border-bottom: none; }
+  .issue-num {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--warning-bg);
+    border: 1px solid rgba(227,179,65,0.3);
+    color: var(--warning);
+    font-size: 0.68rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .issue-text { font-size: 0.8rem; color: #c9d1d9; line-height: 1.6; }
+  .issue-text strong { color: var(--text); }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+  .role-pane.active { animation: fadeIn 0.2s ease; }
+
+  @media (max-width: 600px) {
+    .trigger-grid { grid-template-columns: 1fr; }
+    .state-row { grid-template-columns: 1fr; }
+    .state-phase { border-right: none; border-bottom: 1px solid var(--border); flex-direction: row; align-items: center; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="doc-tag">SPEC · INTERNAL</div>
+  <div class="header-top">
+    <h1>강의 배너 상태 로직 — 역할별 정의</h1>
+  </div>
+  <div class="header-meta">
+    <span class="meta-chip">예약강의 / 즉시강의</span>
+    <span class="meta-chip">운영자 · 강사 · 학습자</span>
+    <span class="meta-chip">강의 시작 전 / 후</span>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- OPINION -->
+  <div class="opinion-box">
+    <div class="label">⚠ 검토 의견 (기획안과 다른 관점)</div>
+    <p>
+      DB 기준 종료 트리거는 <strong>맞아</strong>. 근데 지금 버그의 본질은 트리거 문제만이 아니야.<br>
+      9시 30분 강의가 13시 19분에도 노출된 이유 — 트리거 없음 + <strong>강사에게 자기 강의 상태 피드백이 없음</strong> 이 두 개가 같이 터진 거야.<br><br>
+      운영에서 풀어야 할 문제라는 건 동의해. 근데 <strong>강사가 자기 강의가 "아직 열린 상태"인지 인지할 수 있으면</strong> 운영 개입 빈도 자체가 줄어. 역할별 상태 문구는 UX가 아니라 <strong>운영 비용 절감 장치</strong>야.
+    </p>
+    <div class="diff">
+      <div class="diff-row">
+        <span class="diff-label">기획안</span>
+        <span class="diff-val">DB 종료시간 기준으로 배너 비노출. 초과케이스는 운영에서 처리.</span>
+      </div>
+      <div class="diff-row">
+        <span class="diff-label">추가 의견</span>
+        <span class="diff-val mine">DB 기준 트리거 유지 + 역할별 상태 문구로 강사 자기인지 루프 추가 → 운영 에스컬레이션 감소.</span>
+      </div>
+      <div class="diff-row">
+        <span class="diff-label">공통</span>
+        <span class="diff-val">즉시강의 웹훅 로직 건드리지 않음. 예약강의만 적용.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- TRIGGER LOGIC -->
+  <div class="section-title">TRIGGER LOGIC</div>
+  <div class="trigger-grid">
+    <div class="trigger-card">
+      <h4><div class="dot green"></div>즉시강의</h4>
+      <ul>
+        <li><strong>비노출 트리거:</strong> 웹훅 수신 (강의 종료 이벤트)</li>
+        <li>강사 설정 시간(30분/1시간) 초과 시 자동 종료</li>
+        <li>기존 로직 그대로 유지 — 변경 없음</li>
+      </ul>
+      <div class="highlight">변경 없음 ✓</div>
+    </div>
+    <div class="trigger-card">
+      <h4><div class="dot blue"></div>예약강의</h4>
+      <ul>
+        <li><strong>비노출 트리거 (둘 중 먼저 충족):</strong></li>
+        <li>① 웹훅 수신 (강의 종료 이벤트)</li>
+        <li>② DB 종료 예정 시각 + 30분 버퍼 도달</li>
+        <li>실제 강의 진행 여부 무관하게 ② 조건 도달 시 비노출</li>
+      </ul>
+      <div class="highlight">② 조건 신규 추가 ← 이번 변경사항</div>
+    </div>
+  </div>
+
+  <!-- ROLE TABS -->
+  <div class="section-title">역할별 배너 상태 정의</div>
+
+  <div class="role-tabs">
+    <button class="role-tab active-admin" onclick="switchRole('admin')">🔴 운영자</button>
+    <button class="role-tab" onclick="switchRole('instructor')">🔵 강사</button>
+    <button class="role-tab" onclick="switchRole('student')">🟢 학습자</button>
+  </div>
+
+  <div class="state-section">
+
+    <!-- ADMIN -->
+    <div class="role-pane active" id="pane-admin">
+      <div class="state-row">
+        <div class="state-phase">
+          <span class="phase-tag before">BEFORE</span>
+          <span class="phase-desc">DB 시작시각 이전</span>
+        </div>
+        <div class="state-content">
+          <div class="banner-text">📋 강의 예정</div>
+          <div class="banner-sub">강사 미입장 상태. 시작 전 강의 목록에서 확인 가능.</div>
+          <div class="action-chips">
+            <span class="action-chip chip-warn">강사 입장 대기 중</span>
+            <span class="action-chip chip-danger">[강의 취소]</span>
+            <span class="action-chip chip-muted">[상세보기]</span>
+          </div>
+          <div class="note"><strong>표시 정보:</strong> 강의명 / 예약 시각 / 강사명 / 입장 여부 (미입장)</div>
+        </div>
+      </div>
+      <div class="state-row">
+        <div class="state-phase">
+          <span class="phase-tag after">DURING</span>
+          <span class="phase-desc">시작 ~ DB 종료+버퍼</span>
+        </div>
+        <div class="state-content">
+          <div class="banner-text">🟡 강의 진행 중</div>
+          <div class="banner-sub">강사 입장 여부를 실시간 상태값으로 노출. 미입장이면 즉시 인지 가능.</div>
+          <div class="action-chips">
+            <span class="action-chip chip-warn">강사 입장 O / 미입장</span>
+            <span class="action-chip chip-danger">[강제 종료]</span>
+            <span class="action-chip chip-muted">[수강생 현황]</span>
+          </div>
+          <div class="note"><strong>강사 미입장 시:</strong> <strong>⚠ 강사 미접속</strong> 강조 표시 → 운영자가 강사에게 직접 연락하는 트리거로 활용</div>
+        </div>
+      </div>
+      <div class="state-row">
+        <div class="state-phase">
+          <span class="phase-tag end">END</span>
+          <span class="phase-desc">DB 종료+버퍼 도달</span>
+        </div>
+        <div class="state-content">
+          <div class="banner-text">⚫ 배너 비노출</div>
+          <div class="banner-sub">실제 강의 진행 여부 무관. 강의 이력은 관리 페이지에서 확인.</div>
+          <div class="action-chips">
+            <span class="action-chip chip-muted">배너 비노출</span>
+            <span class="action-chip chip-muted">[강의 이력 조회]</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- INSTRUCTOR -->
+    <div class="role-pane" id="pane-instructor">
+      <div class="state-row">
+        <div class="state-phase">
+          <span class="phase-tag before">BEFORE</span>
+          <span class="phase-desc">DB 시작시각 이전</span>
+        </div>
+        <div class="state-content">
+          <div class="banner-text">📅 강의 시작 전</div>
+          <div class="banner-sub">예약된 강의 안내. Zoom 실행 유도.</div>
+          <div class="action-chips">
+            <span class="action-chip chip-primary">[Zoom으로 강의 시작]</span>
+            <span class="action-chip chip-danger">[강의 취소]</span>
+          </div>
+          <div class="note">시작 <strong>10분 전</strong>부터 배너 강조 표시 권장 (선택 사항)</div>
+        </div>
+      </div>
+      <div class="state-row">
+        <div class="state-phase">
+          <span class="phase-tag after">DURING</span>
+          <span class="phase-desc">시작 ~ DB 종료+버퍼</span>
+        </div>
+        <div class="state-content">
+          <div class="banner-text">🟢 강의 진행 중</div>
+          <div class="banner-sub">강사 본인 입장 여부에 따라 문구 분기.</div>
+          <div class="action-chips">
+            <span class="action-chip chip-green">입장 O → 강의 진행 중</span>
+            <span class="action-chip chip-warn">입장 X → Zoom 미실행 상태</span>
+          </div>
+          <div class="note">
+            <strong>강사 미입장 상태 문구:</strong> "Zoom이 실행되지 않았습니다. 강의를 시작하려면 Zoom을 실행해주세요."<br>
+            → 강사 자기인지 루프. 운영 개입 없이 해결 가능.
+          </div>
+        </div>
+      </div>
+      <div class="state-row">
+        <div class="state-phase">
+          <span class="phase-tag end">END</span>
+          <span class="phase-desc">DB 종료+버퍼 도달</span>
+        </div>
+        <div class="state-content">
+          <div class="banner-text">⚫ 배너 비노출</div>
+          <div class="banner-sub">강의 종료 처리. 다음 예약 강의가 있으면 해당 배너로 전환.</div>
+          <div class="action-chips">
+            <span class="action-chip chip-muted">배너 비노출</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STUDENT -->
+    <div class="role-pane" id="pane-student">
+      <div class="state-row">
+        <div class="state-phase">
+          <span class="phase-tag before">BEFORE</span>
+          <span class="phase-desc">DB 시작시각 이전</span>
+        </div>
+        <div class="state-content">
+          <div class="banner-text">⏰ 강의 시작 전</div>
+          <div class="banner-sub">예약 강의 안내. 입장 버튼 비활성.</div>
+          <div class="action-chips">
+            <span class="action-chip chip-muted">[입장 불가 — 시작 전]</span>
+          </div>
+          <div class="note">강사 입장 여부는 학습자에게 노출하지 않음. 시작 시각만 표시.</div>
+        </div>
+      </div>
+      <div class="state-row">
+        <div class="state-phase">
+          <span class="phase-tag after">DURING</span>
+          <span class="phase-desc">시작 ~ DB 종료+버퍼</span>
+        </div>
+        <div class="state-content">
+          <div class="banner-text">🟢 강의 진행 중</div>
+          <div class="banner-sub">강사 입장 여부에 따라 버튼 상태만 분기. 내부 상태 미노출.</div>
+          <div class="action-chips">
+            <span class="action-chip chip-green">강사 입장 O → [입장하기] 활성</span>
+            <span class="action-chip chip-warn">강사 입장 X → [강의 준비 중]</span>
+          </div>
+          <div class="note">
+            <strong>강사 미입장 시 문구:</strong> "강의를 준비 중입니다. 잠시 후 다시 시도해주세요."<br>
+            → 강사 상태 노출 없이 자연스럽게 처리.
+          </div>
+        </div>
+      </div>
+      <div class="state-row">
+        <div class="state-phase">
+          <span class="phase-tag end">END</span>
+          <span class="phase-desc">DB 종료+버퍼 도달</span>
+        </div>
+        <div class="state-content">
+          <div class="banner-text">⚫ 배너 비노출</div>
+          <div class="banner-sub">강의 종료. 다음 강의 배너로 전환 또는 비노출.</div>
+          <div class="action-chips">
+            <span class="action-chip chip-muted">배너 비노출</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- SUMMARY TABLE -->
+  <div class="section-title">전체 요약</div>
+  <table class="summary-table">
+    <thead>
+      <tr>
+        <th>역할</th>
+        <th>강의 시작 전</th>
+        <th>강의 중 (강사 입장 O)</th>
+        <th>강의 중 (강사 입장 X)</th>
+        <th>종료 후</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="role-label admin">운영자</span></td>
+        <td>강의 예정 / 강사 대기 중<br><span style="color:var(--muted);font-size:0.72rem">[취소] 버튼</span></td>
+        <td>진행 중 / 입장 상태 표시</td>
+        <td>⚠ 강사 미접속 강조<br><span style="color:var(--muted);font-size:0.72rem">[강제종료] 버튼</span></td>
+        <td>비노출</td>
+      </tr>
+      <tr>
+        <td><span class="role-label instructor">강사</span></td>
+        <td>강의 시작 전<br><span style="color:var(--muted);font-size:0.72rem">[Zoom 시작] 버튼</span></td>
+        <td>강의 진행 중</td>
+        <td>Zoom 미실행 안내<br><span style="color:var(--muted);font-size:0.72rem">자기인지 유도</span></td>
+        <td>비노출</td>
+      </tr>
+      <tr>
+        <td><span class="role-label student">학습자</span></td>
+        <td>강의 시작 전<br><span style="color:var(--muted);font-size:0.72rem">[입장 불가]</span></td>
+        <td>강의 진행 중<br><span style="color:var(--muted);font-size:0.72rem">[입장하기] 활성</span></td>
+        <td>강의 준비 중<br><span style="color:var(--muted);font-size:0.72rem">[입장하기] 비활성</span></td>
+        <td>비노출</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- OPEN ISSUES -->
+  <div class="section-title">개발자 확인 요청 사항</div>
+  <div class="issue-list">
+    <div class="issue-item">
+      <div class="issue-num">1</div>
+      <div class="issue-text"><strong>DB 종료 예정 시각 저장 형태</strong> — 원래 종료 시각 저장인지, 버퍼(+30분) 포함 시각이 이미 저장돼 있는지. 버퍼 계산을 서버에서 할지 DB에서 할지 결정 필요.</div>
+    </div>
+    <div class="issue-item">
+      <div class="issue-num">2</div>
+      <div class="issue-text"><strong>강사 입장 여부 상태값</strong> — 현재 웹훅 외 별도 상태값 존재하는지. 없으면 Zoom 웹훅에서 강사 join 이벤트 수신 시 상태값 저장하는 로직 추가 필요.</div>
+    </div>
+    <div class="issue-item">
+      <div class="issue-num">3</div>
+      <div class="issue-text"><strong>배너 1개 노출 기준</strong> — 현재 시각 기준 "진행 중인 강의" 우선인지, "다음 예정 강의" 우선인지 정의 필요. 진행 중 강의가 있으면 해당 강의 우선 표시 권장.</div>
+    </div>
+    <div class="issue-item">
+      <div class="issue-num">4</div>
+      <div class="issue-text"><strong>즉시강의 로직 영향 없음 확인</strong> — 이번 변경은 예약강의에만 적용. 즉시강의 웹훅 기반 종료 로직 변경 없음.</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function switchRole(role) {
+  document.querySelectorAll('.role-tab').forEach(t => t.className = 'role-tab');
+  document.querySelectorAll('.role-pane').forEach(p => p.classList.remove('active'));
+  const map = { admin: 0, instructor: 1, student: 2 };
+  document.querySelectorAll('.role-tab')[map[role]].classList.add('active-' + role);
+  document.getElementById('pane-' + role).classList.add('active');
+}
+</script>
+</body>
+</html>
