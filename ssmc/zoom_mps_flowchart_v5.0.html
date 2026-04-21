@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zoom × AI Studio 전체 플로우차트 v5.0</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Noto Sans KR',sans-serif;background:#f0f2f5;color:#1a1a2e;padding:40px}
+
+.page-header{background:linear-gradient(135deg,#0d1b4b 0%,#1446d4 100%);border-radius:16px;padding:36px 40px;margin-bottom:32px;color:white}
+.page-header h1{font-size:22px;font-weight:700;margin-bottom:6px}
+.page-header p{font-size:13px;opacity:.75}
+.version-badge{display:inline-block;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:.05em;margin-bottom:14px}
+
+.legend{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:28px;background:white;padding:16px 20px;border-radius:12px;border:1px solid #e2e5ea}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:12px;color:#374151}
+.dot{width:12px;height:12px;border-radius:3px;flex-shrink:0}
+.dot.confirmed{background:#10b981}
+.dot.tbd{background:#f59e0b}
+.dot.removed{background:#ef4444}
+.dot.new{background:#6366f1}
+
+/* confirmed/updated items */
+.confirmed-list{background:white;border-radius:14px;border:1px solid #e2e5ea;padding:24px 28px;margin-bottom:28px}
+.confirmed-list h3{font-size:13px;font-weight:700;color:#6b7280;letter-spacing:.06em;text-transform:uppercase;margin-bottom:16px}
+.confirmed-item{display:flex;align-items:flex-start;gap:10px;font-size:13px;color:#374151;padding:6px 0;border-bottom:1px solid #f3f4f6;line-height:1.6}
+.confirmed-item:last-child{border-bottom:none}
+.confirmed-item .badge{font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;white-space:nowrap;flex-shrink:0;margin-top:2px}
+.badge.ok{background:#dcfce7;color:#15803d}
+.badge.new{background:#e0e7ff;color:#3730a3}
+.badge.removed{background:#fee2e2;color:#dc2626}
+
+/* Phase layout */
+.phases{display:flex;flex-direction:column;gap:20px}
+.phase{background:white;border-radius:14px;border:1px solid #e2e5ea;overflow:hidden}
+.phase-header{padding:16px 24px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #f3f4f6}
+.phase-num{font-size:11px;font-weight:700;color:#9ca3af;letter-spacing:.08em}
+.phase-title{font-size:15px;font-weight:700;color:#0d1b4b}
+.phase-body{padding:20px 24px;display:flex;flex-direction:column;gap:16px}
+
+/* Role rows */
+.role-row{display:grid;grid-template-columns:80px 1fr;gap:16px;align-items:start}
+.role-label{font-size:11px;font-weight:700;color:#9ca3af;letter-spacing:.05em;padding-top:12px}
+
+.nodes{display:flex;align-items:flex-start;gap:0;flex-wrap:wrap}
+.node{border-radius:10px;padding:10px 14px;font-size:12px;font-weight:600;border:1.5px solid;text-align:center;line-height:1.4}
+.node.instructor{background:#eff6ff;border-color:#bfdbfe;color:#1d4ed8}
+.node.student{background:#f0fdf4;border-color:#bbf7d0;color:#15803d}
+.node.system{background:#fdf4ff;border-color:#e9d5ff;color:#7e22ce}
+.node.admin{background:#fff7ed;border-color:#fed7aa;color:#c2410c}
+.node.error{background:#fff1f2;border-color:#fecdd3;color:#be123c}
+.node.qstash{background:#e0e7ff;border-color:#a5b4fc;color:#3730a3}
+.node.webhook{background:#fffbeb;border-color:#fde68a;color:#b45309}
+.node sub{font-size:10px;font-weight:400;display:block;margin-top:2px;opacity:.8}
+
+.arrow{font-size:16px;color:#d1d5db;padding:0 8px;margin-top:10px;flex-shrink:0}
+.arrow.down{transform:rotate(90deg)}
+
+.divider{height:1px;background:#f3f4f6}
+
+.note-box{background:#f8fafc;border-left:3px solid #1446d4;border-radius:6px;padding:12px 16px;font-size:12px;color:#374151;line-height:1.7}
+.note-box strong{color:#1446d4}
+.note-box.warn{border-left-color:#f59e0b;}
+.note-box.warn strong{color:#b45309}
+.note-box.new-feature{border-left-color:#6366f1;}
+.note-box.new-feature strong{color:#3730a3}
+
+/* appendix */
+.appendix{background:white;border-radius:14px;border:1px solid #e2e5ea;padding:28px;margin-top:20px}
+.appendix h3{font-size:13px;font-weight:700;color:#6b7280;letter-spacing:.06em;text-transform:uppercase;margin-bottom:16px}
+.api-table{width:100%;border-collapse:collapse;font-size:12px}
+.api-table th{text-align:left;padding:8px 12px;background:#f8fafc;font-weight:600;color:#6b7280;font-size:11px;border-bottom:1px solid #e5e7eb}
+.api-table td{padding:8px 12px;border-bottom:1px solid #f3f4f6;color:#374151;vertical-align:top;line-height:1.6}
+.api-table td:first-child{font-family:'Courier New',monospace;font-size:11px;color:#7e22ce;white-space:nowrap}
+.api-table tr:last-child td{border-bottom:none}
+
+.footer{margin-top:32px;padding-top:20px;border-top:1px solid #e2e5ea;font-size:12px;color:#9ca3af;display:flex;justify-content:space-between}
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="version-badge">v5.0</div>
+  <h1>Zoom × AI Studio 전체 플로우차트</h1>
+  <p>강사 · 수강생 · 어드민 역할별 실시간 강의 연동 전체 흐름 — 동적 계정 매핑 기준 | 2026-04-17</p>
+</div>
+
+<div class="legend">
+  <div class="legend-item"><div class="dot confirmed"></div> 확정/유지</div>
+  <div class="legend-item"><div class="dot new"></div> v5.0 신규 반영</div>
+  <div class="legend-item"><div class="dot removed"></div> 제거/폐기</div>
+  <div class="legend-item"><div class="dot tbd"></div> 확인 필요</div>
+</div>
+
+<!-- 변경 이력 -->
+<div class="confirmed-list">
+  <h3>v5.0 변경 사항</h3>
+  <div class="confirmed-item"><span class="badge new">NEW</span> 강의 자동종료 방식: 1분 폴링 배치 → QStash 예약 메시지 기반으로 전환</div>
+  <div class="confirmed-item"><span class="badge new">NEW</span> 즉시·당일 예약 강의: 생성 시점 즉시 QStash publish / 익일 이후: 매일 00:10 KST 일괄 등록</div>
+  <div class="confirmed-item"><span class="badge new">NEW</span> 강의 수정·취소·삭제 시 QStash 알람 cancel 연동</div>
+  <div class="confirmed-item"><span class="badge new">NEW</span> meeting.ended Webhook → QStash cancel + 계정 반납 (즉시 강의), 버퍼 종료 기준 반납 (예약 강의)</div>
+  <div class="confirmed-item"><span class="badge removed">제거</span> 1분 폴링 배치 (/api/batch/liv/auto-end) 제거</div>
+  <div class="confirmed-item"><span class="badge ok">확정</span> 예약 강의 조기종료: 버퍼 종료 시각까지 재오픈 가능, 계정 즉시 반납 안 함</div>
+  <div class="confirmed-item"><span class="badge ok">확정</span> 즉시 강의 조기종료: meeting.ended Webhook 수신 즉시 계정 반납</div>
+  <div class="confirmed-item"><span class="badge ok">확정</span> 강의 자동종료 정확도: 정확한 종료시간 처리 (기존 최대 1분 오차 해소)</div>
+</div>
+
+<div class="phases">
+
+  <!-- PHASE 01 -->
+  <div class="phase">
+    <div class="phase-header">
+      <span class="phase-num">PHASE 01</span>
+      <span class="phase-title">사전 준비 — OAuth 인증 · 계정 등록</span>
+    </div>
+    <div class="phase-body">
+      <div class="role-row">
+        <div class="role-label">ADMIN</div>
+        <div class="nodes">
+          <div class="node admin">Zoom 계정 등록<sub>계정관리 탭 단독 운영</sub></div>
+          <div class="arrow">→</div>
+          <div class="node system">S2S OAuth 자동 인증<sub>1시간 자동 갱신</sub></div>
+        </div>
+      </div>
+      <div class="note-box">
+        <strong>확정</strong> Server-to-Server OAuth · 마스터 계정 aistudio.service@multicampus.com · 배정관리 탭 제거 · 강사 계정 편입 미채택
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 02 -->
+  <div class="phase">
+    <div class="phase-header">
+      <span class="phase-num">PHASE 02</span>
+      <span class="phase-title">강의 개설 및 동적 계정 배정</span>
+    </div>
+    <div class="phase-body">
+      <div class="role-row">
+        <div class="role-label">강사</div>
+        <div class="nodes">
+          <div class="node instructor">강의 생성<sub>즉시 시작 / 예약하기</sub></div>
+          <div class="arrow">→</div>
+          <div class="node system">동적 계정 배정<sub>First-Fit · 유료 우선 · 마스터 최하순</sub></div>
+          <div class="arrow">→</div>
+          <div class="node system">Zoom Meeting 생성<sub>POST /v2/users/{email}/meetings</sub></div>
+          <div class="arrow">→</div>
+          <div class="node qstash">QStash 종료 알람 등록<sub>즉시·당일: 즉시 등록<br>익일 이후: 00:10 일괄 등록</sub></div>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="note-box new-feature">
+        <strong>v5.0 신규</strong> 강의 생성 시 종료 예약이 QStash에 자동 등록됩니다. 익일 이후 예약은 매일 00:10 KST에 당일 분을 일괄 등록합니다.
+      </div>
+      <div class="note-box">
+        <strong>버퍼 정책</strong> 예약 강의: 앞뒤 30분 서버 내부 자동 확보 (UI 미노출) · 즉시 강의: 버퍼 없음, 종료 시 즉시 계정 반납
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 03 -->
+  <div class="phase">
+    <div class="phase-header">
+      <span class="phase-num">PHASE 03</span>
+      <span class="phase-title">강의 진행</span>
+    </div>
+    <div class="phase-body">
+      <div class="role-row">
+        <div class="role-label">강사</div>
+        <div class="nodes">
+          <div class="node instructor">start_url 새 탭 입장<sub>ZAK 포함 · 호스트 권한 즉시</sub></div>
+          <div class="arrow">→</div>
+          <div class="node system">lecture_status = "active"<sub>수강생 입장 버튼 활성화</sub></div>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="role-row">
+        <div class="role-label">수강생</div>
+        <div class="nodes">
+          <div class="node student">배너 확인<sub>DB 시작시간 5분 전부터</sub></div>
+          <div class="arrow">→</div>
+          <div class="node student">join_url 새 탭 입장<sub>Zoom Web Client</sub></div>
+        </div>
+      </div>
+      <div class="note-box">
+        <strong>배너 노출 기준</strong> DB 시작시간 기준 우선 · 수강생 입장 버튼 활성화: DB 시작시간 도달 AND Webhook 수신 두 조건 모두 충족 필요
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 04 -->
+  <div class="phase">
+    <div class="phase-header">
+      <span class="phase-num">PHASE 04</span>
+      <span class="phase-title">강의 종료 — QStash 자동종료</span>
+    </div>
+    <div class="phase-body">
+
+      <div class="role-row">
+        <div class="role-label">자동 종료</div>
+        <div class="nodes">
+          <div class="node qstash">QStash 알람 발동<sub>설정 종료시간 도달</sub></div>
+          <div class="arrow">→</div>
+          <div class="node system">단건 종료 처리<sub>POST /api/batch/liv/auto-end-one</sub></div>
+          <div class="arrow">→</div>
+          <div class="node system">계정 반납<sub>assigned_course_id = NULL</sub></div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="role-row">
+        <div class="role-label">조기 종료<br>(즉시강의)</div>
+        <div class="nodes">
+          <div class="node webhook">meeting.ended Webhook</div>
+          <div class="arrow">→</div>
+          <div class="node qstash">QStash 알람 cancel</div>
+          <div class="arrow">→</div>
+          <div class="node system">계정 즉시 반납</div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="role-row">
+        <div class="role-label">조기 종료<br>(예약강의)</div>
+        <div class="nodes">
+          <div class="node webhook">meeting.ended Webhook</div>
+          <div class="arrow">→</div>
+          <div class="node qstash">QStash 알람 cancel</div>
+          <div class="arrow">→</div>
+          <div class="node system">버퍼 종료 시각까지<br>계정 유지 · 재오픈 가능</div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="role-row">
+        <div class="role-label">Fallback</div>
+        <div class="nodes">
+          <div class="node webhook">Webhook 미수신</div>
+          <div class="arrow">→</div>
+          <div class="node system">강의중 UI 1시간 노출 후 비노출</div>
+          <div class="arrow">→</div>
+          <div class="node qstash">QStash 알람으로 종료 처리</div>
+        </div>
+      </div>
+
+      <div class="note-box new-feature">
+        <strong>v5.0 핵심 변경</strong> 1분 폴링 배치 제거. QStash 예약 메시지가 정확한 종료 시각에 단건 처리. Idempotent 필수 — 이미 ended/cancelled 상태면 skip.
+      </div>
+      <div class="note-box warn">
+        <strong>확인 필요</strong> QStash 장애·메시지 유실 대비 저빈도 백업 스캔 유지 여부 / 00:10 크론 실패 시 재실행 전략 / NEXT_PUBLIC_APP_URL 고정 필수
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 05 -->
+  <div class="phase">
+    <div class="phase-header">
+      <span class="phase-num">PHASE 05</span>
+      <span class="phase-title">강의 종료 후 — 녹화 · 다시보기</span>
+    </div>
+    <div class="phase-body">
+      <div class="role-row">
+        <div class="role-label">시스템</div>
+        <div class="nodes">
+          <div class="node webhook">recording.completed Webhook</div>
+          <div class="arrow">→</div>
+          <div class="node system">share_url DB 저장<sub>녹화중 상태 → 완료</sub></div>
+          <div class="arrow">→</div>
+          <div class="node instructor">다시보기 탭 노출<sub>강사 ON 시 수강생 공개<br>기본값: 비공개</sub></div>
+        </div>
+      </div>
+      <div class="note-box">
+        <strong>확정</strong> 다시보기 기간: 생성 시 설정 (기본 30일) · 강사가 공개 여부 토글 제어 · 다시보기 기본값: 비공개
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 06 -->
+  <div class="phase">
+    <div class="phase-header">
+      <span class="phase-num">PHASE 06</span>
+      <span class="phase-title">어드민 — 계정 관리</span>
+    </div>
+    <div class="phase-body">
+      <div class="role-row">
+        <div class="role-label">ADMIN</div>
+        <div class="nodes">
+          <div class="node admin">계정 등록·수정·비활성화<sub>활성 / 비활성 / 수락대기</sub></div>
+          <div class="arrow">→</div>
+          <div class="node admin">사용이력 조회<sub>과정명·강의명·일시·상태</sub></div>
+        </div>
+      </div>
+      <div class="note-box">
+        <strong>확정</strong> 배정관리 탭 제거 · 계정관리 탭 단독 운영 · 관리자 알림: 시간 충돌 / API 오류 2가지 케이스
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Appendix -->
+<div class="appendix">
+  <h3>API · Webhook 참조</h3>
+  <table class="api-table">
+    <thead><tr><th>항목</th><th>값</th></tr></thead>
+    <tbody>
+      <tr><td>미팅 생성</td><td>POST /v2/users/{zoom계정email}/meetings</td></tr>
+      <tr><td>자동종료 단건</td><td>POST /api/batch/liv/auto-end-one (QStash Auth)</td></tr>
+      <tr><td>일일 등록 크론</td><td>POST /api/batch/liv/schedule-today (00:10 KST)</td></tr>
+      <tr><td>강의 시작 Webhook</td><td>meeting.started → lecture_status = "active"</td></tr>
+      <tr><td>강의 종료 Webhook</td><td>meeting.ended → QStash cancel + 계정 반납 처리</td></tr>
+      <tr><td>녹화 완료 Webhook</td><td>recording.completed → share_url DB 저장</td></tr>
+      <tr><td>인증 방식</td><td>Server-to-Server OAuth · 1시간 자동 갱신</td></tr>
+      <tr><td>ZAK Token</td><td>start_url 내 포함 — 별도 발급 불필요</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="footer">
+  <span>zoom_mps_flowchart_v5.0.html · v5.0 · 2026-04-17 · QStash 자동종료 전환 반영</span>
+  <span>Samsung SDS Multicampus · AI Studio × Zoom</span>
+</div>
+
+</body>
+</html>
