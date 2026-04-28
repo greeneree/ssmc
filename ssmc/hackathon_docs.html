@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AI 해커톤 — 기획 문서</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: #f5f5f3;
+    color: #1a1a1a;
+    min-height: 100vh;
+  }
+
+  header {
+    background: #fff;
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+    padding: 20px 40px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .logo-dot { width: 8px; height: 8px; border-radius: 50%; background: #10b981; }
+  header h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.02em; }
+  header span { font-size: 13px; color: #888; margin-left: auto; }
+
+  main { max-width: 1100px; margin: 0 auto; padding: 40px 24px 80px; display: flex; flex-direction: column; gap: 48px; }
+
+  .doc-section {}
+  .section-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .section-num {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: #1a1a1a; color: #fff;
+    font-size: 11px; font-weight: 600;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .section-title { font-size: 14px; font-weight: 600; letter-spacing: -0.01em; }
+  .section-sub { font-size: 12px; color: #999; margin-left: auto; font-weight: 400; }
+
+  .img-card {
+    background: #fff;
+    border: 1px solid rgba(0,0,0,0.08);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  .img-card img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  .img-card .img-placeholder {
+    width: 100%;
+    min-height: 360px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: #fafaf8;
+    border: 2px dashed rgba(0,0,0,0.1);
+    border-radius: 16px;
+  }
+  .img-placeholder .ph-icon {
+    width: 36px; height: 36px; opacity: 0.2;
+  }
+  .img-placeholder p { font-size: 12px; color: #bbb; }
+
+  footer {
+    text-align: center;
+    font-size: 11px;
+    color: #ccc;
+    padding: 24px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-dot"></div>
+  <h1>AI 해커톤 플랫폼 — 기획 문서</h1>
+  <span>Samsung SDS Multicampus</span>
+</header>
+
+<main>
+
+  <div class="doc-section">
+    <div class="section-label">
+      <div class="section-num">1</div>
+      <span class="section-title">LLM 심사 엔진 구조</span>
+      <span class="section-sub">engine.png</span>
+    </div>
+    <div class="img-card">
+      <img src="./engine.png" alt="LLM 심사 엔진 구조도"
+        onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'"/>
+      <div class="img-placeholder" style="display:none;">
+        <svg class="ph-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="3" y="3" width="18" height="18" rx="3"/>
+          <circle cx="8.5" cy="8.5" r="1.5"/>
+          <path d="M21 15l-5-5L5 21"/>
+        </svg>
+        <p>engine.png 파일을 같은 경로에 두면 표시됩니다</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="doc-section">
+    <div class="section-label">
+      <div class="section-num">2</div>
+      <span class="section-title">사용자 Journey</span>
+      <span class="section-sub">journey.png</span>
+    </div>
+    <div class="img-card">
+      <img src="./journey.png" alt="사용자 여정 맵"
+        onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'"/>
+      <div class="img-placeholder" style="display:none;">
+        <svg class="ph-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="3" y="3" width="18" height="18" rx="3"/>
+          <circle cx="8.5" cy="8.5" r="1.5"/>
+          <path d="M21 15l-5-5L5 21"/>
+        </svg>
+        <p>journey.png 파일을 같은 경로에 두면 표시됩니다</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="doc-section">
+    <div class="section-label">
+      <div class="section-num">3</div>
+      <span class="section-title">시스템 구성도</span>
+      <span class="section-sub">architecture.png</span>
+    </div>
+    <div class="img-card">
+      <img src="./architecture.png" alt="시스템 구성도"
+        onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'"/>
+      <div class="img-placeholder" style="display:none;">
+        <svg class="ph-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="3" y="3" width="18" height="18" rx="3"/>
+          <circle cx="8.5" cy="8.5" r="1.5"/>
+          <path d="M21 15l-5-5L5 21"/>
+        </svg>
+        <p>architecture.png 파일을 같은 경로에 두면 표시됩니다</p>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<footer>AI Hackathon Platform · Samsung SDS Multicampus</footer>
+
+</body>
+</html>

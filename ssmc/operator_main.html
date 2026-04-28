@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>라이브 강의 — 운영자</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ─── Design Tokens ─────────────────────────────── */
+    :root {
+      --primary:       #10b981;
+      --primary-hover: #059669;
+      --primary-light: #ecfdf5;
+      --primary-text:  #065f46;
+      --blue:          #3b82f6;
+      --blue-light:    #eff6ff;
+      --blue-medium:   #bfdbfe;
+      --blue-text:     #1d4ed8;
+      --amber:         #f59e0b;
+      --amber-light:   #fffbeb;
+      --amber-text:    #92400e;
+      --gray-50:       #f9fafb;
+      --gray-100:      #f3f4f6;
+      --gray-200:      #e5e7eb;
+      --gray-300:      #d1d5db;
+      --gray-400:      #9ca3af;
+      --gray-500:      #6b7280;
+      --gray-600:      #4b5563;
+      --gray-700:      #374151;
+      --gray-800:      #1f2937;
+      --gray-900:      #111827;
+      --red:           #ef4444;
+      --red-light:     #fef2f2;
+      --text-primary:  #030213;
+      --text-secondary:#717182;
+      --text-muted:    #9ca3af;
+      --border:        rgba(0,0,0,0.08);
+      --border-solid:  #e5e7eb;
+      --sidebar-w:     220px;
+      --header-h:      64px;
+      --radius-sm:     6px;
+      --radius:        10px;
+      --radius-lg:     14px;
+      --shadow-sm:     0 1px 3px rgba(0,0,0,0.08);
+      --shadow:        0 4px 16px rgba(0,0,0,0.10);
+      --shadow-lg:     0 8px 32px rgba(0,0,0,0.14);
+    }
+
+    /* ─── Reset & Base ───────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background: #f0f0f2;
+      color: var(--text-primary);
+      font-size: 14px;
+      line-height: 1.5;
+      min-width: 1280px;
+    }
+    button { cursor: pointer; border: none; background: none; font-family: inherit; }
+    svg { display: block; flex-shrink: 0; }
+
+    /* ─── App Shell ──────────────────────────────────── */
+    .app-shell { display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+
+    /* ─── Top Header ─────────────────────────────────── */
+    .app-header {
+      height: var(--header-h);
+      background: #fff;
+      border-bottom: 1px solid var(--border-solid);
+      display: flex;
+      align-items: center;
+      padding: 0 20px 0 0;
+      gap: 12px;
+      flex-shrink: 0;
+      z-index: 100;
+    }
+    .header-logo {
+      width: var(--sidebar-w);
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      gap: 8px;
+      border-right: 1px solid var(--border-solid);
+      height: 100%;
+    }
+    .logo-icon {
+      width: 32px; height: 32px;
+      background: linear-gradient(135deg, #10b981, #059669);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .logo-text { font-size: 15px; font-weight: 700; color: var(--text-primary); letter-spacing: -0.02em; }
+    .logo-sub  { font-size: 10px; color: var(--text-secondary); font-weight: 400; }
+
+    .header-spacer { flex: 1; }
+
+    .header-search {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--gray-50);
+      border: 1px solid var(--border-solid);
+      border-radius: var(--radius);
+      padding: 0 14px;
+      height: 38px;
+      width: 260px;
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+    .header-icon-btn {
+      width: 38px; height: 38px;
+      border-radius: var(--radius);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--gray-500);
+      transition: background 0.15s;
+      position: relative;
+    }
+    .header-icon-btn:hover { background: var(--gray-100); }
+    .notif-dot {
+      position: absolute; top: 7px; right: 7px;
+      width: 7px; height: 7px;
+      background: var(--red);
+      border-radius: 9999px;
+      border: 1.5px solid #fff;
+    }
+    .header-avatar {
+      width: 34px; height: 34px;
+      border-radius: 9999px;
+      background: linear-gradient(135deg, #a78bfa, #7c3aed);
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 13px; font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* ─── Body Layout ────────────────────────────────── */
+    .app-body { display: flex; flex: 1; overflow: hidden; }
+
+    /* ─── Sidebar / LNB ──────────────────────────────── */
+    .sidebar {
+      width: var(--sidebar-w);
+      background: #fff;
+      border-right: 1px solid var(--border-solid);
+      overflow-y: auto;
+      flex-shrink: 0;
+      padding: 16px 0 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+    .sidebar::-webkit-scrollbar { width: 4px; }
+    .sidebar::-webkit-scrollbar-thumb { background: var(--gray-200); border-radius: 4px; }
+
+    .lnb-head {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 4px 12px 12px 18px;
+      color: var(--text-secondary); font-size: 11px; font-weight: 600;
+      letter-spacing: 0.06em; text-transform: uppercase;
+    }
+    .lnb-collapse-btn {
+      width: 24px; height: 24px; border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--gray-400);
+      transition: background 0.15s;
+    }
+    .lnb-collapse-btn:hover { background: var(--gray-100); }
+
+    .lnb-section { margin-bottom: 2px; }
+    .lnb-item {
+      display: flex; align-items: center; gap: 8px;
+      height: 36px; padding: 0 10px 0 10px;
+      margin: 0 8px;
+      border-radius: var(--radius-sm);
+      color: var(--gray-700); font-size: 13.5px; font-weight: 400;
+      cursor: pointer; user-select: none;
+      transition: background 0.12s, color 0.12s;
+    }
+    .lnb-item:hover { background: var(--gray-100); }
+    .lnb-item.active {
+      background: var(--primary-light);
+      color: var(--primary);
+      font-weight: 600;
+    }
+    .lnb-item.parent { font-weight: 500; }
+    .lnb-item .icon { width: 18px; height: 18px; flex-shrink: 0; }
+    .lnb-item .chevron {
+      margin-left: auto;
+      width: 16px; height: 16px; color: var(--gray-400);
+      transition: transform 0.2s;
+    }
+    .lnb-item.open .chevron { transform: rotate(180deg); }
+    .lnb-item .label { flex: 1; }
+
+    .lnb-sub { padding: 2px 0 2px 12px; border-left: 2px solid var(--gray-200); margin: 0 8px 4px 20px; }
+    .lnb-sub-item {
+      display: flex; align-items: center; gap: 8px;
+      height: 34px; padding: 0 8px;
+      border-radius: var(--radius-sm);
+      color: var(--gray-600); font-size: 13px;
+      cursor: pointer; user-select: none;
+      transition: background 0.12s, color 0.12s;
+    }
+    .lnb-sub-item:hover { background: var(--gray-100); color: var(--gray-900); }
+    .lnb-sub-item.active {
+      background: var(--primary-light);
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    .lnb-divider { height: 1px; background: var(--gray-100); margin: 8px 16px; }
+
+    /* ─── Main Content ───────────────────────────────── */
+    .main-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 28px 28px 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .main-content::-webkit-scrollbar { width: 6px; }
+    .main-content::-webkit-scrollbar-thumb { background: var(--gray-300); border-radius: 4px; }
+
+    /* ─── Page Title Row ─────────────────────────────── */
+    .page-title-row {
+      display: flex; align-items: flex-end; justify-content: space-between;
+      gap: 12px;
+    }
+    .page-title {
+      font-size: 24px; font-weight: 700;
+      color: var(--text-primary); letter-spacing: -0.03em;
+    }
+    .btn-primary {
+      display: flex; align-items: center; gap: 6px;
+      height: 40px; padding: 0 18px;
+      background: var(--primary); color: #fff;
+      border-radius: var(--radius); font-size: 14px; font-weight: 600;
+      transition: background 0.15s, transform 0.1s;
+      white-space: nowrap;
+    }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-primary:active { transform: scale(0.98); }
+
+    /* ─── Tabs ───────────────────────────────────────── */
+    .tab-bar {
+      display: flex;
+      border-bottom: 2px solid var(--gray-200);
+      gap: 0;
+    }
+    .tab-item {
+      padding: 10px 20px;
+      font-size: 14px; font-weight: 500;
+      color: var(--text-secondary);
+      cursor: pointer; user-select: none;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+      transition: color 0.15s, border-color 0.15s;
+      white-space: nowrap;
+    }
+    .tab-item:hover { color: var(--text-primary); }
+    .tab-item.active {
+      color: var(--text-primary); font-weight: 700;
+      border-bottom-color: var(--text-primary);
+    }
+
+    /* ─── Tab Panel ──────────────────────────────────── */
+    .tab-panel { display: none; flex-direction: column; gap: 20px; }
+    .tab-panel.active { display: flex; }
+
+    /* ─── Timetable Card ─────────────────────────────── */
+    .card {
+      background: #fff;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-solid);
+      overflow: hidden;
+    }
+
+    /* Date Navigator */
+    .date-nav {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--gray-100);
+    }
+    .date-nav-left { display: flex; align-items: center; gap: 10px; }
+    .btn-today {
+      height: 32px; padding: 0 14px;
+      background: var(--gray-900); color: #fff;
+      border-radius: var(--radius-sm); font-size: 13px; font-weight: 600;
+      transition: background 0.15s;
+    }
+    .btn-today:hover { background: var(--gray-700); }
+    .date-arrow {
+      width: 30px; height: 30px; border-radius: var(--radius-sm);
+      border: 1px solid var(--border-solid);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--gray-600); font-size: 13px;
+      transition: background 0.12s;
+    }
+    .date-arrow:hover { background: var(--gray-100); }
+    .date-label {
+      font-size: 15px; font-weight: 600; color: var(--text-primary);
+    }
+
+    /* Legend */
+    .legend { display: flex; align-items: center; gap: 16px; }
+    .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-secondary); }
+    .legend-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+    .legend-dot.live     { background: var(--blue); }
+    .legend-dot.scheduled { background: var(--amber); }
+    .legend-dot.completed { background: var(--gray-300); }
+    .legend-dot.buffer   {
+      background: transparent;
+      border: 1.5px dashed var(--gray-300);
+    }
+
+    /* Timeline Grid */
+    .timeline-wrap {
+      overflow-x: auto;
+      padding: 0;
+    }
+    .timeline-wrap::-webkit-scrollbar { height: 5px; }
+    .timeline-wrap::-webkit-scrollbar-thumb { background: var(--gray-200); border-radius: 4px; }
+
+    .timeline-inner { min-width: 960px; }
+
+    /* Hour header row */
+    .timeline-header {
+      display: flex;
+      border-bottom: 1px solid var(--gray-100);
+      background: var(--gray-50);
+    }
+    .timeline-instructor-col {
+      width: 120px; flex-shrink: 0;
+      padding: 10px 16px;
+      font-size: 11px; font-weight: 600; color: var(--text-secondary);
+      text-transform: uppercase; letter-spacing: 0.05em;
+      border-right: 1px solid var(--gray-100);
+    }
+    .timeline-hours-row {
+      flex: 1; display: flex;
+    }
+    .timeline-hour-cell {
+      flex: 1;
+      padding: 8px 0 8px 8px;
+      font-size: 11px; font-weight: 500; color: var(--text-secondary);
+      border-right: 1px solid var(--gray-100);
+      min-width: 80px;
+    }
+    .timeline-hour-cell:last-child { border-right: none; }
+
+    /* Instructor rows */
+    .timeline-body { display: flex; flex-direction: column; }
+    .timeline-row {
+      display: flex;
+      min-height: 80px;
+      border-bottom: 1px solid var(--gray-100);
+    }
+    .timeline-row:last-child { border-bottom: none; }
+    .timeline-row:nth-child(even) { background: #fafafa; }
+
+    .timeline-instructor-label {
+      width: 120px; flex-shrink: 0;
+      padding: 10px 16px;
+      border-right: 1px solid var(--gray-100);
+      display: flex; align-items: center;
+    }
+    .instructor-name {
+      font-size: 13px; font-weight: 500; color: var(--text-primary);
+    }
+    .instructor-sub {
+      font-size: 11px; color: var(--text-muted); margin-top: 1px;
+    }
+
+    /* Grid + blocks area */
+    .timeline-grid-area {
+      flex: 1; position: relative;
+      display: flex;
+    }
+    .timeline-grid-col {
+      flex: 1;
+      border-right: 1px dashed var(--gray-200);
+      min-width: 80px;
+    }
+    .timeline-grid-col:last-child { border-right: none; }
+
+    /* Lecture blocks */
+    .lecture-block {
+      position: absolute;
+      top: 10px; bottom: 10px;
+      border-radius: var(--radius-sm);
+      padding: 0 10px;
+      display: flex; align-items: center; gap: 6px;
+      cursor: pointer;
+      overflow: hidden;
+      transition: filter 0.15s, transform 0.1s;
+      z-index: 1;
+    }
+    .lecture-block:hover { filter: brightness(0.95); transform: translateY(-1px); z-index: 10; }
+
+    .lecture-block.live {
+      background: var(--blue);
+      color: #fff;
+    }
+    .lecture-block.live-pulse::before {
+      content: '';
+      position: absolute; left: 0; top: 0; right: 0; bottom: 0;
+      border-radius: var(--radius-sm);
+      box-shadow: 0 0 0 2px rgba(59,130,246,0.4);
+      animation: pulse-ring 2s infinite;
+    }
+    @keyframes pulse-ring {
+      0%   { box-shadow: 0 0 0 0 rgba(59,130,246,0.5); }
+      70%  { box-shadow: 0 0 0 6px rgba(59,130,246,0); }
+      100% { box-shadow: 0 0 0 0 rgba(59,130,246,0); }
+    }
+    .lecture-block.scheduled {
+      background: var(--amber-light);
+      border: 1.5px solid #fde68a;
+      color: var(--amber-text);
+    }
+    .lecture-block.completed {
+      background: var(--gray-100);
+      border: 1px solid var(--gray-200);
+      color: var(--gray-500);
+    }
+    .lecture-block.buffer {
+      background: transparent;
+      border: 1.5px dashed var(--gray-300);
+      color: var(--gray-400);
+    }
+
+    .block-inner { display: flex; flex-direction: column; min-width: 0; }
+    .block-instructor { font-size: 11px; font-weight: 500; opacity: 0.8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .block-title { font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    .live-badge {
+      display: flex; align-items: center; gap: 4px;
+      background: rgba(255,255,255,0.25); border-radius: 4px;
+      padding: 2px 6px; font-size: 10px; font-weight: 700;
+      white-space: nowrap; flex-shrink: 0;
+    }
+    .live-dot { width: 5px; height: 5px; border-radius: 9999px; background: #fff; animation: blink 1.2s infinite; }
+    @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+
+    /* Current time line */
+    .current-time-line {
+      position: absolute;
+      top: 0; bottom: 0;
+      width: 2px;
+      background: var(--red);
+      z-index: 5;
+      pointer-events: none;
+    }
+    .current-time-line::before {
+      content: '';
+      position: absolute;
+      top: -4px; left: -4px;
+      width: 10px; height: 10px;
+      background: var(--red);
+      border-radius: 9999px;
+    }
+
+    /* ─── Tooltip ────────────────────────────────────── */
+    .tooltip {
+      position: fixed;
+      background: var(--gray-900);
+      color: #fff;
+      border-radius: var(--radius);
+      padding: 12px 14px;
+      font-size: 12px;
+      line-height: 1.6;
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0;
+      transition: opacity 0.15s;
+      min-width: 180px;
+      box-shadow: var(--shadow-lg);
+    }
+    .tooltip.visible { opacity: 1; }
+    .tooltip-title { font-size: 13px; font-weight: 700; margin-bottom: 8px; color: #fff; }
+    .tooltip-row { display: flex; gap: 8px; }
+    .tooltip-label { color: var(--gray-400); min-width: 52px; }
+    .tooltip-value { color: #fff; font-weight: 500; }
+    .tooltip-status {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 1px 7px; border-radius: 4px; font-size: 11px; font-weight: 600;
+    }
+    .tooltip-status.live      { background: rgba(59,130,246,0.3); color: #93c5fd; }
+    .tooltip-status.scheduled { background: rgba(245,158,11,0.3); color: #fcd34d; }
+    .tooltip-status.completed { background: rgba(107,114,128,0.3); color: #d1d5db; }
+
+    /* ─── Status Badges (list) ───────────────────────── */
+    .badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px 10px; border-radius: 9999px;
+      font-size: 11px; font-weight: 600; white-space: nowrap;
+    }
+    .badge.live     { background: #dcfce7; color: #15803d; }
+    .badge.waiting  { background: #fef3c7; color: #b45309; }
+    .badge.scheduled{ background: var(--blue-light); color: var(--blue-text); }
+    .badge.completed{ background: var(--gray-100); color: var(--gray-500); }
+    .badge-live-dot { width: 6px; height: 6px; border-radius: 9999px; background: #16a34a; animation: blink 1.2s infinite; }
+
+    /* ─── Live Status Badge (title area) ───────────────── */
+    .live-status-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 14px;
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      border-radius: 9999px;
+      font-size: 13px; font-weight: 600;
+      color: #dc2626;
+    }
+    .live-status-dot {
+      width: 7px; height: 7px;
+      border-radius: 9999px;
+      background: #ef4444;
+      animation: blink 1.2s infinite;
+    }
+
+    /* ─── Empty Tab Placeholder ──────────────────────── */
+    .empty-panel {
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 80px 20px; gap: 12px;
+      color: var(--text-muted);
+    }
+    .empty-panel .empty-icon { font-size: 40px; opacity: 0.4; }
+    .empty-panel .empty-text { font-size: 14px; font-weight: 500; }
+    .empty-panel .empty-sub  { font-size: 13px; }
+  </style>
+</head>
+<body>
+
+<!-- ═══ App Shell ═══════════════════════════════════════ -->
+<div class="app-shell">
+
+  <!-- ▸ Header -->
+  <header class="app-header">
+    <div class="header-logo">
+      <div class="logo-icon">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+          <path d="M9 2L15 5.5V12.5L9 16L3 12.5V5.5L9 2Z" stroke="#fff" stroke-width="1.5" stroke-linejoin="round" fill="rgba(255,255,255,0.2)"/>
+          <circle cx="9" cy="9" r="2.5" fill="#fff"/>
+        </svg>
+      </div>
+      <div>
+        <div class="logo-text">AI Studio</div>
+        <div class="logo-sub">Admin</div>
+      </div>
+    </div>
+
+    <div class="header-spacer"></div>
+
+    <div class="header-search">
+      <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+        <circle cx="6.5" cy="6.5" r="5" stroke="#9ca3af" stroke-width="1.3"/>
+        <path d="M10.5 10.5L13.5 13.5" stroke="#9ca3af" stroke-width="1.3" stroke-linecap="round"/>
+      </svg>
+      <span>검색어를 입력해주세요</span>
+    </div>
+
+    <button class="header-icon-btn">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+        <path d="M9 1.5C9 1.5 4 4.5 4 9.75V14.25H14V9.75C14 4.5 9 1.5 9 1.5Z" stroke="#6b7280" stroke-width="1.3" stroke-linejoin="round"/>
+        <path d="M7 14.25C7 15.35 7.9 16.25 9 16.25C10.1 16.25 11 15.35 11 14.25" stroke="#6b7280" stroke-width="1.3"/>
+      </svg>
+      <span class="notif-dot"></span>
+    </button>
+
+    <button class="header-icon-btn">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+        <circle cx="9" cy="9" r="3.5" stroke="#6b7280" stroke-width="1.3"/>
+        <path d="M9 2V3.5M9 14.5V16M2 9H3.5M14.5 9H16M3.93 3.93L4.99 4.99M13.01 13.01L14.07 14.07M3.93 14.07L4.99 13.01M13.01 4.99L14.07 3.93" stroke="#6b7280" stroke-width="1.3" stroke-linecap="round"/>
+      </svg>
+    </button>
+
+    <div class="header-avatar">관</div>
+  </header>
+
+  <!-- ▸ Body -->
+  <div class="app-body">
+
+    <!-- ▸ Sidebar / LNB -->
+    <nav class="sidebar">
+      <div class="lnb-head">
+        <span>MENU</span>
+        <button class="lnb-collapse-btn">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <rect x="1" y="1" width="12" height="12" rx="2" stroke="#9ca3af" stroke-width="1.2"/>
+            <path d="M5 1v12" stroke="#9ca3af" stroke-width="1.2"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- 과정 (expanded: 대시보드, 학습자) -->
+      <div class="lnb-section">
+        <div class="lnb-item parent open" id="menu-course">
+          <svg class="icon" viewBox="0 0 18 18" fill="none">
+            <rect x="2" y="3" width="14" height="3" rx="1" fill="#9ca3af"/>
+            <rect x="2" y="8" width="9" height="3" rx="1" fill="#9ca3af"/>
+            <rect x="2" y="13" width="6" height="3" rx="1" fill="#9ca3af" opacity="0.5"/>
+          </svg>
+          <span class="label">과정</span>
+          <svg class="chevron" viewBox="0 0 16 16" fill="none">
+            <path d="M4 6l4 4 4-4" stroke="#9ca3af" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="lnb-sub" id="sub-course">
+          <div class="lnb-sub-item">
+            <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+              <rect x="1" y="1" width="5" height="6" rx="1" fill="#9ca3af"/>
+              <rect x="8" y="1" width="5" height="3" rx="1" fill="#9ca3af" opacity="0.6"/>
+              <rect x="1" y="9" width="5" height="4" rx="1" fill="#9ca3af" opacity="0.6"/>
+              <rect x="8" y="6" width="5" height="7" rx="1" fill="#9ca3af" opacity="0.4"/>
+            </svg>
+            대시보드
+          </div>
+          <div class="lnb-sub-item">
+            <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+              <circle cx="7.5" cy="5" r="2.5" stroke="#9ca3af" stroke-width="1.2"/>
+              <path d="M2 13c0-2.76 2.24-5 5.5-5s5.5 2.24 5.5 5" stroke="#9ca3af" stroke-width="1.2" stroke-linecap="round"/>
+            </svg>
+            학습자
+          </div>
+        </div>
+      </div>
+
+      <div class="lnb-divider"></div>
+
+      <!-- 실습 환경 (expanded) -->
+      <div class="lnb-section">
+        <div class="lnb-item parent open" id="menu-lab">
+          <svg class="icon" viewBox="0 0 18 18" fill="none">
+            <rect x="2" y="2" width="6" height="6" rx="1.5" stroke="#9ca3af" stroke-width="1.3"/>
+            <rect x="10" y="2" width="6" height="6" rx="1.5" stroke="#9ca3af" stroke-width="1.3"/>
+            <rect x="2" y="10" width="6" height="6" rx="1.5" stroke="#9ca3af" stroke-width="1.3"/>
+            <rect x="10" y="10" width="6" height="6" rx="1.5" stroke="#9ca3af" stroke-width="1.3" opacity="0.4"/>
+          </svg>
+          <span class="label">실습 환경</span>
+          <svg class="chevron" viewBox="0 0 16 16" fill="none">
+            <path d="M4 6l4 4 4-4" stroke="#9ca3af" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="lnb-sub" id="sub-lab">
+          <div class="lnb-sub-item">AI 갤러리 관리</div>
+          <div class="lnb-sub-item">코드편집기</div>
+          <div class="lnb-sub-item">VM 관리</div>
+          <div class="lnb-sub-item active">라이브강의</div>
+        </div>
+      </div>
+
+      <!-- 콘텐츠 관리 -->
+      <div class="lnb-section">
+        <div class="lnb-item parent">
+          <svg class="icon" viewBox="0 0 18 18" fill="none">
+            <path d="M4 2h7l4 4v10a1 1 0 01-1 1H4a1 1 0 01-1-1V3a1 1 0 011-1z" stroke="#9ca3af" stroke-width="1.3" stroke-linejoin="round"/>
+            <path d="M11 2v4h4" stroke="#9ca3af" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M6 9h6M6 12h4" stroke="#9ca3af" stroke-width="1.3" stroke-linecap="round"/>
+          </svg>
+          <span class="label">콘텐츠 관리</span>
+          <svg class="chevron" viewBox="0 0 16 16" fill="none">
+            <path d="M4 6l4 4 4-4" stroke="#9ca3af" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="lnb-divider"></div>
+
+      <!-- 설정 -->
+      <div class="lnb-section">
+        <div class="lnb-item">
+          <svg class="icon" viewBox="0 0 18 18" fill="none">
+            <circle cx="9" cy="9" r="2.5" stroke="#9ca3af" stroke-width="1.3"/>
+            <path d="M9 1.5v2M9 14.5v2M1.5 9h2M14.5 9h2M3.64 3.64l1.41 1.41M12.95 12.95l1.41 1.41M3.64 14.36l1.41-1.41M12.95 5.05l1.41-1.41" stroke="#9ca3af" stroke-width="1.3" stroke-linecap="round"/>
+          </svg>
+          <span class="label">설정</span>
+        </div>
+      </div>
+    </nav>
+
+    <!-- ▸ Main Content -->
+    <main class="main-content">
+
+      <!-- Page Title Row -->
+      <div class="page-title-row">
+        <div>
+          <h1 class="page-title">라이브 강의</h1>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div class="live-status-badge">
+            <span class="live-status-dot"></span>
+            강의 진행 중
+          </div>
+          <button class="btn-primary">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M8 3v10M3 8h10" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            강의 등록
+          </button>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="tab-bar" id="tabBar">
+        <div class="tab-item active" data-tab="timetable">강의 타임테이블</div>
+        <div class="tab-item" data-tab="list">강의 목록</div>
+        <div class="tab-item" data-tab="accounts">계정 관리</div>
+      </div>
+
+      <!-- ── Tab: 강의 타임테이블 ────────────────────── -->
+      <div class="tab-panel active" id="panel-timetable">
+
+        <!-- Timetable Card -->
+        <div class="card">
+          <!-- Date Navigator -->
+          <div class="date-nav">
+            <div class="date-nav-left">
+              <button class="btn-today">오늘</button>
+              <button class="date-arrow">&#8249;</button>
+              <span class="date-label">2026. 04. 22 (수)</span>
+              <button class="date-arrow">&#8250;</button>
+            </div>
+            <div class="legend">
+              <div class="legend-item">
+                <div class="legend-dot live"></div>
+                <span>진행 중</span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-dot scheduled"></div>
+                <span>예약 대기</span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-dot completed"></div>
+                <span>완료</span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-dot buffer"></div>
+                <span>버퍼</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Timeline -->
+          <div class="timeline-wrap">
+            <div class="timeline-inner" id="timelineInner">
+
+              <!-- Hour header -->
+              <div class="timeline-header">
+                <div class="timeline-instructor-col">강사</div>
+                <div class="timeline-hours-row" id="hoursRow"></div>
+              </div>
+
+              <!-- Rows -->
+              <div class="timeline-body" id="timelineBody"></div>
+
+            </div>
+          </div>
+        </div><!-- /card -->
+      </div><!-- /tab: timetable -->
+
+      <!-- ── Tab: 강의 목록 ──────────────────────────── -->
+      <div class="tab-panel" id="panel-list">
+        <div class="card">
+          <div class="empty-panel">
+            <div class="empty-icon">📋</div>
+            <div class="empty-text">강의 목록</div>
+            <div class="empty-sub">이 탭은 이번 구현 범위에 포함되지 않습니다.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Tab: 계정 관리 ─────────────────────────── -->
+      <div class="tab-panel" id="panel-accounts">
+        <div class="card">
+          <div class="empty-panel">
+            <div class="empty-icon">🔑</div>
+            <div class="empty-text">Zoom 계정 관리</div>
+            <div class="empty-sub">이 탭은 이번 구현 범위에 포함되지 않습니다.</div>
+          </div>
+        </div>
+      </div>
+
+    </main><!-- /main-content -->
+  </div><!-- /app-body -->
+</div><!-- /app-shell -->
+
+<!-- Tooltip -->
+<div class="tooltip" id="tooltip"></div>
+
+<!-- ═══ Script ════════════════════════════════════════ -->
+<script>
+/* ── Mock Data ────────────────────────────────────── */
+const MOCK_DATA = {
+  date: '2026-04-22',
+  currentTime: '13:20', // simulated current time (손승우 강의 진행 중)
+  lectures: [
+    {
+      instructor: '손승우',
+      title: 'GPT Prompt Tuning',
+      start: '13:00',
+      end: '14:30',
+      status: 'live',
+      students: 21
+    },
+    {
+      instructor: '김강사',
+      title: 'LLM 파인튜닝 실습',
+      start: '09:00',
+      end: '11:00',
+      status: 'completed',
+      students: 15
+    },
+    {
+      instructor: '박강사',
+      title: 'Cloud-Native 전문가 양성',
+      start: '15:00',
+      end: '17:00',
+      status: 'scheduled',
+      students: 18
+    }
+  ]
+};
+
+/* ── Constants ────────────────────────────────────── */
+const HOUR_START  = 9;  // 09:00
+const HOUR_END    = 18; // 18:00
+const HOUR_COUNT  = HOUR_END - HOUR_START; // 9 hours
+const PX_PER_HOUR = 110; // pixels per hour
+
+/* ── Helpers ──────────────────────────────────────── */
+function timeToMinutes(t) {
+  const [h, m] = t.split(':').map(Number);
+  return h * 60 + m;
+}
+function minutesFromStart(t) {
+  return timeToMinutes(t) - HOUR_START * 60;
+}
+function minutesToPx(min) {
+  return (min / 60) * PX_PER_HOUR;
+}
+function durationLabel(start, end) {
+  const diff = timeToMinutes(end) - timeToMinutes(start);
+  const h = Math.floor(diff / 60);
+  const m = diff % 60;
+  return h > 0 ? (m > 0 ? `${h}시간 ${m}분` : `${h}시간`) : `${m}분`;
+}
+function statusLabel(s) {
+  return { live: '진행 중', completed: '완료', scheduled: '예약 대기', waiting: '강의대기' }[s] || s;
+}
+
+/* ── Build Hour Header ────────────────────────────── */
+function buildHoursRow() {
+  const row = document.getElementById('hoursRow');
+  for (let h = HOUR_START; h < HOUR_END; h++) {
+    const cell = document.createElement('div');
+    cell.className = 'timeline-hour-cell';
+    cell.style.minWidth = PX_PER_HOUR + 'px';
+    cell.textContent = String(h).padStart(2,'0') + ':00';
+    row.appendChild(cell);
+  }
+}
+
+/* ── Build Timeline Body ──────────────────────────── */
+function buildTimelineBody() {
+  const body = document.getElementById('timelineBody');
+  const totalPx = HOUR_COUNT * PX_PER_HOUR;
+
+  MOCK_DATA.lectures.forEach(lec => {
+    const row = document.createElement('div');
+    row.className = 'timeline-row';
+
+    /* Instructor label */
+    const label = document.createElement('div');
+    label.className = 'timeline-instructor-label';
+    label.innerHTML = `
+      <div>
+        <div class="instructor-name">${lec.instructor}</div>
+      </div>`;
+    row.appendChild(label);
+
+    /* Grid area */
+    const gridArea = document.createElement('div');
+    gridArea.className = 'timeline-grid-area';
+    gridArea.style.width = totalPx + 'px';
+    gridArea.style.flexShrink = '0';
+
+    /* Background grid columns */
+    for (let h = 0; h < HOUR_COUNT; h++) {
+      const col = document.createElement('div');
+      col.className = 'timeline-grid-col';
+      col.style.width = PX_PER_HOUR + 'px';
+      col.style.flexShrink = '0';
+      gridArea.appendChild(col);
+    }
+
+    /* Lecture block */
+    const startMin = minutesFromStart(lec.start);
+    const endMin   = minutesFromStart(lec.end);
+    const leftPx   = minutesToPx(startMin);
+    const widthPx  = minutesToPx(endMin - startMin);
+
+    const block = document.createElement('div');
+    block.className = `lecture-block ${lec.status}${lec.status === 'live' ? ' live-pulse' : ''}`;
+    block.style.left  = leftPx + 'px';
+    block.style.width = widthPx + 'px';
+
+    if (lec.status === 'live') {
+      block.innerHTML = `
+        <div class="block-inner" style="flex:1;min-width:0;">
+          <div class="block-instructor">${lec.instructor}</div>
+          <div class="block-title">${lec.title}</div>
+        </div>
+        <div class="live-badge"><span class="live-dot"></span>LIVE</div>`;
+    } else {
+      block.innerHTML = `
+        <div class="block-inner" style="flex:1;min-width:0;">
+          <div class="block-instructor">${lec.instructor}</div>
+          <div class="block-title">${lec.title}</div>
+        </div>`;
+    }
+
+    /* Tooltip events */
+    block.addEventListener('mousemove', (e) => showTooltip(e, lec));
+    block.addEventListener('mouseleave', hideTooltip);
+
+    gridArea.appendChild(block);
+
+    /* Buffer blocks (±15 min) */
+    if (lec.status !== 'completed') {
+      const bufStart = Math.max(0, startMin - 15);
+      const bufEnd   = startMin;
+      if (bufEnd > bufStart) {
+        const buf = document.createElement('div');
+        buf.className = 'lecture-block buffer';
+        buf.style.left  = minutesToPx(bufStart) + 'px';
+        buf.style.width = minutesToPx(bufEnd - bufStart) + 'px';
+        buf.style.top   = '14px'; buf.style.bottom = '14px';
+        gridArea.appendChild(buf);
+      }
+    }
+
+    /* Current time line is added globally after all rows */
+
+    row.appendChild(gridArea);
+    body.appendChild(row);
+  });
+}
+
+/* ── Tooltip ──────────────────────────────────────── */
+const tooltip = document.getElementById('tooltip');
+
+function showTooltip(e, lec) {
+  const statusClass = lec.status;
+  tooltip.innerHTML = `
+    <div class="tooltip-title">${lec.title}</div>
+    <div class="tooltip-row"><span class="tooltip-label">강사</span><span class="tooltip-value">${lec.instructor}</span></div>
+    <div class="tooltip-row"><span class="tooltip-label">시간</span><span class="tooltip-value">${lec.start} ~ ${lec.end}</span></div>
+    <div class="tooltip-row"><span class="tooltip-label">강의 시간</span><span class="tooltip-value">${durationLabel(lec.start, lec.end)}</span></div>
+    <div class="tooltip-row"><span class="tooltip-label">수강생</span><span class="tooltip-value">${lec.students}명</span></div>
+    <div class="tooltip-row" style="margin-top:6px;"><span class="tooltip-label">상태</span><span class="tooltip-status ${statusClass}">${statusLabel(lec.status)}</span></div>`;
+  tooltip.classList.add('visible');
+  positionTooltip(e);
+}
+
+function positionTooltip(e) {
+  const tw = tooltip.offsetWidth, th = tooltip.offsetHeight;
+  const vw = window.innerWidth,   vh = window.innerHeight;
+  let x = e.clientX + 14, y = e.clientY - 10;
+  if (x + tw > vw - 12) x = e.clientX - tw - 14;
+  if (y + th > vh - 12) y = vh - th - 12;
+  tooltip.style.left = x + 'px';
+  tooltip.style.top  = y + 'px';
+}
+
+function hideTooltip() {
+  tooltip.classList.remove('visible');
+}
+
+document.addEventListener('mousemove', (e) => {
+  if (tooltip.classList.contains('visible')) positionTooltip(e);
+});
+
+/* ── Tab switching ────────────────────────────────── */
+document.getElementById('tabBar').addEventListener('click', (e) => {
+  const tab = e.target.closest('.tab-item');
+  if (!tab) return;
+  const target = tab.dataset.tab;
+
+  document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+
+  tab.classList.add('active');
+  document.getElementById('panel-' + target).classList.add('active');
+});
+
+/* ── LNB sub menu toggle ──────────────────────────── */
+document.querySelectorAll('.lnb-item.parent').forEach(item => {
+  item.addEventListener('click', () => {
+    const isOpen = item.classList.contains('open');
+    if (isOpen) {
+      item.classList.remove('open');
+      const subId = item.id ? 'sub-' + item.id.replace('menu-', '') : null;
+      if (subId) {
+        const sub = document.getElementById(subId);
+        if (sub) sub.style.display = 'none';
+      }
+    } else {
+      item.classList.add('open');
+      const subId = item.id ? 'sub-' + item.id.replace('menu-', '') : null;
+      if (subId) {
+        const sub = document.getElementById(subId);
+        if (sub) sub.style.display = '';
+      }
+    }
+  });
+});
+
+/* ── Global Current-Time Line ─────────────────────── */
+function buildCurrentTimeLine() {
+  const curMin  = minutesFromStart(MOCK_DATA.currentTime);
+  const curLeft = minutesToPx(curMin);
+  const body    = document.getElementById('timelineBody');
+
+  // Overlay a full-height time line over the body
+  body.style.position = 'relative';
+  const line = document.createElement('div');
+  line.style.cssText = `
+    position: absolute;
+    top: 0; bottom: 0;
+    left: ${120 + curLeft}px;   /* 120px = instructor column width */
+    width: 2px;
+    background: #ef4444;
+    z-index: 10;
+    pointer-events: none;
+  `;
+  const dot = document.createElement('div');
+  dot.style.cssText = `
+    position: absolute;
+    top: 0; left: -4px;
+    width: 10px; height: 10px;
+    background: #ef4444;
+    border-radius: 9999px;
+    border: 2px solid #fff;
+  `;
+  line.appendChild(dot);
+  body.appendChild(line);
+}
+
+/* ── Init ─────────────────────────────────────────── */
+buildHoursRow();
+buildTimelineBody();
+buildCurrentTimeLine();
+</script>
+</body>
+</html>
