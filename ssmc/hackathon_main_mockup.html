@@ -211,11 +211,32 @@ a{text-decoration:none;color:inherit}
 .gl-proj{font-size:14px;font-weight:700;color:var(--t1);margin-bottom:3px}
 .gl-desc{font-size:12px;color:var(--t2);margin-bottom:12px;line-height:1.45}
 .gl-foot{display:flex;align-items:center;justify-content:space-between}
-.like-btn{display:flex;align-items:center;gap:5px;font-size:13px;font-weight:600;color:var(--t2);background:none;border:none;cursor:pointer;padding:4px 8px;border-radius:6px;transition:background .15s}
-.like-btn:hover{background:var(--bg)}
+.like-btn{position:relative;display:flex;align-items:center;gap:5px;font-size:13px;font-weight:600;color:var(--t2);background:none;border:none;cursor:pointer;padding:4px 8px;border-radius:6px;transition:background .15s,color .15s}
+.like-btn:hover:not(.liked){background:var(--bg)}
 .like-btn.liked{color:#EF4444}
+.like-pop{position:absolute;top:-22px;left:50%;transform:translateX(-50%);font-size:12px;font-weight:700;color:#EF4444;white-space:nowrap;pointer-events:none;animation:likeFloat .65s ease-out forwards}
+@keyframes likeFloat{0%{opacity:1;transform:translateX(-50%) translateY(0)}70%{opacity:.7}100%{opacity:0;transform:translateX(-50%) translateY(-18px)}}
 .gl-more{text-align:center;padding:28px 0 0}
 .btn-more{padding:11px 28px;border:1.5px solid var(--border);background:#fff;border-radius:8px;font-size:13px;font-weight:600;color:var(--t2);cursor:pointer}
+
+/* Awards */
+.aw-section{background:var(--bg);border-top:1px solid var(--border)}
+.aw-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+.aw-card{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:24px;display:flex;flex-direction:column}
+.aw-card.rank1{border-color:#FCD34D;background:linear-gradient(155deg,#FFFEF5 0%,#fff 55%)}
+.aw-card.rank2{border-color:#C8CDD5;background:linear-gradient(155deg,#FAFAFA 0%,#fff 55%)}
+.aw-card.rank3{border-color:#FDBA74;background:linear-gradient(155deg,#FFF9F5 0%,#fff 55%)}
+.aw-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:14px;background:rgba(26,58,107,.06)}
+.aw-card.rank1 .aw-icon{background:#FFFBEB}
+.aw-card.rank2 .aw-icon{background:#F3F4F6}
+.aw-card.rank3 .aw-icon{background:#FFF7ED}
+.aw-name{font-size:15px;font-weight:700;color:var(--t1);margin-bottom:4px}
+.aw-prize{font-size:13px;font-weight:700;color:var(--navy-m);margin-bottom:10px}
+.aw-desc{font-size:12px;color:var(--t2);line-height:1.55;margin-bottom:14px;flex:1}
+.aw-divider{width:100%;height:1px;background:var(--border);margin-bottom:12px}
+.aw-tbd{display:inline-flex;align-items:center;gap:6px}
+.aw-tbd-badge{font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;background:var(--bg);color:var(--t2);border:1px solid var(--border)}
+.aw-tbd-text{font-size:11px;color:var(--t2)}
 
 /* FOOTER */
 #footer{background:var(--navy-d);padding:28px 40px}
@@ -321,6 +342,14 @@ a{text-decoration:none;color:inherit}
               <div class="stat-ico">⏱️</div>
               <div class="stat-val">48<small>시간</small></div>
               <div class="stat-lbl">해커톤 진행</div>
+            </div>
+            <div class="stat-box" style="grid-column:span 2">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+                <div class="stat-ico" style="margin-bottom:0;font-size:18px">🙋</div>
+                <span style="font-size:10px;font-weight:700;color:rgba(255,255,255,.5);background:rgba(255,255,255,.08);padding:3px 8px;border-radius:4px;letter-spacing:.06em">● LIVE</span>
+              </div>
+              <div class="stat-val"><span id="team-counter">0</span><small>팀</small></div>
+              <div class="stat-lbl">현재 참가 신청팀</div>
             </div>
           </div>
         </div>
@@ -438,6 +467,89 @@ a{text-decoration:none;color:inherit}
             <li>수료 후 우수팀 채용 연계 기회 제공</li>
             <li>결과물 포트폴리오 피드백 리포트 제공</li>
           </ul>
+        </div>
+
+      </div>
+    </div></div>
+  </div>
+
+  <!-- Awards Section -->
+  <div class="aw-section">
+    <div class="wrap"><div class="sec">
+      <div class="sec-title">수상 카테고리</div>
+      <div class="sec-sub">총 8개 부문 · 수상팀은 심사 완료 후 시상식에서 발표됩니다</div>
+      <div class="aw-grid">
+
+        <div class="aw-card rank1">
+          <div class="aw-icon">🥇</div>
+          <div class="aw-name">종합 대상</div>
+          <div class="aw-prize">상금 500만원</div>
+          <div class="aw-desc">전 분야를 통틀어 혁신성·완성도·영향력 종합 1위 팀에게 수여</div>
+          <div class="aw-divider"></div>
+          <div class="aw-tbd"><span class="aw-tbd-badge">미정</span><span class="aw-tbd-text">심사 완료 후 발표</span></div>
+        </div>
+
+        <div class="aw-card rank2">
+          <div class="aw-icon">🥈</div>
+          <div class="aw-name">종합 최우수</div>
+          <div class="aw-prize">상금 300만원</div>
+          <div class="aw-desc">혁신성·완성도·발표력 종합 심사 기준 2위에 선정된 팀</div>
+          <div class="aw-divider"></div>
+          <div class="aw-tbd"><span class="aw-tbd-badge">미정</span><span class="aw-tbd-text">심사 완료 후 발표</span></div>
+        </div>
+
+        <div class="aw-card rank3">
+          <div class="aw-icon">🥉</div>
+          <div class="aw-name">종합 우수</div>
+          <div class="aw-prize">상금 200만원 × 2팀</div>
+          <div class="aw-desc">상위 수상 외 우수팀 2개사 별도 선정 · 분야 구분 없이 평가</div>
+          <div class="aw-divider"></div>
+          <div class="aw-tbd"><span class="aw-tbd-badge">미정</span><span class="aw-tbd-text">심사 완료 후 발표</span></div>
+        </div>
+
+        <div class="aw-card">
+          <div class="aw-icon">👍</div>
+          <div class="aw-name">인기상</div>
+          <div class="aw-prize">상품권 50만원</div>
+          <div class="aw-desc">갤러리 좋아요 수 최다 팀 · 참가자 및 관람자 투표로 결정</div>
+          <div class="aw-divider"></div>
+          <div class="aw-tbd"><span class="aw-tbd-badge">미정</span><span class="aw-tbd-text">제출 마감 후 집계</span></div>
+        </div>
+
+        <div class="aw-card">
+          <div class="aw-icon">💡</div>
+          <div class="aw-name">아이디어상</div>
+          <div class="aw-prize">상품권 30만원</div>
+          <div class="aw-desc">문제 정의와 해결 아이디어의 독창성이 가장 돋보인 팀</div>
+          <div class="aw-divider"></div>
+          <div class="aw-tbd"><span class="aw-tbd-badge">미정</span><span class="aw-tbd-text">심사 완료 후 발표</span></div>
+        </div>
+
+        <div class="aw-card">
+          <div class="aw-icon">⚙️</div>
+          <div class="aw-name">기술상</div>
+          <div class="aw-prize">상품권 30만원</div>
+          <div class="aw-desc">AI·ML 기술 활용도와 구현 완성도가 가장 높이 평가된 팀</div>
+          <div class="aw-divider"></div>
+          <div class="aw-tbd"><span class="aw-tbd-badge">미정</span><span class="aw-tbd-text">심사 완료 후 발표</span></div>
+        </div>
+
+        <div class="aw-card">
+          <div class="aw-icon">✅</div>
+          <div class="aw-name">실현가능성상</div>
+          <div class="aw-prize">상품권 30만원</div>
+          <div class="aw-desc">비즈니스 적용 가능성과 현장 실용성이 가장 높이 평가된 팀</div>
+          <div class="aw-divider"></div>
+          <div class="aw-tbd"><span class="aw-tbd-badge">미정</span><span class="aw-tbd-text">심사 완료 후 발표</span></div>
+        </div>
+
+        <div class="aw-card">
+          <div class="aw-icon">🚀</div>
+          <div class="aw-name">도전상</div>
+          <div class="aw-prize">상품권 30만원</div>
+          <div class="aw-desc">가장 도전적인 주제에 과감히 임한 팀 · 심사위원 특별 추천</div>
+          <div class="aw-divider"></div>
+          <div class="aw-tbd"><span class="aw-tbd-badge">미정</span><span class="aw-tbd-text">심사 완료 후 발표</span></div>
         </div>
 
       </div>
@@ -789,6 +901,89 @@ a{text-decoration:none;color:inherit}
     </div></div>
   </div>
 
+  <!-- Awards Section -->
+  <div class="aw-section">
+    <div class="wrap"><div class="sec">
+      <div class="sec-title">수상 카테고리</div>
+      <div class="sec-sub">총 8개 부문 · 수상팀은 심사 완료 후 시상식에서 발표됩니다</div>
+      <div class="aw-grid">
+
+        <div class="aw-card rank1">
+          <div class="aw-icon">🥇</div>
+          <div class="aw-name">종합 대상</div>
+          <div class="aw-prize">상금 500만원</div>
+          <div class="aw-desc">전 분야를 통틀어 혁신성·완성도·영향력 종합 1위 팀에게 수여</div>
+          <div class="aw-divider"></div>
+          <div class="aw-tbd"><span class="aw-tbd-badge">미정</span><span class="aw-tbd-text">심사 완료 후 발표</span></div>
+        </div>
+
+        <div class="aw-card rank2">
+          <div class="aw-icon">🥈</div>
+          <div class="aw-name">종합 최우수</div>
+          <div class="aw-prize">상금 300만원</div>
+          <div class="aw-desc">혁신성·완성도·발표력 종합 심사 기준 2위에 선정된 팀</div>
+          <div class="aw-divider"></div>
+          <div class="aw-tbd"><span class="aw-tbd-badge">미정</span><span class="aw-tbd-text">심사 완료 후 발표</span></div>
+        </div>
+
+        <div class="aw-card rank3">
+          <div class="aw-icon">🥉</div>
+          <div class="aw-name">종합 우수</div>
+          <div class="aw-prize">상금 200만원 × 2팀</div>
+          <div class="aw-desc">상위 수상 외 우수팀 2개사 별도 선정 · 분야 구분 없이 평가</div>
+          <div class="aw-divider"></div>
+          <div class="aw-tbd"><span class="aw-tbd-badge">미정</span><span class="aw-tbd-text">심사 완료 후 발표</span></div>
+        </div>
+
+        <div class="aw-card">
+          <div class="aw-icon">👍</div>
+          <div class="aw-name">인기상</div>
+          <div class="aw-prize">상품권 50만원</div>
+          <div class="aw-desc">갤러리 좋아요 수 최다 팀 · 참가자 및 관람자 투표로 결정</div>
+          <div class="aw-divider"></div>
+          <div class="aw-tbd"><span class="aw-tbd-badge">미정</span><span class="aw-tbd-text">제출 마감 후 집계</span></div>
+        </div>
+
+        <div class="aw-card">
+          <div class="aw-icon">💡</div>
+          <div class="aw-name">아이디어상</div>
+          <div class="aw-prize">상품권 30만원</div>
+          <div class="aw-desc">문제 정의와 해결 아이디어의 독창성이 가장 돋보인 팀</div>
+          <div class="aw-divider"></div>
+          <div class="aw-tbd"><span class="aw-tbd-badge">미정</span><span class="aw-tbd-text">심사 완료 후 발표</span></div>
+        </div>
+
+        <div class="aw-card">
+          <div class="aw-icon">⚙️</div>
+          <div class="aw-name">기술상</div>
+          <div class="aw-prize">상품권 30만원</div>
+          <div class="aw-desc">AI·ML 기술 활용도와 구현 완성도가 가장 높이 평가된 팀</div>
+          <div class="aw-divider"></div>
+          <div class="aw-tbd"><span class="aw-tbd-badge">미정</span><span class="aw-tbd-text">심사 완료 후 발표</span></div>
+        </div>
+
+        <div class="aw-card">
+          <div class="aw-icon">✅</div>
+          <div class="aw-name">실현가능성상</div>
+          <div class="aw-prize">상품권 30만원</div>
+          <div class="aw-desc">비즈니스 적용 가능성과 현장 실용성이 가장 높이 평가된 팀</div>
+          <div class="aw-divider"></div>
+          <div class="aw-tbd"><span class="aw-tbd-badge">미정</span><span class="aw-tbd-text">심사 완료 후 발표</span></div>
+        </div>
+
+        <div class="aw-card">
+          <div class="aw-icon">🚀</div>
+          <div class="aw-name">도전상</div>
+          <div class="aw-prize">상품권 30만원</div>
+          <div class="aw-desc">가장 도전적인 주제에 과감히 임한 팀 · 심사위원 특별 추천</div>
+          <div class="aw-divider"></div>
+          <div class="aw-tbd"><span class="aw-tbd-badge">미정</span><span class="aw-tbd-text">심사 완료 후 발표</span></div>
+        </div>
+
+      </div>
+    </div></div>
+  </div>
+
 </div><!-- /screen during -->
 
 
@@ -796,7 +991,7 @@ a{text-decoration:none;color:inherit}
 <footer id="footer">
   <div class="footer-row">
     <div>
-      <div class="f-logo">SSMC AI 해커톤 2026</div>
+      <div class="f-logo">AI 해커톤 2026</div>
       <div class="f-sub">Powered by 삼성멀티캠퍼스 AI Education</div>
     </div>
     <div class="f-links">
@@ -836,13 +1031,38 @@ function tick() {
 tick();
 setInterval(tick, 1000);
 
-/* Like Toggle */
+/* Like — 한 카드당 1회 (좋아요 후 취소 불가) */
 function toggleLike(btn) {
-  var isLiked = btn.classList.toggle('liked');
-  var count = parseInt(btn.dataset.count) + (isLiked ? 1 : -1);
+  if (btn.classList.contains('liked')) return;
+  btn.classList.add('liked');
+  var count = parseInt(btn.dataset.count) + 1;
   btn.dataset.count = count;
-  btn.textContent = (isLiked ? '♥' : '♡') + ' ' + count;
+  btn.textContent = '♥ ' + count;
+  /* +1 팝업 애니메이션 */
+  var pop = document.createElement('span');
+  pop.className = 'like-pop';
+  pop.textContent = '+1';
+  btn.appendChild(pop);
+  setTimeout(function(){ if (pop.parentNode) pop.parentNode.removeChild(pop); }, 680);
 }
+
+/* 참가팀 카운트업 */
+function countUp(el, target, duration) {
+  var start = 0;
+  var step = target / (duration / 16);
+  var raf;
+  function frame() {
+    start += step;
+    if (start >= target) { el.textContent = target; return; }
+    el.textContent = Math.floor(start);
+    raf = requestAnimationFrame(frame);
+  }
+  raf = requestAnimationFrame(frame);
+}
+document.addEventListener('DOMContentLoaded', function() {
+  var el = document.getElementById('team-counter');
+  if (el) setTimeout(function(){ countUp(el, 73, 1600); }, 400);
+});
 </script>
 </body>
 </html>
