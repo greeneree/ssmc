@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AI 해커톤 IA Table</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Noto Sans KR', sans-serif; background: #f5f5f3; font-size: 13px; }
+
+header {
+  background: #111; color: #fff;
+  padding: 16px 24px; display: flex; align-items: center; gap: 12px;
+  position: sticky; top: 0; z-index: 200;
+}
+.h-dot { width: 7px; height: 7px; border-radius: 50%; background: #10b981; }
+header h1 { font-size: 14px; font-weight: 600; }
+.h-badge { margin-left: auto; font-size: 11px; color: #888; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 3px 10px; }
+
+.toolbar {
+  background: #fff; border-bottom: 1px solid rgba(0,0,0,0.08);
+  padding: 10px 20px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+  position: sticky; top: 49px; z-index: 100;
+}
+.filter-group { display: flex; gap: 4px; align-items: center; }
+.filter-label { font-size: 11px; color: #999; margin-right: 4px; }
+.filter-btn {
+  font-size: 11px; font-family: 'Noto Sans KR', sans-serif;
+  padding: 4px 10px; border-radius: 20px; border: 1px solid rgba(0,0,0,0.12);
+  background: #fff; cursor: pointer; font-weight: 500; color: #555; transition: all .15s;
+}
+.filter-btn:hover { border-color: #10b981; color: #10b981; }
+.filter-btn.active { background: #111; color: #fff; border-color: #111; }
+.sep { width: 1px; height: 20px; background: rgba(0,0,0,0.1); margin: 0 4px; }
+.count-badge { font-size: 11px; color: #aaa; margin-left: auto; }
+
+.table-wrap { padding: 16px 12px 60px; overflow-x: auto; }
+
+table {
+  width: 100%; border-collapse: collapse;
+  background: #fff; border-radius: 12px; overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  min-width: 1000px;
+}
+thead th {
+  background: #111; color: #fff;
+  padding: 10px 12px; text-align: left;
+  font-size: 11px; font-weight: 600; letter-spacing: .04em;
+  white-space: nowrap;
+}
+tbody tr { border-bottom: 1px solid rgba(0,0,0,0.05); transition: background .1s; }
+tbody tr:hover { background: #fafaf8; }
+tbody tr:last-child { border-bottom: none; }
+tbody td { padding: 7px 12px; vertical-align: middle; line-height: 1.4; }
+
+/* 구분 badges */
+.badge {
+  display: inline-block; font-size: 10px; font-weight: 600;
+  padding: 2px 7px; border-radius: 20px; white-space: nowrap;
+}
+.badge-front  { background: #e1f5ee; color: #0f6e56; }
+.badge-admin  { background: #eeedfe; color: #3c3489; }
+.badge-sysadmin { background: #f1f0eb; color: #444441; }
+
+/* Target badges */
+.target {
+  display: inline-block; font-size: 10px; font-weight: 500;
+  padding: 2px 7px; border-radius: 4px; white-space: nowrap;
+}
+.target-participant { background: #e1f5ee; color: #085041; }
+.target-peer        { background: #eaf3de; color: #27500a; }
+.target-judge       { background: #faeeda; color: #633806; }
+.target-operator    { background: #eeedfe; color: #3c3489; }
+.target-sysadmin    { background: #f1f0eb; color: #5f5e5a; }
+
+/* Depth cells */
+.d1 { font-weight: 600; color: #111; }
+.d2 { color: #333; }
+.d3 { color: #555; }
+.d4 { color: #777; font-size: 11px; }
+td.empty { color: #ddd; }
+
+/* Login */
+.login-o { color: #059669; font-weight: 700; }
+.login-x { color: #dc2626; font-weight: 700; }
+
+/* Note */
+.note { color: #888; font-size: 11px; }
+
+/* P2 */
+.p2 { font-size: 9px; font-weight: 700; background: #7f77dd; color: #fff; border-radius: 3px; padding: 1px 4px; margin-left: 3px; vertical-align: middle; }
+.new { font-size: 9px; font-weight: 700; background: #fb2c36; color: #fff; border-radius: 3px; padding: 1px 4px; margin-left: 3px; vertical-align: middle; }
+
+/* Row highlight by phase */
+tr.phase-common  { border-left: 3px solid #d1d0c9; }
+tr.phase-before  { border-left: 3px solid #10b981; }
+tr.phase-during  { border-left: 3px solid #7f77dd; }
+tr.phase-after   { border-left: 3px solid #ba7517; }
+tr.phase-system  { border-left: 3px solid #a32d2d; }
+
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="h-dot"></div>
+  <h1>AI 해커톤 플랫폼 — IA Table</h1>
+  <span class="h-badge">v0.2 · depth 4단계</span>
+</header>
+
+<div class="toolbar">
+  <div class="filter-group">
+    <span class="filter-label">구분</span>
+    <button class="filter-btn active" onclick="setFilter('구분','all')">전체</button>
+    <button class="filter-btn" onclick="setFilter('구분','Front')">Front</button>
+    <button class="filter-btn" onclick="setFilter('구분','Admin')">Admin</button>
+    <button class="filter-btn" onclick="setFilter('구분','SystemAdmin')">SystemAdmin</button>
+  </div>
+  <div class="sep"></div>
+  <div class="filter-group">
+    <span class="filter-label">대상</span>
+    <button class="filter-btn active" onclick="setFilter('target','all')">전체</button>
+    <button class="filter-btn" onclick="setFilter('target','참가자')">참가자</button>
+    <button class="filter-btn" onclick="setFilter('target','동료평가자')">동료평가자</button>
+    <button class="filter-btn" onclick="setFilter('target','심사위원')">심사위원</button>
+    <button class="filter-btn" onclick="setFilter('target','운영자')">운영자</button>
+    <button class="filter-btn" onclick="setFilter('target','시스템관리자')">시스템관리자</button>
+  </div>
+  <span class="count-badge" id="rowCount"></span>
+</div>
+
+<div class="table-wrap">
+<table id="iaTable">
+<thead>
+  <tr>
+    <th style="width:90px">구분</th>
+    <th style="width:100px">Target</th>
+    <th style="width:110px">1depth</th>
+    <th style="width:140px">2depth</th>
+    <th style="width:160px">3depth</th>
+    <th style="width:150px">4depth</th>
+    <th style="width:70px">로그인</th>
+    <th>비고</th>
+  </tr>
+</thead>
+<tbody id="tbody"></tbody>
+</table>
+</div>
+
+<script>
+const rows = [
+  // ── FRONT / 참가자 ──────────────────────────────────────────
+  {gb:'Front', target:'참가자', d1:'랜딩', d2:'', d3:'', d4:'', login:'X', note:'비로그인 접근 가능한 서비스 소개 페이지', phase:'common'},
+  {gb:'Front', target:'참가자', d1:'랜딩', d2:'대회 소개 / 일정', d3:'', d4:'', login:'X', note:'강조형 일정 UI (Kaggle 레퍼런스)', phase:'common'},
+  {gb:'Front', target:'참가자', d1:'랜딩', d2:'규칙 안내', d3:'', d4:'', login:'X', note:'', phase:'common'},
+  {gb:'Front', target:'참가자', d1:'랜딩', d2:'FAQ / 공지', d3:'', d4:'', login:'X', note:'기존 공지 기능 활용 가능', phase:'common'},
+  {gb:'Front', target:'참가자', d1:'로그인', d2:'', d3:'', d4:'', login:'X', note:'MLP SSO 연동 (SAML / OAuth)', phase:'common'},
+  {gb:'Front', target:'참가자', d1:'팀 관리', d2:'팀 구성 / 등록', d3:'', d4:'', login:'O', note:'대회 참가를 위한 팀 단위 등록', phase:'before'},
+  {gb:'Front', target:'참가자', d1:'팀 관리', d2:'팀 구성 / 등록', d3:'팀원 초대', d4:'', login:'O', note:'', phase:'before'},
+  {gb:'Front', target:'참가자', d1:'팀 관리', d2:'팀 구성 / 등록', d3:'관심 분야 설정', d4:'', login:'O', note:'카테고리 기반', phase:'before'},
+  {gb:'Front', target:'참가자', d1:'대회 참여', d2:'대회 상세 보기', d3:'', d4:'', login:'O', note:'대회 정보 / 일정 / 규칙 통합 뷰', phase:'during'},
+  {gb:'Front', target:'참가자', d1:'대회 참여', d2:'결과물 제출 / 수정', d3:'', d4:'', login:'O', note:'제출 마감 전까지 수정 가능', phase:'during'},
+  {gb:'Front', target:'참가자', d1:'대회 참여', d2:'결과물 제출 / 수정', d3:'텍스트 / 파일 업로드', d4:'', login:'O', note:'PDF, PPT 등 파일 형식 검증 포함', phase:'during'},
+  {gb:'Front', target:'참가자', d1:'대회 참여', d2:'결과물 제출 / 수정', d3:'썸네일 등록', d4:'', login:'O', note:'갤러리 카드 노출용', phase:'during'},
+  {gb:'Front', target:'참가자', d1:'대회 참여', d2:'결과물 제출 / 수정', d3:'제출 이력 조회', d4:'', login:'O', note:'타임스탬프 기반 이력 관리', phase:'during'},
+  {gb:'Front', target:'참가자', d1:'대회 참여', d2:'갤러리', d3:'나의 팀 제출물', d4:'', login:'O', note:'본인 팀은 항상 열람 가능', phase:'during'},
+  {gb:'Front', target:'참가자', d1:'대회 참여', d2:'갤러리', d3:'타팀 제출물', d4:'', login:'O', note:'운영자 갤러리 노출 설정에 따라 열람 범위 결정', phase:'during'},
+  {gb:'Front', target:'참가자', d1:'대회 참여', d2:'실시간 대시보드', d3:'심사 진행 현황', d4:'', login:'O', note:'AI 심사 / 동료 평가 진행률', phase:'during'},
+  {gb:'Front', target:'참가자', d1:'대회 참여', d2:'실시간 대시보드', d3:'AI 가이드 메시지', d4:'', login:'O', note:'AI 엔진이 생성한 가이드 피드백', phase:'during'},
+  {gb:'Front', target:'참가자', d1:'대회 참여', d2:'실시간 대시보드', d3:'팀별 현황 조회', d4:'', login:'O', note:'', phase:'during'},
+  {gb:'Front', target:'참가자', d1:'대회 참여', d2:'리더보드', d3:'', d4:'', login:'O', note:'상위 N% 범위 공개 (운영자 설정)', phase:'during'},
+  {gb:'Front', target:'참가자', d1:'결과 확인', d2:'최종 리더보드', d3:'', d4:'', login:'O', note:'대회 종료 후 전체 순위 공개', phase:'after'},
+  {gb:'Front', target:'참가자', d1:'결과 확인', d2:'점수 / 순위 확인', d3:'', d4:'', login:'O', note:'항목별 점수 breakdown 포함', phase:'after'},
+  {gb:'Front', target:'참가자', d1:'결과 확인', d2:'AI 개인 리포트', d3:'AI 피드백 요약', d4:'', login:'O', note:'Dual-LLM 평가 기반 항목별 피드백', phase:'after'},
+  {gb:'Front', target:'참가자', d1:'결과 확인', d2:'AI 개인 리포트', d3:'개선 가이드 제공', d4:'', login:'O', note:'', phase:'after'},
+  {gb:'Front', target:'참가자', d1:'결과 확인', d2:'AI 개인 리포트', d3:'PDF 다운로드', d4:'', login:'O', note:'웹뷰 / PDF 병행 제공', phase:'after'},
+  {gb:'Front', target:'참가자', d1:'결과 확인', d2:'적용 여부 설문', d3:'', d4:'', login:'O', note:'대회 종료 후 메일 링크로 접근, 응답 결과 리더보드 반영', phase:'after'},
+
+  // ── FRONT / 동료평가자 ─────────────────────────────────────
+  {gb:'Front', target:'동료평가자', d1:'로그인', d2:'', d3:'', d4:'', login:'X', note:'MLP SSO. 참가자와 동일 계정으로 역할 분기', phase:'common'},
+  {gb:'Front', target:'동료평가자', d1:'평가 홈', d2:'배정 대상 목록', d3:'', d4:'', login:'O', note:'랜덤 배정, 자기 팀 자동 제외', phase:'during'},
+  {gb:'Front', target:'동료평가자', d1:'평가 홈', d2:'배정 대상 목록', d3:'자기 팀 제외 확인', d4:'', login:'O', note:'배정 로직에서 서버단 처리', phase:'during'},
+  {gb:'Front', target:'동료평가자', d1:'평가 홈', d2:'배정 대상 목록', d3:'최소 평가 수 안내', d4:'', login:'O', note:'운영자 설정값 (예: 5회) 기반 안내', phase:'during'},
+  {gb:'Front', target:'동료평가자', d1:'평가 홈', d2:'제출물 상세 보기', d3:'파일 / 텍스트 열람', d4:'', login:'O', note:'', phase:'during'},
+  {gb:'Front', target:'동료평가자', d1:'평가 홈', d2:'제출물 상세 보기', d3:'익명 여부', d4:'', login:'O', note:'운영자 설정에 따라 팀명 노출 여부 결정', phase:'during'},
+  {gb:'Front', target:'동료평가자', d1:'평가 홈', d2:'평가 입력', d3:'점수 입력', d4:'', login:'O', note:'항목별 점수 입력', phase:'during'},
+  {gb:'Front', target:'동료평가자', d1:'평가 홈', d2:'평가 입력', d3:'코멘트 입력', d4:'', login:'O', note:'', phase:'during'},
+  {gb:'Front', target:'동료평가자', d1:'평가 홈', d2:'평가 입력', d3:'임시저장 / 최종 제출', d4:'', login:'O', note:'최종 제출 후 수정 불가', phase:'during'},
+  {gb:'Front', target:'동료평가자', d1:'평가 홈', d2:'평가 현황 확인', d3:'완료 / 미완료 목록', d4:'', login:'O', note:'', phase:'during'},
+  {gb:'Front', target:'동료평가자', d1:'평가 홈', d2:'평가 현황 확인', d3:'남은 평가 수 표시', d4:'', login:'O', note:'최소 평가 수 미달 시 경고', phase:'during'},
+  {gb:'Front', target:'동료평가자', d1:'결과 확인', d2:'내가 한 평가 이력', d3:'', d4:'', login:'O', note:'', phase:'after'},
+  {gb:'Front', target:'동료평가자', d1:'결과 확인', d2:'동료 평가 결과 확인', d3:'', d4:'', login:'O', note:'익명 처리 여부에 따라 공개 범위 결정', phase:'after'},
+
+  // ── FRONT / 심사위원 ───────────────────────────────────────
+  {gb:'Front', target:'심사위원', d1:'로그인', d2:'', d3:'', d4:'', login:'X', note:'MLP SSO. 운영자가 지정한 계정에 심사위원 권한 부여', phase:'common'},
+  {gb:'Front', target:'심사위원', d1:'심사 홈', d2:'배정된 참가자 목록', d3:'', d4:'', login:'O', note:'심사위원별 배정 범위 내 목록', phase:'during'},
+  {gb:'Front', target:'심사위원', d1:'심사 홈', d2:'제출물 상세 확인', d3:'파일 / 텍스트 열람', d4:'', login:'O', note:'', phase:'during'},
+  {gb:'Front', target:'심사위원', d1:'심사 홈', d2:'AI 참고자료', d3:'Dual-LLM 평가 요약', d4:'', login:'O', note:'GPT-4o × Claude 3.5 교차 평가 결과', phase:'during'},
+  {gb:'Front', target:'심사위원', d1:'심사 홈', d2:'AI 참고자료', d3:'Anchoring 보정 결과', d4:'', login:'O', note:'10% 샘플 기반 상/중/하 보정 결과 제공', phase:'during'},
+  {gb:'Front', target:'심사위원', d1:'심사 홈', d2:'AI 참고자료', d3:'동료 평가 점수 참고', d4:'', login:'O', note:'', phase:'during'},
+  {gb:'Front', target:'심사위원', d1:'심사 홈', d2:'심사 점수 입력', d3:'항목별 점수 입력', d4:'', login:'O', note:'', phase:'during'},
+  {gb:'Front', target:'심사위원', d1:'심사 홈', d2:'심사 점수 입력', d3:'심사 의견 작성', d4:'', login:'O', note:'', phase:'during'},
+  {gb:'Front', target:'심사위원', d1:'심사 홈', d2:'심사 점수 입력', d3:'이의 신청 로그 조회', d4:'', login:'O', note:'운영자가 등록한 이의 신청 내용 확인', phase:'during'},
+  {gb:'Front', target:'심사위원', d1:'심사 홈', d2:'심사 제출 / 확정', d3:'', d4:'', login:'O', note:'확정 후 수정 불가 (운영자 승인 후 최종)', phase:'during'},
+  {gb:'Front', target:'심사위원', d1:'결과 확인', d2:'심사 진척률 확인', d3:'', d4:'', login:'O', note:'담당 건수 대비 완료 건수', phase:'after'},
+  {gb:'Front', target:'심사위원', d1:'결과 확인', d2:'최종 점수 리더보드', d3:'', d4:'', login:'O', note:'운영자 노출 설정에 따라 공개', phase:'after'},
+
+  // ── ADMIN / 운영자 ─────────────────────────────────────────
+  {gb:'Admin', target:'운영자', d1:'대시보드', d2:'', d3:'', d4:'', login:'O', note:'전체 운영 현황 모니터링 메인', phase:'common'},
+  {gb:'Admin', target:'운영자', d1:'대시보드', d2:'참가 / 제출 / 심사 현황', d3:'', d4:'', login:'O', note:'', phase:'common'},
+  {gb:'Admin', target:'운영자', d1:'대시보드', d2:'대회 상태 관리', d3:'', d4:'', login:'O', note:'Draft → 공개 → 접수중 → 제출마감 → 1차결과공개 → 2차심사중 → 종료', phase:'common'},
+
+  {gb:'Admin', target:'운영자', d1:'대회 설정', d2:'기본 정보 / 일정', d3:'', d4:'', login:'O', note:'대회명, 일정, 해커톤 유형 (아이디어톤/MVP톤)', phase:'before'},
+  {gb:'Admin', target:'운영자', d1:'대회 설정', d2:'해커톤 유형 설정', d3:'', d4:'', login:'O', note:'아이디어톤 / MVP톤 선택', phase:'before'},
+  {gb:'Admin', target:'운영자', d1:'대회 설정', d2:'규칙 / FAQ 관리', d3:'', d4:'', login:'O', note:'기존 공지 기능 활용 가능', phase:'before'},
+  {gb:'Admin', target:'운영자', d1:'대회 설정', d2:'심사 기준 / 가중치', d3:'', d4:'', login:'O', note:'평가 항목별 가중치 설정', phase:'before'},
+  {gb:'Admin', target:'운영자', d1:'대회 설정', d2:'심사 기준 / 가중치', d3:'AI 심사 기준 설정', d4:'평가 항목별 가중치', login:'O', note:'기획·전략 / 기술논리 / 구현실증 / 임팩트', phase:'before'},
+  {gb:'Admin', target:'운영자', d1:'대회 설정', d2:'갤러리 노출 설정', d3:'', d4:'', login:'O', note:'타팀 제출물 공개 범위, 본선 진출 여부 노출 설정', phase:'before'},
+  {gb:'Admin', target:'운영자', d1:'대회 설정', d2:'동료 평가 세부 설정', d3:'팀당 최소 평가 수', d4:'', login:'O', note:'', phase:'before'},
+  {gb:'Admin', target:'운영자', d1:'대회 설정', d2:'동료 평가 세부 설정', d3:'익명 평가 여부', d4:'', login:'O', note:'', phase:'before'},
+  {gb:'Admin', target:'운영자', d1:'대회 설정', d2:'심사위원 배정', d3:'', d4:'', login:'O', note:'심사위원 계정 지정 및 평가 범위 배정', phase:'before'},
+  {gb:'Admin', target:'운영자', d1:'대회 설정', d2:'리더보드 내용 설정', d3:'', d4:'', login:'O', note:'노출 순위 범위, 표시 항목 설정', phase:'before'},
+
+  {gb:'Admin', target:'운영자', d1:'심사 관리', d2:'제출 현황 / 검증 로그', d3:'', d4:'', login:'O', note:'파일 형식·요건 자동 검증 결과', phase:'during'},
+  {gb:'Admin', target:'운영자', d1:'심사 관리', d2:'AI 심사 요청 / 확인', d3:'AI 점수 1차 확인', d4:'', login:'O', note:'', phase:'during'},
+  {gb:'Admin', target:'운영자', d1:'심사 관리', d2:'AI 심사 요청 / 확인', d3:'최종 승인 / 수정', d4:'', login:'O', note:'AI 결과 검토 후 담당자 확정', phase:'during'},
+  {gb:'Admin', target:'운영자', d1:'심사 관리', d2:'Anchoring 검토 / 승인', d3:'10% 샘플 보정 확인', d4:'', login:'O', note:'NEW — Dual-LLM 점수의 상/중/하 기준 보정 결과', phase:'during'},
+  {gb:'Admin', target:'운영자', d1:'심사 관리', d2:'Anchoring 검토 / 승인', d3:'상/중/하 기준 조정', d4:'', login:'O', note:'NEW — 운영자가 직접 Anchor 기준 수동 조정 가능', phase:'during'},
+  {gb:'Admin', target:'운영자', d1:'심사 관리', d2:'Anchoring 검토 / 승인', d3:'Anchor 확정 승인', d4:'', login:'O', note:'NEW — 승인 후 AI 엔진에 반영', phase:'during'},
+  {gb:'Admin', target:'운영자', d1:'심사 관리', d2:'동료 평가 현황', d3:'', d4:'', login:'O', note:'팀별 평가 완료 현황 모니터링', phase:'during'},
+  {gb:'Admin', target:'운영자', d1:'심사 관리', d2:'심사위원 평가 현황', d3:'', d4:'', login:'O', note:'심사 진척률 확인', phase:'during'},
+  {gb:'Admin', target:'운영자', d1:'심사 관리', d2:'리더보드 설정', d3:'', d4:'', login:'O', note:'공개 시점 / 범위 조정', phase:'during'},
+  {gb:'Admin', target:'운영자', d1:'심사 관리', d2:'이의 신청 로그 조회', d3:'', d4:'', login:'O', note:'NEW — 심사 이의 내용 확인 및 심사위원 전달', phase:'during'},
+
+  {gb:'Admin', target:'운영자', d1:'결과 처리', d2:'AI 심사 기준 DB', d3:'Anchor 기준안 이력', d4:'', login:'O', note:'NEW — 회차별 Anchor 설정 이력 보관', phase:'after'},
+  {gb:'Admin', target:'운영자', d1:'결과 처리', d2:'AI 심사 기준 DB', d3:'프롬프트 버전 관리', d4:'', login:'O', note:'NEW — AI 심사 프롬프트 버전 이력', phase:'after'},
+  {gb:'Admin', target:'운영자', d1:'결과 처리', d2:'AI 심사 기준 DB', d3:'평가 가중치 이력', d4:'', login:'O', note:'NEW — 대회별 가중치 설정 이력', phase:'after'},
+  {gb:'Admin', target:'운영자', d1:'결과 처리', d2:'개인 리포트 관리', d3:'생성 현황 확인', d4:'', login:'O', note:'', phase:'after'},
+  {gb:'Admin', target:'운영자', d1:'결과 처리', d2:'개인 리포트 관리', d3:'개별 / 일괄 다운로드', d4:'ZIP 다운로드', login:'O', note:'', phase:'after'},
+  {gb:'Admin', target:'운영자', d1:'결과 처리', d2:'메일링 발송 설정', d3:'발송 대상 / 시점', d4:'', login:'O', note:'수상자/전체, 팀장/전체 선택', phase:'after'},
+  {gb:'Admin', target:'운영자', d1:'결과 처리', d2:'메일링 발송 설정', d3:'발송 이력 확인', d4:'', login:'O', note:'', phase:'after'},
+
+  // ── SYSTEM ADMIN ───────────────────────────────────────────
+  {gb:'SystemAdmin', target:'시스템관리자', d1:'전체 관리', d2:'대회 목록 전체 조회', d3:'', d4:'', login:'O', note:'전체 대회 현황 슈퍼뷰', phase:'common'},
+  {gb:'SystemAdmin', target:'시스템관리자', d1:'전체 관리', d2:'사용자 / 권한 관리', d3:'어드민 계정 생성', d4:'', login:'O', note:'', phase:'common'},
+  {gb:'SystemAdmin', target:'시스템관리자', d1:'전체 관리', d2:'사용자 / 권한 관리', d3:'심사위원 계정 관리', d4:'', login:'O', note:'', phase:'common'},
+  {gb:'SystemAdmin', target:'시스템관리자', d1:'전체 관리', d2:'사용자 / 권한 관리', d3:'역할 / 접근 권한 설정', d4:'', login:'O', note:'', phase:'common'},
+
+  {gb:'SystemAdmin', target:'시스템관리자', d1:'AI 엔진 관리', d2:'파이프라인 상태 확인', d3:'', d4:'', login:'O', note:'NEW — Document AI / Evaluation AI / Calibration 상태', phase:'system'},
+  {gb:'SystemAdmin', target:'시스템관리자', d1:'AI 엔진 관리', d2:'Dual-LLM 모델 설정', d3:'', d4:'', login:'O', note:'NEW — GPT-4o(비즈니스) × Claude 3.5(기술) 설정', phase:'system'},
+  {gb:'SystemAdmin', target:'시스템관리자', d1:'AI 엔진 관리', d2:'인스턴스 확장 설정', d3:'', d4:'', login:'O', note:'다수 파일 일괄 처리 시 자동 확장 정책', phase:'system'},
+  {gb:'SystemAdmin', target:'시스템관리자', d1:'AI 엔진 관리', d2:'AI 로그 조회', d3:'', d4:'', login:'O', note:'심사 로그 / 근거 데이터 별도 저장', phase:'system'},
+  {gb:'SystemAdmin', target:'시스템관리자', d1:'AI 엔진 관리', d2:'LLM 모델 설정 [P2]', d3:'고객사별 모델 지정', d4:'', login:'O', note:'Phase 2 — 멀티테넌트 환경에서 고객사별 LLM 커스텀', phase:'system'},
+  {gb:'SystemAdmin', target:'시스템관리자', d1:'AI 엔진 관리', d2:'LLM 모델 설정 [P2]', d3:'평가 기준 커스텀', d4:'', login:'O', note:'Phase 2', phase:'system'},
+  {gb:'SystemAdmin', target:'시스템관리자', d1:'AI 엔진 관리', d2:'LLM 모델 설정 [P2]', d3:'Claude / GPT-4o 전환', d4:'', login:'O', note:'Phase 2', phase:'system'},
+
+  {gb:'SystemAdmin', target:'시스템관리자', d1:'시스템', d2:'파일 저장소 관리', d3:'S3 버킷 관리', d4:'', login:'O', note:'', phase:'system'},
+  {gb:'SystemAdmin', target:'시스템관리자', d1:'시스템', d2:'DB 관리', d3:'PostgreSQL', d4:'', login:'O', note:'Main DB', phase:'system'},
+  {gb:'SystemAdmin', target:'시스템관리자', d1:'시스템', d2:'DB 관리', d3:'Pinecone (Vector DB)', d4:'', login:'O', note:'임베딩 데이터 관리', phase:'system'},
+  {gb:'SystemAdmin', target:'시스템관리자', d1:'시스템', d2:'DB 관리', d3:'NoSQL (AI Log)', d4:'', login:'O', note:'', phase:'system'},
+  {gb:'SystemAdmin', target:'시스템관리자', d1:'시스템', d2:'SSO 연동 설정', d3:'SAML / OAuth 관리', d4:'', login:'O', note:'MLP 기업 계정 연동', phase:'system'},
+  {gb:'SystemAdmin', target:'시스템관리자', d1:'시스템', d2:'멀티테넌트 관리 [P2]', d3:'테넌트별 데이터 격리', d4:'', login:'O', note:'Phase 2 — B2B SaaS 전환 시', phase:'system'},
+  {gb:'SystemAdmin', target:'시스템관리자', d1:'시스템', d2:'멀티테넌트 관리 [P2]', d3:'고객사 온보딩', d4:'', login:'O', note:'Phase 2', phase:'system'},
+
+  {gb:'SystemAdmin', target:'시스템관리자', d1:'보안 / 감사', d2:'감사 로그 조회', d3:'', d4:'', login:'O', note:'데이터 접근 전수 기록', phase:'system'},
+  {gb:'SystemAdmin', target:'시스템관리자', d1:'보안 / 감사', d2:'이상 접근 탐지', d3:'', d4:'', login:'O', note:'', phase:'system'},
+  {gb:'SystemAdmin', target:'시스템관리자', d1:'보안 / 감사', d2:'데이터 보관 / 삭제 정책', d3:'', d4:'', login:'O', note:'저장/전송 암호화 정책 포함', phase:'system'},
+  {gb:'SystemAdmin', target:'시스템관리자', d1:'보안 / 감사', d2:'LLM 세션 폐기 정책', d3:'학습 미사용 확인', d4:'', login:'O', note:'LLM 전송 시 학습 미사용 / 세션 단위 폐기 설정', phase:'system'},
+  {gb:'SystemAdmin', target:'시스템관리자', d1:'보안 / 감사', d2:'LLM 세션 폐기 정책', d3:'세션 단위 폐기 설정', d4:'', login:'O', note:'', phase:'system'},
+];
+
+const targetClass = {
+  '참가자':'participant','동료평가자':'peer','심사위원':'judge','운영자':'operator','시스템관리자':'sysadmin'
+};
+const gbLabel = { 'Front':'Front','Admin':'Admin','SystemAdmin':'SystemAdmin' };
+const gbBadge = { 'Front':'badge-front','Admin':'badge-admin','SystemAdmin':'badge-sysadmin' };
+
+let filterGb = 'all', filterTarget = 'all';
+
+function render() {
+  const tbody = document.getElementById('tbody');
+  tbody.innerHTML = '';
+  let count = 0;
+  rows.forEach(r => {
+    const gbMatch = filterGb === 'all' || r.gb === filterGb;
+    const tMatch  = filterTarget === 'all' || r.target === filterTarget;
+    if (!gbMatch || !tMatch) return;
+    count++;
+    const tr = document.createElement('tr');
+    tr.className = 'phase-' + r.phase;
+    const noteHtml = r.note.includes('[P2]') || r.note.includes('Phase 2')
+      ? r.note.replace(/Phase 2/g, '<span class="p2">P2</span>')
+      : r.note.includes('NEW')
+      ? r.note.replace(/NEW/g, '<span class="new">NEW</span>')
+      : r.note;
+    tr.innerHTML = `
+      <td><span class="badge ${gbBadge[r.gb]}">${r.gb}</span></td>
+      <td><span class="target target-${targetClass[r.target]}">${r.target}</span></td>
+      <td class="d1">${r.d1}</td>
+      <td class="d2">${r.d2 || '<span style="color:#e5e5e5">—</span>'}</td>
+      <td class="d3">${r.d3 || '<span style="color:#e5e5e5">—</span>'}</td>
+      <td class="d4">${r.d4 || '<span style="color:#e5e5e5">—</span>'}</td>
+      <td class="${r.login==='O'?'login-o':'login-x'}">${r.login}</td>
+      <td class="note">${noteHtml}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+  document.getElementById('rowCount').textContent = `${count}개 항목`;
+}
+
+function setFilter(type, val) {
+  if (type === '구분') {
+    filterGb = val;
+    document.querySelectorAll('.filter-group:nth-child(1) .filter-btn').forEach(b => b.classList.remove('active'));
+  } else {
+    filterTarget = val;
+    document.querySelectorAll('.filter-group:nth-child(3) .filter-btn').forEach(b => b.classList.remove('active'));
+  }
+  event.target.classList.add('active');
+  render();
+}
+
+render();
+</script>
+</body>
+</html>

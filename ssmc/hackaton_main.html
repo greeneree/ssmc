@@ -1,0 +1,1328 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=1280" />
+  <title>AI Hackathon Platform Mockup</title>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap');
+
+    :root {
+      --navy: #1A3A6B;
+      --navy-dark: #102A52;
+      --navy-light: #EAF0F8;
+      --accent: #35B8FF;
+      --accent-soft: #E8F7FF;
+      --green: #18A058;
+      --red: #E5484D;
+      --orange: #F59E0B;
+      --text: #1F2937;
+      --sub: #667085;
+      --line: #E5EAF2;
+      --bg: #F6F8FB;
+      --white: #FFFFFF;
+      --shadow: 0 16px 40px rgba(26, 58, 107, 0.10);
+      --radius-lg: 24px;
+      --radius-md: 16px;
+      --radius-sm: 10px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Noto Sans KR', sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      letter-spacing: -0.02em;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button {
+      font-family: inherit;
+      cursor: pointer;
+      border: 0;
+    }
+
+    .page {
+      width: 1280px;
+      margin: 0 auto;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 90% 10%, rgba(53, 184, 255, 0.13), transparent 280px),
+        linear-gradient(180deg, #FFFFFF 0%, #F6F8FB 460px);
+    }
+
+    /* Header */
+    .header {
+      height: 78px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 54px;
+      border-bottom: 1px solid rgba(229, 234, 242, 0.9);
+      background: rgba(255,255,255,0.88);
+      backdrop-filter: blur(12px);
+      position: sticky;
+      top: 0;
+      z-index: 20;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 800;
+      color: var(--navy);
+      font-size: 21px;
+    }
+
+    .logo-mark {
+      width: 36px;
+      height: 36px;
+      border-radius: 11px;
+      background: linear-gradient(135deg, var(--navy), #2B65B1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: 800;
+      box-shadow: 0 8px 20px rgba(26, 58, 107, 0.22);
+    }
+
+    .nav {
+      display: flex;
+      gap: 34px;
+      font-size: 15px;
+      color: #344054;
+      font-weight: 600;
+    }
+
+    .nav a:hover {
+      color: var(--navy);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn {
+      height: 42px;
+      padding: 0 18px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: 0.18s ease;
+    }
+
+    .btn-primary {
+      background: var(--navy);
+      color: #fff;
+      box-shadow: 0 10px 20px rgba(26, 58, 107, 0.22);
+    }
+
+    .btn-primary:hover {
+      background: var(--navy-dark);
+      transform: translateY(-1px);
+    }
+
+    .btn-accent {
+      background: var(--accent);
+      color: #fff;
+      box-shadow: 0 10px 22px rgba(53, 184, 255, 0.28);
+    }
+
+    .btn-accent:hover {
+      background: #1EA7F5;
+      transform: translateY(-1px);
+    }
+
+    .btn-ghost {
+      background: #fff;
+      color: var(--navy);
+      border: 1px solid var(--line);
+    }
+
+    .btn-ghost:hover {
+      background: var(--navy-light);
+    }
+
+    /* Main */
+    .container {
+      padding: 34px 54px 70px;
+    }
+
+    .screen-tabs {
+      width: fit-content;
+      display: flex;
+      gap: 6px;
+      background: #EEF3FA;
+      border: 1px solid #E2EAF5;
+      padding: 6px;
+      border-radius: 999px;
+      margin-bottom: 28px;
+    }
+
+    .tab-btn {
+      height: 42px;
+      padding: 0 22px;
+      border-radius: 999px;
+      background: transparent;
+      color: #5B677A;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .tab-btn.active {
+      background: #fff;
+      color: var(--navy);
+      box-shadow: 0 8px 18px rgba(26, 58, 107, 0.10);
+    }
+
+    .panel {
+      display: none;
+    }
+
+    .panel.active {
+      display: block;
+    }
+
+    /* Hero */
+    .hero {
+      position: relative;
+      min-height: 330px;
+      border-radius: var(--radius-lg);
+      background:
+        linear-gradient(135deg, rgba(26, 58, 107, 0.98), rgba(27, 79, 142, 0.92)),
+        url('https://picsum.photos/1200/500?random=14') center/cover;
+      overflow: hidden;
+      color: #fff;
+      box-shadow: var(--shadow);
+      padding: 46px 48px;
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      gap: 32px;
+      margin-bottom: 32px;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      right: -120px;
+      top: -130px;
+      width: 420px;
+      height: 420px;
+      border-radius: 50%;
+      background: rgba(53, 184, 255, 0.18);
+      border: 1px solid rgba(255,255,255,0.14);
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      height: 32px;
+      padding: 0 13px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.13);
+      border: 1px solid rgba(255,255,255,0.18);
+      color: #DDEEFF;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 18px;
+    }
+
+    .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: 42px;
+      line-height: 1.23;
+      font-weight: 800;
+      letter-spacing: -0.045em;
+    }
+
+    .hero p {
+      margin: 18px 0 0;
+      color: rgba(255,255,255,0.78);
+      font-size: 17px;
+      line-height: 1.7;
+      max-width: 660px;
+    }
+
+    .hero-cta {
+      margin-top: 30px;
+      display: flex;
+      gap: 12px;
+    }
+
+    .hero-card {
+      position: relative;
+      z-index: 1;
+      align-self: center;
+      border-radius: 22px;
+      background: rgba(255,255,255,0.96);
+      color: var(--text);
+      padding: 28px;
+      box-shadow: 0 24px 50px rgba(0,0,0,0.15);
+      border: 1px solid rgba(255,255,255,0.5);
+    }
+
+    .count-label {
+      color: var(--sub);
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .d-day {
+      color: var(--navy);
+      font-size: 54px;
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: -0.05em;
+    }
+
+    .date-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 22px;
+    }
+
+    .date-item {
+      background: #F5F8FC;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 14px;
+    }
+
+    .date-item span {
+      display: block;
+      color: var(--sub);
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+
+    .date-item strong {
+      color: var(--navy);
+      font-size: 15px;
+    }
+
+    .hero-progress {
+      margin-top: 20px;
+      background: #EEF5FF;
+      border-radius: 999px;
+      height: 10px;
+      overflow: hidden;
+    }
+
+    .hero-progress span {
+      display: block;
+      height: 100%;
+      width: 74%;
+      background: linear-gradient(90deg, var(--accent), #77D7FF);
+      border-radius: inherit;
+    }
+
+    /* Section Common */
+    .section {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      box-shadow: 0 12px 30px rgba(26, 58, 107, 0.06);
+      padding: 30px;
+      margin-bottom: 24px;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 22px;
+    }
+
+    .section-title {
+      margin: 0;
+      font-size: 24px;
+      color: #111827;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+    }
+
+    .section-desc {
+      margin: 8px 0 0;
+      color: var(--sub);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .link-more {
+      color: var(--navy);
+      font-weight: 800;
+      font-size: 14px;
+    }
+
+    /* Timeline */
+    .timeline {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      position: relative;
+    }
+
+    .timeline-card {
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: linear-gradient(180deg, #FFFFFF, #F9FBFE);
+      position: relative;
+    }
+
+    .timeline-card.active {
+      border-color: rgba(53, 184, 255, 0.7);
+      background: linear-gradient(180deg, #F3FBFF, #FFFFFF);
+    }
+
+    .step-num {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: var(--navy-light);
+      color: var(--navy);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 800;
+      margin-bottom: 16px;
+    }
+
+    .timeline-card.active .step-num {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .timeline-card h3 {
+      margin: 0 0 8px;
+      font-size: 17px;
+      color: #111827;
+    }
+
+    .timeline-card p {
+      margin: 0;
+      color: var(--sub);
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    .timeline-date {
+      margin-top: 15px;
+      display: inline-flex;
+      color: var(--navy);
+      background: var(--navy-light);
+      padding: 7px 11px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    /* Info / Rules */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 24px;
+    }
+
+    .info-box {
+      border-radius: 18px;
+      padding: 24px;
+      border: 1px solid var(--line);
+      background: #fff;
+    }
+
+    .info-box.blue {
+      background: linear-gradient(180deg, #F4F8FF, #FFFFFF);
+    }
+
+    .info-box h3 {
+      margin: 0 0 14px;
+      color: var(--navy);
+      font-size: 19px;
+    }
+
+    .info-box p {
+      margin: 0;
+      color: #475467;
+      line-height: 1.75;
+      font-size: 15px;
+    }
+
+    .rule-list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 12px;
+    }
+
+    .rule-list li {
+      display: flex;
+      gap: 10px;
+      color: #475467;
+      font-size: 15px;
+      line-height: 1.55;
+    }
+
+    .check {
+      flex: 0 0 22px;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--accent-soft);
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .faq-strip {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 22px 26px;
+      margin-top: 24px;
+    }
+
+    .faq-strip strong {
+      color: var(--navy);
+      font-size: 18px;
+    }
+
+    .faq-strip span {
+      color: var(--sub);
+      margin-left: 10px;
+      font-size: 14px;
+    }
+
+    /* During Layout */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      gap: 24px;
+      align-items: start;
+    }
+
+    .stage-card {
+      background: rgba(255,255,255,0.96);
+      border-radius: 22px;
+      padding: 26px;
+      color: var(--text);
+      box-shadow: 0 24px 50px rgba(0,0,0,0.15);
+      position: relative;
+      z-index: 1;
+    }
+
+    .stage-badge {
+      display: inline-flex;
+      height: 30px;
+      align-items: center;
+      padding: 0 12px;
+      border-radius: 999px;
+      background: #FFF7E8;
+      color: #B76E00;
+      font-size: 13px;
+      font-weight: 800;
+      margin-bottom: 14px;
+    }
+
+    .stage-card h2 {
+      margin: 0;
+      color: var(--navy);
+      font-size: 34px;
+      letter-spacing: -0.04em;
+    }
+
+    .stage-card p {
+      margin: 10px 0 0;
+      color: var(--sub);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    .mini-steps {
+      display: grid;
+      gap: 12px;
+      margin-top: 22px;
+    }
+
+    .mini-step {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #475467;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .mini-step .circle {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #EAF0F8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--navy);
+      font-size: 11px;
+      font-weight: 900;
+    }
+
+    .mini-step.done .circle {
+      background: var(--green);
+      color: #fff;
+    }
+
+    .mini-step.now .circle {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    /* Leaderboard */
+    .leaderboard {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .leaderboard th {
+      color: var(--sub);
+      font-size: 13px;
+      text-align: left;
+      padding: 0 12px 12px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .leaderboard td {
+      padding: 16px 12px;
+      border-bottom: 1px solid #EDF1F6;
+      font-size: 15px;
+      vertical-align: middle;
+    }
+
+    .leaderboard tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .rank {
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: #F1F5FA;
+      color: var(--navy);
+      font-weight: 900;
+    }
+
+    .rank.gold {
+      background: linear-gradient(135deg, #FFE7A3, #FFB547);
+      color: #5E3B00;
+    }
+
+    .team-name {
+      font-weight: 800;
+      color: #111827;
+    }
+
+    .team-sub {
+      display: block;
+      margin-top: 3px;
+      color: var(--sub);
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .score {
+      color: var(--navy);
+      font-weight: 900;
+    }
+
+    .move {
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .up {
+      color: var(--green);
+    }
+
+    .down {
+      color: var(--red);
+    }
+
+    .same {
+      color: #98A2B3;
+    }
+
+    /* Gallery */
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+
+    .team-card {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      overflow: hidden;
+      background: #fff;
+      transition: 0.18s ease;
+    }
+
+    .team-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 26px rgba(26, 58, 107, 0.10);
+    }
+
+    .thumb {
+      height: 142px;
+      background: #DCE6F3;
+      overflow: hidden;
+    }
+
+    .thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .team-card-body {
+      padding: 16px;
+    }
+
+    .team-card-body h3 {
+      margin: 0 0 8px;
+      font-size: 16px;
+      color: #111827;
+    }
+
+    .team-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: var(--sub);
+      font-size: 13px;
+    }
+
+    .like {
+      color: #EF4B6A;
+      font-weight: 800;
+    }
+
+    /* My Widget */
+    .side-stack {
+      display: grid;
+      gap: 24px;
+    }
+
+    .my-widget {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      padding: 26px;
+      box-shadow: 0 12px 30px rgba(26, 58, 107, 0.06);
+    }
+
+    .profile-mini {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      margin-bottom: 22px;
+    }
+
+    .avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, var(--navy), var(--accent));
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+    }
+
+    .profile-mini strong {
+      display: block;
+      color: #111827;
+      font-size: 16px;
+    }
+
+    .profile-mini span {
+      display: block;
+      color: var(--sub);
+      margin-top: 3px;
+      font-size: 13px;
+    }
+
+    .status-list {
+      display: grid;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .status-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 13px 14px;
+      border-radius: 14px;
+      background: #F7FAFE;
+      border: 1px solid #EDF1F6;
+      font-size: 14px;
+      color: #475467;
+      font-weight: 600;
+    }
+
+    .pill {
+      height: 26px;
+      display: inline-flex;
+      align-items: center;
+      padding: 0 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .pill.done {
+      background: #E9F8F0;
+      color: var(--green);
+    }
+
+    .pill.pending {
+      background: #FFF7E8;
+      color: #B76E00;
+    }
+
+    .pill.review {
+      background: var(--accent-soft);
+      color: #0988C9;
+    }
+
+    .notice-card {
+      background: linear-gradient(180deg, #F4F8FF, #FFFFFF);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+    }
+
+    .notice-card h3 {
+      margin: 0 0 12px;
+      color: var(--navy);
+      font-size: 18px;
+    }
+
+    .notice-card ul {
+      margin: 0;
+      padding-left: 18px;
+      color: #475467;
+      font-size: 14px;
+      line-height: 1.8;
+    }
+
+    .footer-space {
+      height: 20px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <!-- Header -->
+    <header class="header">
+      <a href="#" class="logo">
+        <span class="logo-mark">AI</span>
+        <span>AI Hackathon</span>
+      </a>
+
+      <nav class="nav">
+        <a href="#">대회 소개</a>
+        <a href="#">일정</a>
+        <a href="#">리더보드</a>
+        <a href="#">갤러리</a>
+        <a href="#">공지사항</a>
+      </nav>
+
+      <div class="header-actions">
+        <button class="btn btn-ghost">로그인</button>
+        <button class="btn btn-primary">마이페이지</button>
+      </div>
+    </header>
+
+    <main class="container">
+      <!-- Screen Tabs -->
+      <div class="screen-tabs">
+        <button class="tab-btn active" data-target="before">① 진행 전 화면</button>
+        <button class="tab-btn" data-target="during">② 진행 중 화면</button>
+      </div>
+
+      <!-- Screen 01 Before -->
+      <section id="before" class="panel active">
+        <section class="hero">
+          <div class="hero-content">
+            <div class="eyebrow">
+              <span class="dot"></span>
+              2026 AI Innovation Hackathon
+            </div>
+            <h1>
+              생성형 AI로 만드는<br />
+              업무 혁신 아이디어 해커톤
+            </h1>
+            <p>
+              멀티캠퍼스 AI 교육 경험과 기업 현장의 문제 해결 역량을 연결하는
+              실전형 AI 해커톤입니다. 팀을 구성하고, 아이디어를 제출하고,
+              전문가 평가를 통해 우수 프로젝트를 선정합니다.
+            </p>
+
+            <div class="hero-cta">
+              <button class="btn btn-accent">참가 신청하기</button>
+              <button class="btn btn-ghost">대회 안내서 보기</button>
+            </div>
+          </div>
+
+          <aside class="hero-card">
+            <div class="count-label">참가 신청 마감까지</div>
+            <div class="d-day">D-14</div>
+
+            <div class="date-grid">
+              <div class="date-item">
+                <span>접수 기간</span>
+                <strong>05.01 - 05.20</strong>
+              </div>
+              <div class="date-item">
+                <span>본선 진행</span>
+                <strong>05.24 - 05.31</strong>
+              </div>
+              <div class="date-item">
+                <span>결과 발표</span>
+                <strong>06.05</strong>
+              </div>
+              <div class="date-item">
+                <span>참가 규모</span>
+                <strong>최대 80팀</strong>
+              </div>
+            </div>
+          </aside>
+        </section>
+
+        <section class="section">
+          <div class="section-head">
+            <div>
+              <h2 class="section-title">대회 일정 타임라인</h2>
+              <p class="section-desc">접수부터 최종 발표까지 주요 일정을 한눈에 확인하세요.</p>
+            </div>
+            <a href="#" class="link-more">전체 일정 보기 →</a>
+          </div>
+
+          <div class="timeline">
+            <article class="timeline-card active">
+              <div class="step-num">01</div>
+              <h3>참가 접수</h3>
+              <p>팀 정보와 참가 신청서를 제출합니다.</p>
+              <span class="timeline-date">05.01 - 05.20</span>
+            </article>
+
+            <article class="timeline-card">
+              <div class="step-num">02</div>
+              <h3>프로젝트 제출</h3>
+              <p>아이디어 기획서, 데모 링크, 발표 자료를 등록합니다.</p>
+              <span class="timeline-date">05.24 - 05.31</span>
+            </article>
+
+            <article class="timeline-card">
+              <div class="step-num">03</div>
+              <h3>전문가 심사</h3>
+              <p>기술성, 실현 가능성, 비즈니스 임팩트를 평가합니다.</p>
+              <span class="timeline-date">06.01 - 06.04</span>
+            </article>
+
+            <article class="timeline-card">
+              <div class="step-num">04</div>
+              <h3>결과 발표</h3>
+              <p>최종 수상팀과 특별상을 공지합니다.</p>
+              <span class="timeline-date">06.05</span>
+            </article>
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="section-head">
+            <div>
+              <h2 class="section-title">대회 소개 / 규칙 안내</h2>
+              <p class="section-desc">공정하고 효율적인 대회 운영을 위한 핵심 안내입니다.</p>
+            </div>
+          </div>
+
+          <div class="two-col">
+            <div class="info-box blue">
+              <h3>AI Hackathon Mission</h3>
+              <p>
+                참가자는 실제 비즈니스 문제를 정의하고, 생성형 AI 또는 머신러닝 기술을 활용해
+                실행 가능한 솔루션을 제안합니다. 데이터 분석, 자동화, 고객 경험 개선,
+                업무 생산성 향상 등 다양한 주제를 자유롭게 선택할 수 있습니다.
+              </p>
+            </div>
+
+            <div class="info-box">
+              <h3>참가 규칙</h3>
+              <ul class="rule-list">
+                <li>
+                  <span class="check">✓</span>
+                  팀 구성은 2인 이상 5인 이하로 제한됩니다.
+                </li>
+                <li>
+                  <span class="check">✓</span>
+                  제출물은 지정된 마감 시간 이후 수정할 수 없습니다.
+                </li>
+                <li>
+                  <span class="check">✓</span>
+                  외부 오픈소스 사용 시 출처를 명확히 표기해야 합니다.
+                </li>
+                <li>
+                  <span class="check">✓</span>
+                  개인정보 및 민감 데이터 사용은 금지됩니다.
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="faq-strip">
+            <div>
+              <strong>자주 묻는 질문</strong>
+              <span>참가 자격, 제출 형식, 심사 기준을 확인해보세요.</span>
+            </div>
+            <button class="btn btn-primary">FAQ 바로가기</button>
+          </div>
+        </section>
+      </section>
+
+      <!-- Screen 02 During -->
+      <section id="during" class="panel">
+        <section class="hero">
+          <div class="hero-content">
+            <div class="eyebrow">
+              <span class="dot"></span>
+              Live Hackathon Dashboard
+            </div>
+            <h1>
+              현재 제출 단계 진행 중<br />
+              마감 전 최종 점검이 필요합니다
+            </h1>
+            <p>
+              각 팀의 제출 현황, 실시간 리더보드, 참가팀 프로젝트 갤러리를 확인할 수 있습니다.
+              마감 전까지 기획서와 데모 링크를 반드시 등록해주세요.
+            </p>
+
+            <div class="hero-cta">
+              <button class="btn btn-accent">제출물 등록하기</button>
+              <button class="btn btn-ghost">내 팀 현황 보기</button>
+            </div>
+          </div>
+
+          <aside class="stage-card">
+            <span class="stage-badge">제출 마감 D-3</span>
+            <h2>74% 진행</h2>
+            <p>전체 운영 일정 기준 현재 프로젝트 제출 단계입니다.</p>
+
+            <div class="hero-progress">
+              <span></span>
+            </div>
+
+            <div class="mini-steps">
+              <div class="mini-step done">
+                <span class="circle">✓</span>
+                참가 접수 완료
+              </div>
+              <div class="mini-step now">
+                <span class="circle">2</span>
+                프로젝트 제출 진행 중
+              </div>
+              <div class="mini-step">
+                <span class="circle">3</span>
+                전문가 심사 예정
+              </div>
+            </div>
+          </aside>
+        </section>
+
+        <div class="dashboard-grid">
+          <div>
+            <section class="section">
+              <div class="section-head">
+                <div>
+                  <h2 class="section-title">실시간 랭킹 리더보드</h2>
+                  <p class="section-desc">평가 점수와 사용자 반응을 반영한 현재 상위 팀 순위입니다.</p>
+                </div>
+                <a href="#" class="link-more">전체 순위 보기 →</a>
+              </div>
+
+              <table class="leaderboard">
+                <thead>
+                  <tr>
+                    <th style="width: 80px;">순위</th>
+                    <th>팀명</th>
+                    <th style="width: 140px;">점수</th>
+                    <th style="width: 100px;">변동</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="rank gold">1</span></td>
+                    <td>
+                      <span class="team-name">Neural Works</span>
+                      <span class="team-sub">AI 기반 업무 문서 자동화</span>
+                    </td>
+                    <td><span class="score">96.8</span></td>
+                    <td><span class="move up">▲ 2</span></td>
+                  </tr>
+                  <tr>
+                    <td><span class="rank">2</span></td>
+                    <td>
+                      <span class="team-name">Data Bridge</span>
+                      <span class="team-sub">고객 상담 로그 인사이트 분석</span>
+                    </td>
+                    <td><span class="score">94.5</span></td>
+                    <td><span class="move same">—</span></td>
+                  </tr>
+                  <tr>
+                    <td><span class="rank">3</span></td>
+                    <td>
+                      <span class="team-name">Prompt Lab</span>
+                      <span class="team-sub">사내 지식 검색 AI 어시스턴트</span>
+                    </td>
+                    <td><span class="score">92.9</span></td>
+                    <td><span class="move down">▼ 1</span></td>
+                  </tr>
+                  <tr>
+                    <td><span class="rank">4</span></td>
+                    <td>
+                      <span class="team-name">Insight Crew</span>
+                      <span class="team-sub">교육 추천 개인화 엔진</span>
+                    </td>
+                    <td><span class="score">91.4</span></td>
+                    <td><span class="move up">▲ 3</span></td>
+                  </tr>
+                  <tr>
+                    <td><span class="rank">5</span></td>
+                    <td>
+                      <span class="team-name">AutoMate AI</span>
+                      <span class="team-sub">반복 업무 자동화 워크플로우</span>
+                    </td>
+                    <td><span class="score">89.7</span></td>
+                    <td><span class="move same">—</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </section>
+
+            <section class="section">
+              <div class="section-head">
+                <div>
+                  <h2 class="section-title">참가팀 프로젝트 갤러리</h2>
+                  <p class="section-desc">참가팀이 공개한 프로젝트 썸네일과 좋아요 현황입니다.</p>
+                </div>
+                <a href="#" class="link-more">갤러리 전체 보기 →</a>
+              </div>
+
+              <div class="gallery-grid">
+                <article class="team-card">
+                  <div class="thumb">
+                    <img src="https://picsum.photos/360/200?random=21" alt="project thumbnail" />
+                  </div>
+                  <div class="team-card-body">
+                    <h3>Neural Works</h3>
+                    <div class="team-meta">
+                      <span>문서 자동화 AI</span>
+                      <span class="like">♥ 248</span>
+                    </div>
+                  </div>
+                </article>
+
+                <article class="team-card">
+                  <div class="thumb">
+                    <img src="https://picsum.photos/360/200?random=22" alt="project thumbnail" />
+                  </div>
+                  <div class="team-card-body">
+                    <h3>Data Bridge</h3>
+                    <div class="team-meta">
+                      <span>상담 분석 대시보드</span>
+                      <span class="like">♥ 221</span>
+                    </div>
+                  </div>
+                </article>
+
+                <article class="team-card">
+                  <div class="thumb">
+                    <img src="https://picsum.photos/360/200?random=23" alt="project thumbnail" />
+                  </div>
+                  <div class="team-card-body">
+                    <h3>Prompt Lab</h3>
+                    <div class="team-meta">
+                      <span>지식 검색 어시스턴트</span>
+                      <span class="like">♥ 198</span>
+                    </div>
+                  </div>
+                </article>
+
+                <article class="team-card">
+                  <div class="thumb">
+                    <img src="https://picsum.photos/360/200?random=24" alt="project thumbnail" />
+                  </div>
+                  <div class="team-card-body">
+                    <h3>Insight Crew</h3>
+                    <div class="team-meta">
+                      <span>교육 추천 엔진</span>
+                      <span class="like">♥ 176</span>
+                    </div>
+                  </div>
+                </article>
+
+                <article class="team-card">
+                  <div class="thumb">
+                    <img src="https://picsum.photos/360/200?random=25" alt="project thumbnail" />
+                  </div>
+                  <div class="team-card-body">
+                    <h3>AutoMate AI</h3>
+                    <div class="team-meta">
+                      <span>업무 자동화 플로우</span>
+                      <span class="like">♥ 153</span>
+                    </div>
+                  </div>
+                </article>
+
+                <article class="team-card">
+                  <div class="thumb">
+                    <img src="https://picsum.photos/360/200?random=26" alt="project thumbnail" />
+                  </div>
+                  <div class="team-card-body">
+                    <h3>Vision Makers</h3>
+                    <div class="team-meta">
+                      <span>이미지 검수 AI</span>
+                      <span class="like">♥ 139</span>
+                    </div>
+                  </div>
+                </article>
+              </div>
+            </section>
+          </div>
+
+          <aside class="side-stack">
+            <section class="my-widget">
+              <div class="section-head" style="margin-bottom: 18px;">
+                <div>
+                  <h2 class="section-title" style="font-size: 22px;">나의 팀 제출 현황</h2>
+                  <p class="section-desc">로그인 사용자 기준 위젯</p>
+                </div>
+              </div>
+
+              <div class="profile-mini">
+                <div class="avatar">MC</div>
+                <div>
+                  <strong>Multi Coders</strong>
+                  <span>팀장 김하늘 외 3명</span>
+                </div>
+              </div>
+
+              <div class="status-list">
+                <div class="status-item">
+                  팀 정보
+                  <span class="pill done">완료</span>
+                </div>
+                <div class="status-item">
+                  기획서 PDF
+                  <span class="pill done">완료</span>
+                </div>
+                <div class="status-item">
+                  데모 링크
+                  <span class="pill pending">대기</span>
+                </div>
+                <div class="status-item">
+                  발표 자료
+                  <span class="pill review">검토 중</span>
+                </div>
+              </div>
+
+              <button class="btn btn-primary" style="width: 100%;">제출 현황 관리</button>
+            </section>
+
+            <section class="notice-card">
+              <h3>운영 공지</h3>
+              <ul>
+                <li>제출 마감은 05.31 18:00입니다.</li>
+                <li>데모 링크는 외부 접근이 가능해야 합니다.</li>
+                <li>심사용 발표 자료는 PDF 형식만 지원합니다.</li>
+                <li>부정 제출 적발 시 평가 대상에서 제외됩니다.</li>
+              </ul>
+            </section>
+          </aside>
+        </div>
+      </section>
+
+      <div class="footer-space"></div>
+    </main>
+  </div>
+
+  <script>
+    const tabButtons = document.querySelectorAll('.tab-btn');
+    const panels = document.querySelectorAll('.panel');
+
+    tabButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        const target = button.dataset.target;
+
+        tabButtons.forEach((btn) => btn.classList.remove('active'));
+        panels.forEach((panel) => panel.classList.remove('active'));
+
+        button.classList.add('active');
+        document.getElementById(target).classList.add('active');
+
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        });
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280">
+<title>2026 SSMC AI 해커톤</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#1A3A6B;--navy-d:#0F2347;--navy-m:#2E5BA8;
+  --accent:#0095DA;--accent-h:#007AB8;
+  --bg:#F4F6FA;--white:#fff;
+  --t1:#111827;--t2:#6B7280;--border:#E5E7EB;
+  --green:#10B981;--red:#EF4444;--gold:#F59E0B;
+}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--t1);min-width:1280px}
+button,input{font-family:inherit}
+a{text-decoration:none;color:inherit}
+
+/* ── HEADER ── */
+#header{background:var(--white);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:200}
+.h-row{max-width:1280px;margin:0 auto;padding:0 40px;height:64px;display:flex;align-items:center;justify-content:space-between}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-box{width:34px;height:34px;background:var(--navy);border-radius:7px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:900}
+.logo-name{font-size:15px;font-weight:700;color:var(--navy)}
+.logo-chip{font-size:11px;font-weight:600;color:var(--accent);background:rgba(0,149,218,.1);padding:2px 8px;border-radius:4px}
+.gnb{display:flex;align-items:center;gap:28px}
+.gnb a{font-size:13px;font-weight:500;color:var(--t2);transition:color .15s}
+.gnb a:hover,.gnb a.on{color:var(--navy);font-weight:600}
+.h-btns{display:flex;gap:8px}
+.btn-ghost{padding:7px 16px;border:1.5px solid var(--border);background:#fff;border-radius:6px;font-size:13px;font-weight:600;color:var(--t2);cursor:pointer}
+.btn-ghost:hover{border-color:var(--navy);color:var(--navy)}
+
+/* ── TABS ── */
+#tabs{background:var(--navy)}
+.tabs-row{max-width:1280px;margin:0 auto;padding:0 40px;display:flex}
+.tab{padding:13px 26px;font-size:13px;font-weight:600;color:rgba(255,255,255,.5);background:none;border:none;cursor:pointer;position:relative;transition:color .15s}
+.tab::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:var(--accent);border-radius:3px 3px 0 0;transform:scaleX(0);transition:transform .2s}
+.tab.on{color:#fff}
+.tab.on::after{transform:scaleX(1)}
+
+/* ── SCREEN ── */
+.screen{display:none}
+.screen.on{display:block}
+
+/* ── SHARED ── */
+.wrap{max-width:1280px;margin:0 auto;padding:0 40px}
+.sec{padding:56px 0}
+.sec-title{font-size:24px;font-weight:700;color:var(--t1);margin-bottom:6px}
+.sec-sub{font-size:14px;color:var(--t2);margin-bottom:36px}
+.btn-accent{padding:13px 30px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;transition:background .15s}
+.btn-accent:hover{background:var(--accent-h)}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   SCREEN 1 — BEFORE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+/* Hero Before */
+.hero1{background:linear-gradient(125deg,#09192E 0%,var(--navy) 55%,#1E4D8C 100%);padding:72px 40px;position:relative;overflow:hidden}
+.hero1::before{content:'';position:absolute;top:-140px;right:-80px;width:620px;height:620px;background:radial-gradient(circle,rgba(0,149,218,.13) 0%,transparent 65%);pointer-events:none}
+.hero1::after{content:'';position:absolute;bottom:-60px;left:15%;width:380px;height:380px;background:radial-gradient(circle,rgba(46,91,168,.16) 0%,transparent 65%);pointer-events:none}
+/* dot grid */
+.hero1-grid{position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,.045) 1px,transparent 1px);background-size:28px 28px;pointer-events:none}
+.hero1-inner{max-width:1280px;margin:0 auto;display:flex;align-items:center;gap:60px;position:relative;z-index:1}
+.hero1-left{flex:1}
+.hero1-badge{display:inline-flex;align-items:center;gap:7px;background:rgba(0,149,218,.16);border:1px solid rgba(0,149,218,.35);color:#7DD4F8;font-size:12px;font-weight:600;padding:4px 14px;border-radius:20px;margin-bottom:22px}
+.hero1-badge i{display:inline-block;width:6px;height:6px;background:#7DD4F8;border-radius:50%}
+.hero1-title{font-size:50px;font-weight:900;color:#fff;line-height:1.2;margin-bottom:10px}
+.hero1-title em{font-style:normal;color:var(--accent)}
+.hero1-sub{font-size:17px;color:rgba(255,255,255,.62);line-height:1.65;margin-bottom:36px;font-weight:400}
+.cd-label{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.42);margin-bottom:14px}
+.cd{display:flex;align-items:flex-end;gap:6px;margin-bottom:36px}
+.cd-unit{text-align:center}
+.cd-num{display:block;font-size:58px;font-weight:900;color:#fff;line-height:1;font-feature-settings:'tnum';min-width:78px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:10px 6px}
+.cd-u{font-size:11px;color:rgba(255,255,255,.42);font-weight:500;margin-top:7px}
+.cd-sep{font-size:44px;font-weight:300;color:rgba(255,255,255,.22);line-height:1.15;padding:0 2px;margin-bottom:26px}
+.hero1-actions{display:flex;align-items:center;gap:14px}
+.btn-wh{padding:13px 26px;background:rgba(255,255,255,.1);color:rgba(255,255,255,.85);border:1.5px solid rgba(255,255,255,.22);border-radius:8px;font-size:14px;font-weight:500;cursor:pointer}
+
+.hero1-right{flex:0 0 350px}
+.stats-card{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.11);border-radius:16px;padding:28px;backdrop-filter:blur(10px)}
+.stats-card-ttl{font-size:11px;font-weight:700;color:rgba(255,255,255,.38);letter-spacing:.1em;text-transform:uppercase;margin-bottom:18px}
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.stat-box{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:16px}
+.stat-ico{font-size:20px;margin-bottom:10px}
+.stat-val{font-size:24px;font-weight:900;color:#fff;margin-bottom:3px}
+.stat-val small{font-size:14px;font-weight:600}
+.stat-lbl{font-size:11px;color:rgba(255,255,255,.42)}
+
+/* Timeline */
+.tl-section{background:var(--white);border-bottom:1px solid var(--border)}
+.tl{display:flex;align-items:flex-start}
+.tl-item{flex:1;position:relative}
+.tl-track{display:flex;align-items:center;margin-bottom:18px}
+.tl-dot{width:44px;height:44px;border-radius:50%;border:3px solid var(--white);box-shadow:0 0 0 2px var(--border);display:flex;align-items:center;justify-content:center;font-size:18px;background:var(--bg);flex-shrink:0;z-index:1}
+.tl-dot.done{background:var(--green);box-shadow:0 0 0 2px var(--green)}
+.tl-dot.act{background:var(--accent);box-shadow:0 0 0 5px rgba(0,149,218,.18)}
+.tl-line{flex:1;height:2px;background:var(--border)}
+.tl-line.done{background:var(--green)}
+.tl-item:last-child .tl-line{display:none}
+.tl-chip{font-size:11px;font-weight:700;color:var(--accent);letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px}
+.tl-chip.grey{color:var(--t2)}
+.tl-name{font-size:16px;font-weight:700;color:var(--t1);margin-bottom:6px}
+.tl-date{font-size:13px;color:var(--t2);line-height:1.55}
+.tl-note{font-size:11px;color:var(--t2);margin-top:5px;background:var(--bg);padding:4px 10px;border-radius:5px;display:inline-block}
+
+/* Info */
+.info-section{background:var(--bg)}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.info-card{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:28px}
+.info-ico{width:44px;height:44px;background:rgba(26,58,107,.08);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:18px}
+.info-ttl{font-size:18px;font-weight:700;color:var(--t1);margin-bottom:14px}
+.info-ul{list-style:none}
+.info-ul li{font-size:13px;color:var(--t2);padding:8px 0;border-bottom:1px solid var(--bg);display:flex;gap:8px;line-height:1.6;align-items:flex-start}
+.info-ul li:last-child{border-bottom:none}
+.info-ul li::before{content:'›';color:var(--accent);font-weight:700;flex-shrink:0;margin-top:1px}
+.prize-row{display:flex;gap:10px;margin-top:16px}
+.prize-box{flex:1;padding:14px;border-radius:10px;text-align:center}
+.prize-box.g{background:#FFFBEB;border:1.5px solid #FCD34D}
+.prize-box.s{background:#F9FAFB;border:1.5px solid #D1D5DB}
+.prize-box.b{background:#FFF7F0;border:1.5px solid #FDBA74}
+.prize-rk{font-size:11px;font-weight:700;margin-bottom:4px}
+.prize-amt{font-size:19px;font-weight:900;color:var(--t1)}
+.prize-note{font-size:11px;color:var(--t2);margin-top:2px}
+
+/* FAQ Banner */
+.faq-banner{background:var(--navy);padding:48px 40px;text-align:center}
+.faq-banner h3{font-size:20px;font-weight:700;color:#fff;margin-bottom:8px}
+.faq-banner p{font-size:14px;color:rgba(255,255,255,.52);margin-bottom:22px}
+.btn-faq{display:inline-flex;align-items:center;gap:8px;padding:11px 26px;background:rgba(255,255,255,.12);color:#fff;border:1.5px solid rgba(255,255,255,.25);border-radius:8px;font-size:13px;font-weight:600;cursor:pointer}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   SCREEN 2 — DURING
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+/* Hero During */
+.hero2{background:linear-gradient(125deg,#09192E 0%,var(--navy) 100%);padding:36px 40px}
+.hero2-inner{max-width:1280px;margin:0 auto;display:flex;align-items:center;justify-content:space-between}
+.hero2-kw{font-size:11px;font-weight:700;color:var(--accent);letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px}
+.hero2-title{font-size:30px;font-weight:900;color:#fff;margin-bottom:6px}
+.hero2-sub{font-size:13px;color:rgba(255,255,255,.52)}
+.prog{display:flex;align-items:center}
+.prog-step{display:flex;align-items:center}
+.prog-dot{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff;flex-shrink:0}
+.prog-dot.done{background:var(--green)}
+.prog-dot.act{background:var(--accent);box-shadow:0 0 0 5px rgba(0,149,218,.22)}
+.prog-dot.todo{background:rgba(255,255,255,.18);color:rgba(255,255,255,.45)}
+.prog-info{margin-left:8px}
+.prog-name{font-size:12px;font-weight:600;color:rgba(255,255,255,.7);white-space:nowrap}
+.prog-name.act{color:#fff;font-weight:700}
+.prog-name.todo{color:rgba(255,255,255,.38)}
+.prog-date{font-size:11px;color:rgba(255,255,255,.38)}
+.prog-date.act{color:#7DD4F8}
+.prog-line{width:32px;height:2px;margin:0 8px}
+.prog-line.done{background:var(--green)}
+.prog-line.todo{background:rgba(255,255,255,.15)}
+
+/* My Team */
+.mt-section{background:var(--white);border-bottom:1px solid var(--border)}
+.mt-card{background:linear-gradient(135deg,#EFF6FF,#DBEAFE);border:1.5px solid #BFDBFE;border-radius:14px;padding:26px 28px;display:flex;align-items:center;justify-content:space-between;gap:32px}
+.mt-lbl{font-size:11px;font-weight:700;color:var(--accent);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px}
+.mt-name{font-size:20px;font-weight:800;color:var(--navy);margin-bottom:3px}
+.mt-proj{font-size:13px;color:var(--t2)}
+.mt-stats{display:flex;gap:28px;padding:0 32px;border-left:1px solid #BFDBFE;border-right:1px solid #BFDBFE}
+.mt-stat{text-align:center}
+.mt-sv{font-size:28px;font-weight:900;color:var(--navy);display:flex;align-items:flex-start;gap:2px}
+.mt-sv sup{font-size:13px;color:var(--gold);margin-top:6px}
+.mt-sl{font-size:11px;color:var(--t2);margin-top:2px}
+.mt-actions{display:flex;gap:10px}
+.btn-submit{padding:11px 22px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer}
+.btn-view{padding:11px 20px;background:#fff;color:var(--navy);border:1.5px solid var(--navy);border-radius:8px;font-size:13px;font-weight:600;cursor:pointer}
+
+/* Leaderboard */
+.lb-section{background:var(--white)}
+.lb-head-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+.lb-refresh{font-size:12px;color:var(--t2);background:var(--bg);padding:6px 12px;border-radius:6px;font-weight:600}
+.lb-table{width:100%;border-collapse:collapse}
+.lb-table th{padding:11px 16px;font-size:11px;font-weight:700;color:var(--t2);letter-spacing:.07em;text-transform:uppercase;background:var(--bg);border-bottom:2px solid var(--border);text-align:left}
+.lb-table th.r{text-align:right}
+.lb-table th.c{text-align:center}
+.lb-table td{padding:14px 16px;border-bottom:1px solid var(--border);font-size:14px;vertical-align:middle}
+.lb-table tr:last-child td{border-bottom:none}
+.lb-table tr:hover td{background:#F9FAFB}
+.lb-table tr.myrow td{background:#EFF6FF}
+.rk{font-size:18px;font-weight:900}
+.rk.r1{color:#F59E0B}.rk.r2{color:#9CA3AF}.rk.r3{color:#92400E}.rk.rx{color:var(--t2)}
+.av{width:32px;height:32px;border-radius:7px;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;vertical-align:middle;margin-right:8px}
+.tn{font-weight:600;color:var(--t1);vertical-align:middle}
+.my-badge{font-size:11px;background:#DBEAFE;color:#1D4ED8;padding:2px 6px;border-radius:4px;font-weight:700;margin-left:4px}
+.tm{font-size:12px;color:var(--t2)}
+.sc{font-size:17px;font-weight:800;color:var(--navy)}
+.ch-up{color:var(--green);font-size:13px;font-weight:700}
+.ch-dn{color:var(--red);font-size:13px;font-weight:700}
+.ch-eq{color:var(--t2);font-size:13px}
+.tag{font-size:11px;font-weight:600;padding:3px 9px;background:rgba(0,149,218,.08);color:var(--accent);border-radius:5px;white-space:nowrap}
+.lb-more{text-align:center;padding:16px 0;font-size:13px;color:var(--t2)}
+.lb-more a{color:var(--accent);font-weight:600}
+
+/* Gallery */
+.gl-section{background:var(--bg)}
+.gl-head-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px}
+.gl-filters{display:flex;gap:8px}
+.gl-filter{padding:7px 14px;border:1.5px solid var(--border);background:#fff;border-radius:6px;font-size:12px;font-weight:600;color:var(--t2);cursor:pointer}
+.gl-filter.on{color:var(--accent);border-color:var(--accent);background:rgba(0,149,218,.04)}
+.gl-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+.gl-card{background:var(--white);border-radius:12px;overflow:hidden;border:1px solid var(--border);transition:box-shadow .2s,transform .2s}
+.gl-card:hover{box-shadow:0 8px 24px rgba(0,0,0,.07);transform:translateY(-2px)}
+.gl-img{width:100%;height:154px;object-fit:cover;display:block;background:#E5E7EB}
+.gl-body{padding:14px}
+.gl-team{font-size:12px;font-weight:600;color:var(--accent);margin-bottom:3px}
+.gl-proj{font-size:14px;font-weight:700;color:var(--t1);margin-bottom:3px}
+.gl-desc{font-size:12px;color:var(--t2);margin-bottom:12px;line-height:1.45}
+.gl-foot{display:flex;align-items:center;justify-content:space-between}
+.like-btn{display:flex;align-items:center;gap:5px;font-size:13px;font-weight:600;color:var(--t2);background:none;border:none;cursor:pointer;padding:4px 8px;border-radius:6px;transition:background .15s}
+.like-btn:hover{background:var(--bg)}
+.like-btn.liked{color:#EF4444}
+.gl-more{text-align:center;padding:28px 0 0}
+.btn-more{padding:11px 28px;border:1.5px solid var(--border);background:#fff;border-radius:8px;font-size:13px;font-weight:600;color:var(--t2);cursor:pointer}
+
+/* FOOTER */
+#footer{background:var(--navy-d);padding:28px 40px}
+.footer-row{max-width:1280px;margin:0 auto;display:flex;align-items:center;justify-content:space-between}
+.f-logo{font-size:14px;font-weight:700;color:rgba(255,255,255,.75)}
+.f-sub{font-size:12px;color:rgba(255,255,255,.3);margin-top:3px}
+.f-links{display:flex;gap:20px}
+.f-links a{font-size:12px;color:rgba(255,255,255,.38)}
+.f-copy{font-size:11px;color:rgba(255,255,255,.22)}
+</style>
+</head>
+<body>
+
+<!-- ━━ HEADER ━━ -->
+<header id="header">
+  <div class="h-row">
+    <div class="logo">
+      <div class="logo-box">AI</div>
+      <span class="logo-name">SSMC 해커톤</span>
+      <span class="logo-chip">2026</span>
+    </div>
+    <nav class="gnb">
+      <a href="#" class="on">홈</a>
+      <a href="#">대회 소개</a>
+      <a href="#">일정 · 규칙</a>
+      <a href="#">리더보드</a>
+      <a href="#">FAQ</a>
+    </nav>
+    <div class="h-btns">
+      <button class="btn-ghost">로그인</button>
+    </div>
+  </div>
+</header>
+
+<!-- ━━ TABS ━━ -->
+<div id="tabs">
+  <div class="tabs-row">
+    <button class="tab on" onclick="switchTab('before',this)">① 진행 전</button>
+    <button class="tab" onclick="switchTab('during',this)">② 진행 중</button>
+  </div>
+</div>
+
+<!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+<!-- SCREEN 1 — BEFORE                  -->
+<!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+<div id="s-before" class="screen on">
+
+  <!-- Hero -->
+  <div class="hero1">
+    <div class="hero1-grid"></div>
+    <div class="hero1-inner">
+      <div class="hero1-left">
+        <div class="hero1-badge"><i></i>참가 접수 오픈</div>
+        <h1 class="hero1-title">2026 SSMC<br><em>AI 해커톤</em></h1>
+        <p class="hero1-sub">AI로 세상을 바꾸는 48시간의 여정<br>아이디어에서 실전 AI 솔루션까지, 지금 도전하세요.</p>
+        <div class="cd-label">대회 시작까지</div>
+        <div class="cd">
+          <div class="cd-unit">
+            <span class="cd-num" id="cd-d">20</span>
+            <div class="cd-u">DAYS</div>
+          </div>
+          <span class="cd-sep">:</span>
+          <div class="cd-unit">
+            <span class="cd-num" id="cd-h">08</span>
+            <div class="cd-u">HOURS</div>
+          </div>
+          <span class="cd-sep">:</span>
+          <div class="cd-unit">
+            <span class="cd-num" id="cd-m">45</span>
+            <div class="cd-u">MINS</div>
+          </div>
+          <span class="cd-sep">:</span>
+          <div class="cd-unit">
+            <span class="cd-num" id="cd-s">12</span>
+            <div class="cd-u">SECS</div>
+          </div>
+        </div>
+        <div class="hero1-actions">
+          <button class="btn-accent">참가 신청하기 →</button>
+          <button class="btn-wh">대회 안내 보기</button>
+        </div>
+      </div>
+      <div class="hero1-right">
+        <div class="stats-card">
+          <div class="stats-card-ttl">대회 개요</div>
+          <div class="stats-grid">
+            <div class="stat-box">
+              <div class="stat-ico">🏆</div>
+              <div class="stat-val">1,000<small>만원</small></div>
+              <div class="stat-lbl">총 상금 규모</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-ico">👥</div>
+              <div class="stat-val">100<small>팀</small></div>
+              <div class="stat-lbl">최대 참가팀</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-ico">🧑‍⚖️</div>
+              <div class="stat-val">20<small>명</small></div>
+              <div class="stat-lbl">전문 심사위원</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-ico">⏱️</div>
+              <div class="stat-val">48<small>시간</small></div>
+              <div class="stat-lbl">해커톤 진행</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Timeline -->
+  <div class="tl-section">
+    <div class="wrap"><div class="sec">
+      <div class="sec-title">대회 일정</div>
+      <div class="sec-sub">2026년 5월 1일 접수 시작 · 전 과정 온라인 진행</div>
+      <div class="tl">
+        <div class="tl-item">
+          <div class="tl-track">
+            <div class="tl-dot">📝</div>
+            <div class="tl-line"></div>
+          </div>
+          <div class="tl-chip">Step 01</div>
+          <div class="tl-name">참가 접수</div>
+          <div class="tl-date">2026.05.01(금)<br>~ 2026.05.15(금)</div>
+          <div class="tl-note">팀 구성 후 신청 · 최대 4인</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-track">
+            <div class="tl-dot">💡</div>
+            <div class="tl-line"></div>
+          </div>
+          <div class="tl-chip grey">Step 02</div>
+          <div class="tl-name">본선 제출</div>
+          <div class="tl-date">2026.05.20(수)<br>~ 2026.05.22(금) 18:00</div>
+          <div class="tl-note">결과물 + 발표자료 제출</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-track">
+            <div class="tl-dot">🔍</div>
+            <div class="tl-line"></div>
+          </div>
+          <div class="tl-chip grey">Step 03</div>
+          <div class="tl-name">심사 · 평가</div>
+          <div class="tl-date">2026.05.25(월)<br>~ 2026.05.27(수)</div>
+          <div class="tl-note">전문 심사위원 정량·정성 평가</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-track">
+            <div class="tl-dot">🎉</div>
+          </div>
+          <div class="tl-chip grey">Step 04</div>
+          <div class="tl-name">결과 발표 · 시상</div>
+          <div class="tl-date">2026.05.30(토)<br>오후 2:00</div>
+          <div class="tl-note">온라인 시상식 · 수상작 공개</div>
+        </div>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- Info Grid -->
+  <div class="info-section">
+    <div class="wrap"><div class="sec">
+      <div class="info-grid">
+
+        <div class="info-card">
+          <div class="info-ico">🎯</div>
+          <div class="info-ttl">대회 소개</div>
+          <ul class="info-ul">
+            <li>AI · ML · 데이터 기반의 혁신 솔루션을 개발하는 경진대회</li>
+            <li>주제: 교육, 헬스케어, 환경, 물류 중 1개 선택</li>
+            <li>국내 재직자 및 취업준비생 누구나 참가 가능</li>
+            <li>개인 또는 최대 4인 팀으로 참가</li>
+            <li>전 과정 온라인 진행 (발표 영상 제출 방식)</li>
+          </ul>
+        </div>
+
+        <div class="info-card">
+          <div class="info-ico">📋</div>
+          <div class="info-ttl">참가 규칙</div>
+          <ul class="info-ul">
+            <li>사용 언어 및 프레임워크 자유 (오픈소스 허용)</li>
+            <li>외부 API 사용 가능 (단, 유료 서비스 비용 발생 제한)</li>
+            <li>대회 기간 외 사전 개발물 사용 금지</li>
+            <li>제출 후 코드 수정 불가 (GitHub 커밋 기록 검토)</li>
+            <li>심사 기준: 혁신성 30% · 완성도 30% · 발표 20% · 영향력 20%</li>
+          </ul>
+        </div>
+
+        <div class="info-card">
+          <div class="info-ico">🏆</div>
+          <div class="info-ttl">시상 내역</div>
+          <div class="prize-row">
+            <div class="prize-box g">
+              <div class="prize-rk" style="color:#B45309">🥇 대상</div>
+              <div class="prize-amt">500만원</div>
+              <div class="prize-note">1팀 선정</div>
+            </div>
+            <div class="prize-box s">
+              <div class="prize-rk" style="color:#4B5563">🥈 최우수</div>
+              <div class="prize-amt">300만원</div>
+              <div class="prize-note">1팀 선정</div>
+            </div>
+            <div class="prize-box b">
+              <div class="prize-rk" style="color:#92400E">🥉 우수</div>
+              <div class="prize-amt">200만원</div>
+              <div class="prize-note">2팀 선정</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="info-card">
+          <div class="info-ico">🧑‍🏫</div>
+          <div class="info-ttl">멘토링 지원</div>
+          <ul class="info-ul">
+            <li>삼성 SDS AI 연구소 전문가 멘토링 세션 (팀당 2회)</li>
+            <li>대회 기간 중 Slack 채널을 통한 Q&amp;A 상시 지원</li>
+            <li>클라우드 크레딧 지원: AWS / GCP 각 $100</li>
+            <li>수료 후 우수팀 채용 연계 기회 제공</li>
+            <li>결과물 포트폴리오 피드백 리포트 제공</li>
+          </ul>
+        </div>
+
+      </div>
+    </div></div>
+  </div>
+
+  <!-- FAQ Banner -->
+  <div class="faq-banner">
+    <h3>궁금한 점이 있으신가요?</h3>
+    <p>자주 묻는 질문을 확인하거나, 운영진에게 직접 문의하세요.</p>
+    <button class="btn-faq">FAQ 바로가기 →</button>
+  </div>
+
+</div><!-- /screen before -->
+
+
+<!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+<!-- SCREEN 2 — DURING                  -->
+<!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+<div id="s-during" class="screen">
+
+  <!-- Hero During -->
+  <div class="hero2">
+    <div class="hero2-inner">
+      <div>
+        <div class="hero2-kw">현재 진행 단계</div>
+        <div class="hero2-title">📩 제출 마감 D-3</div>
+        <div class="hero2-sub">2026.05.22(금) 18:00까지 결과물 제출 · 현재 62팀 제출 완료</div>
+      </div>
+      <div class="prog">
+        <div class="prog-step">
+          <div class="prog-dot done">✓</div>
+          <div class="prog-info">
+            <div class="prog-name done">참가 접수</div>
+            <div class="prog-date">완료</div>
+          </div>
+        </div>
+        <div class="prog-line done"></div>
+        <div class="prog-step">
+          <div class="prog-dot done">✓</div>
+          <div class="prog-info">
+            <div class="prog-name done">해커톤 진행</div>
+            <div class="prog-date">완료</div>
+          </div>
+        </div>
+        <div class="prog-line done"></div>
+        <div class="prog-step">
+          <div class="prog-dot act">3</div>
+          <div class="prog-info">
+            <div class="prog-name act">결과물 제출</div>
+            <div class="prog-date act">D-3 남음</div>
+          </div>
+        </div>
+        <div class="prog-line todo"></div>
+        <div class="prog-step">
+          <div class="prog-dot todo">4</div>
+          <div class="prog-info">
+            <div class="prog-name todo">심사 · 시상</div>
+            <div class="prog-date">예정</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- My Team Widget -->
+  <div class="mt-section">
+    <div class="wrap" style="padding-top:28px;padding-bottom:28px">
+      <div class="mt-card">
+        <div>
+          <div class="mt-lbl">나의 팀 현황</div>
+          <div class="mt-name">⚡ AI Explorers</div>
+          <div class="mt-proj">프로젝트: SmartEdu Copilot — 교육 분야</div>
+        </div>
+        <div class="mt-stats">
+          <div class="mt-stat">
+            <div class="mt-sv"><sup>🥇</sup>1</div>
+            <div class="mt-sl">현재 순위</div>
+          </div>
+          <div class="mt-stat">
+            <div class="mt-sv">94.2</div>
+            <div class="mt-sl">최고 점수</div>
+          </div>
+          <div class="mt-stat">
+            <div class="mt-sv">3</div>
+            <div class="mt-sl">제출 횟수</div>
+          </div>
+        </div>
+        <div class="mt-actions">
+          <button class="btn-submit">결과물 제출 →</button>
+          <button class="btn-view">제출 내역 보기</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Leaderboard -->
+  <div class="lb-section">
+    <div class="wrap"><div class="sec">
+      <div class="lb-head-row">
+        <div>
+          <div class="sec-title">실시간 리더보드</div>
+          <div class="sec-sub" style="margin-bottom:0">마지막 업데이트: 2026.05.19 14:32 · 총 87팀 참가</div>
+        </div>
+        <div class="lb-refresh">⚡ 5분마다 자동 갱신</div>
+      </div>
+      <table class="lb-table">
+        <thead>
+          <tr>
+            <th style="width:56px">순위</th>
+            <th>팀명</th>
+            <th>구성원</th>
+            <th class="r">점수</th>
+            <th class="c">변동</th>
+            <th class="c">제출</th>
+            <th>분야</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="myrow">
+            <td><span class="rk r1">1</span></td>
+            <td>
+              <span class="av" style="background:#F59E0B">AI</span>
+              <span class="tn">AI Explorers</span>
+              <span class="my-badge">MY</span>
+            </td>
+            <td><span class="tm">김민준, 이서연, 박지호, 최유나</span></td>
+            <td style="text-align:right"><span class="sc">94.2</span></td>
+            <td style="text-align:center"><span class="ch-up">▲ 2</span></td>
+            <td style="text-align:center;color:var(--t2);font-size:13px">3회</td>
+            <td><span class="tag">교육</span></td>
+          </tr>
+          <tr>
+            <td><span class="rk r2">2</span></td>
+            <td>
+              <span class="av" style="background:#6366F1">DM</span>
+              <span class="tn">DataMinds</span>
+            </td>
+            <td><span class="tm">정우성, 한소희, 오승현</span></td>
+            <td style="text-align:right"><span class="sc">92.8</span></td>
+            <td style="text-align:center"><span class="ch-eq">—</span></td>
+            <td style="text-align:center;color:var(--t2);font-size:13px">2회</td>
+            <td><span class="tag">헬스케어</span></td>
+          </tr>
+          <tr>
+            <td><span class="rk r3">3</span></td>
+            <td>
+              <span class="av" style="background:#8B5CF6">NN</span>
+              <span class="tn">NeuralNova</span>
+            </td>
+            <td><span class="tm">강태양, 윤지민, 임채원, 송민아</span></td>
+            <td style="text-align:right"><span class="sc">91.5</span></td>
+            <td style="text-align:center"><span class="ch-dn">▼ 1</span></td>
+            <td style="text-align:center;color:var(--t2);font-size:13px">4회</td>
+            <td><span class="tag">환경</span></td>
+          </tr>
+          <tr>
+            <td><span class="rk rx">4</span></td>
+            <td>
+              <span class="av" style="background:#10B981">BF</span>
+              <span class="tn">ByteForce</span>
+            </td>
+            <td><span class="tm">남기준, 류지은</span></td>
+            <td style="text-align:right"><span class="sc">89.3</span></td>
+            <td style="text-align:center"><span class="ch-up">▲ 1</span></td>
+            <td style="text-align:center;color:var(--t2);font-size:13px">2회</td>
+            <td><span class="tag">물류</span></td>
+          </tr>
+          <tr>
+            <td><span class="rk rx">5</span></td>
+            <td>
+              <span class="av" style="background:#EC4899">AR</span>
+              <span class="tn">AlgoRhythm</span>
+            </td>
+            <td><span class="tm">홍준혁, 김다은, 이재원</span></td>
+            <td style="text-align:right"><span class="sc">87.6</span></td>
+            <td style="text-align:center"><span class="ch-dn">▼ 2</span></td>
+            <td style="text-align:center;color:var(--t2);font-size:13px">3회</td>
+            <td><span class="tag">교육</span></td>
+          </tr>
+          <tr>
+            <td><span class="rk rx">6</span></td>
+            <td>
+              <span class="av" style="background:#0EA5E9">DL</span>
+              <span class="tn">DeepLeap</span>
+            </td>
+            <td><span class="tm">박성훈, 차수빈, 전민호, 김리아</span></td>
+            <td style="text-align:right"><span class="sc">86.1</span></td>
+            <td style="text-align:center"><span class="ch-eq">—</span></td>
+            <td style="text-align:center;color:var(--t2);font-size:13px">2회</td>
+            <td><span class="tag">헬스케어</span></td>
+          </tr>
+          <tr>
+            <td><span class="rk rx">7</span></td>
+            <td>
+              <span class="av" style="background:#F97316">SW</span>
+              <span class="tn">SynthWave</span>
+            </td>
+            <td><span class="tm">배현우, 노지수</span></td>
+            <td style="text-align:right"><span class="sc">84.9</span></td>
+            <td style="text-align:center"><span class="ch-up">▲ 3</span></td>
+            <td style="text-align:center;color:var(--t2);font-size:13px">5회</td>
+            <td><span class="tag">환경</span></td>
+          </tr>
+          <tr>
+            <td><span class="rk rx">8</span></td>
+            <td>
+              <span class="av" style="background:#14B8A6">CM</span>
+              <span class="tn">CodeMorphs</span>
+            </td>
+            <td><span class="tm">엄선우, 이태경, 구민지</span></td>
+            <td style="text-align:right"><span class="sc">83.2</span></td>
+            <td style="text-align:center"><span class="ch-dn">▼ 1</span></td>
+            <td style="text-align:center;color:var(--t2);font-size:13px">2회</td>
+            <td><span class="tag">물류</span></td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="lb-more">상위 8팀 표시 중 &nbsp;·&nbsp; <a href="#">전체 순위 보기 →</a></div>
+    </div></div>
+  </div>
+
+  <!-- Gallery -->
+  <div class="gl-section">
+    <div class="wrap"><div class="sec">
+      <div class="gl-head-row">
+        <div>
+          <div class="sec-title">참가팀 갤러리</div>
+          <div class="sec-sub" style="margin-bottom:0">87팀의 혁신 프로젝트를 확인하고 좋아요를 눌러보세요</div>
+        </div>
+        <div class="gl-filters">
+          <button class="gl-filter on">전체</button>
+          <button class="gl-filter">교육</button>
+          <button class="gl-filter">헬스케어</button>
+          <button class="gl-filter">환경</button>
+          <button class="gl-filter">물류</button>
+        </div>
+      </div>
+      <div class="gl-grid">
+
+        <div class="gl-card">
+          <img class="gl-img" src="https://picsum.photos/seed/edu1/400/240" alt="">
+          <div class="gl-body">
+            <div class="gl-team">AI Explorers</div>
+            <div class="gl-proj">SmartEdu Copilot</div>
+            <div class="gl-desc">AI 기반 맞춤형 교육 추천 시스템. 학습자 패턴 분석으로 최적 커리큘럼 제안.</div>
+            <div class="gl-foot">
+              <button class="like-btn liked" data-count="128" onclick="toggleLike(this)">♥ 128</button>
+              <span class="tag">교육</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="gl-card">
+          <img class="gl-img" src="https://picsum.photos/seed/health2/400/240" alt="">
+          <div class="gl-body">
+            <div class="gl-team">DataMinds</div>
+            <div class="gl-proj">MediLens AI</div>
+            <div class="gl-desc">의료 영상 분석 AI. 진단 보조 모델로 의사 판단을 지원하는 멀티모달 시스템.</div>
+            <div class="gl-foot">
+              <button class="like-btn" data-count="97" onclick="toggleLike(this)">♡ 97</button>
+              <span class="tag">헬스케어</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="gl-card">
+          <img class="gl-img" src="https://picsum.photos/seed/env3/400/240" alt="">
+          <div class="gl-body">
+            <div class="gl-team">NeuralNova</div>
+            <div class="gl-proj">GreenSort Vision</div>
+            <div class="gl-desc">컴퓨터 비전 기반 재활용 분류 자동화. 카메라로 쓰레기 종류를 실시간 분류.</div>
+            <div class="gl-foot">
+              <button class="like-btn" data-count="89" onclick="toggleLike(this)">♡ 89</button>
+              <span class="tag">환경</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="gl-card">
+          <img class="gl-img" src="https://picsum.photos/seed/logi4/400/240" alt="">
+          <div class="gl-body">
+            <div class="gl-team">ByteForce</div>
+            <div class="gl-proj">RouteOptima</div>
+            <div class="gl-desc">강화학습 기반 배송 경로 최적화. 실시간 교통 데이터 연동으로 배송 효율 30% 향상.</div>
+            <div class="gl-foot">
+              <button class="like-btn" data-count="76" onclick="toggleLike(this)">♡ 76</button>
+              <span class="tag">물류</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="gl-card">
+          <img class="gl-img" src="https://picsum.photos/seed/edu5/400/240" alt="">
+          <div class="gl-body">
+            <div class="gl-team">AlgoRhythm</div>
+            <div class="gl-proj">QuizMind Pro</div>
+            <div class="gl-desc">LLM 기반 자동 문제 생성 플랫폼. 교재 입력 시 난이도별 퀴즈셋 즉시 생성.</div>
+            <div class="gl-foot">
+              <button class="like-btn" data-count="64" onclick="toggleLike(this)">♡ 64</button>
+              <span class="tag">교육</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="gl-card">
+          <img class="gl-img" src="https://picsum.photos/seed/health6/400/240" alt="">
+          <div class="gl-body">
+            <div class="gl-team">DeepLeap</div>
+            <div class="gl-proj">CareBot 365</div>
+            <div class="gl-desc">노인 건강 모니터링 AI 챗봇. 일상 대화로 감정 분석 및 이상 징후를 조기 탐지.</div>
+            <div class="gl-foot">
+              <button class="like-btn" data-count="58" onclick="toggleLike(this)">♡ 58</button>
+              <span class="tag">헬스케어</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="gl-card">
+          <img class="gl-img" src="https://picsum.photos/seed/env7/400/240" alt="">
+          <div class="gl-body">
+            <div class="gl-team">SynthWave</div>
+            <div class="gl-proj">CropGuard AI</div>
+            <div class="gl-desc">드론 이미지 기반 작물 병해충 탐지 시스템. 조기 발견으로 농업 손실을 최소화.</div>
+            <div class="gl-foot">
+              <button class="like-btn" data-count="52" onclick="toggleLike(this)">♡ 52</button>
+              <span class="tag">환경</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="gl-card">
+          <img class="gl-img" src="https://picsum.photos/seed/logi8/400/240" alt="">
+          <div class="gl-body">
+            <div class="gl-team">CodeMorphs</div>
+            <div class="gl-proj">WareVision</div>
+            <div class="gl-desc">창고 관리 AI 비전 시스템. 재고 위치 자동 추적 및 피킹 오류를 실시간 감지.</div>
+            <div class="gl-foot">
+              <button class="like-btn" data-count="47" onclick="toggleLike(this)">♡ 47</button>
+              <span class="tag">물류</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <div class="gl-more">
+        <button class="btn-more">더 보기 (79팀 더)</button>
+      </div>
+    </div></div>
+  </div>
+
+</div><!-- /screen during -->
+
+
+<!-- ━━ FOOTER ━━ -->
+<footer id="footer">
+  <div class="footer-row">
+    <div>
+      <div class="f-logo">SSMC AI 해커톤 2026</div>
+      <div class="f-sub">Powered by 삼성멀티캠퍼스 AI Education</div>
+    </div>
+    <div class="f-links">
+      <a href="#">이용약관</a>
+      <a href="#">개인정보처리방침</a>
+      <a href="#">문의하기</a>
+      <a href="#">FAQ</a>
+    </div>
+    <div class="f-copy">© 2026 Samsung Multicampus. All rights reserved.</div>
+  </div>
+</footer>
+
+<script>
+/* Tab Switching */
+function switchTab(id, el) {
+  document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('on'); });
+  document.querySelectorAll('.tab').forEach(function(t){ t.classList.remove('on'); });
+  document.getElementById('s-' + id).classList.add('on');
+  el.classList.add('on');
+}
+
+/* Countdown Timer — target: 2026-05-20 09:00 KST */
+var target = new Date('2026-05-20T00:00:00Z'); // UTC equiv of 09:00 KST
+function pad(n){ return String(n).padStart(2,'0'); }
+function tick() {
+  var diff = target - Date.now();
+  if (diff < 0) diff = 0;
+  var d = Math.floor(diff / 86400000);
+  var h = Math.floor((diff % 86400000) / 3600000);
+  var m = Math.floor((diff % 3600000) / 60000);
+  var s = Math.floor((diff % 60000) / 1000);
+  document.getElementById('cd-d').textContent = pad(d);
+  document.getElementById('cd-h').textContent = pad(h);
+  document.getElementById('cd-m').textContent = pad(m);
+  document.getElementById('cd-s').textContent = pad(s);
+}
+tick();
+setInterval(tick, 1000);
+
+/* Like Toggle */
+function toggleLike(btn) {
+  var isLiked = btn.classList.toggle('liked');
+  var count = parseInt(btn.dataset.count) + (isLiked ? 1 : -1);
+  btn.dataset.count = count;
+  btn.textContent = (isLiked ? '♥' : '♡') + ' ' + count;
+}
+</script>
+</body>
+</html>

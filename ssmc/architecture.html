@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<title>사용자 Journey</title>
+<style>
+  body {
+    margin: 0;
+    background: #f3f4f6;
+    font-family: "Pretendard", "Noto Sans KR", Arial, sans-serif;
+  }
+
+  .toolbar {
+    position: sticky;
+    top: 0;
+    background: #111827;
+    color: white;
+    padding: 14px 20px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    z-index: 10;
+  }
+
+  button {
+    background: #2563eb;
+    color: white;
+    border: 0;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  button:hover {
+    background: #1d4ed8;
+  }
+
+  .wrap {
+    padding: 30px;
+    display: flex;
+    justify-content: center;
+  }
+
+  svg {
+    background: white;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.12);
+    border-radius: 18px;
+  }
+
+  .title {
+    font-size: 32px;
+    font-weight: 800;
+    fill: #111827;
+  }
+
+  .lane-title {
+    font-size: 19px;
+    font-weight: 800;
+    fill: #374151;
+  }
+
+  .lane-bg {
+    fill: #f9fafb;
+    stroke: #e5e7eb;
+    stroke-width: 2;
+  }
+
+  .box {
+    fill: #ffffff;
+    stroke: #334155;
+    stroke-width: 2;
+    rx: 10;
+  }
+
+  .box-blue {
+    fill: #eff6ff;
+    stroke: #2563eb;
+  }
+
+  .box-green {
+    fill: #ecfdf5;
+    stroke: #059669;
+  }
+
+  .box-yellow {
+    fill: #fffbeb;
+    stroke: #d97706;
+  }
+
+  .box-red {
+    fill: #fef2f2;
+    stroke: #dc2626;
+  }
+
+  .diamond {
+    fill: #ffffff;
+    stroke: #334155;
+    stroke-width: 2;
+  }
+
+  .text {
+    font-size: 15px;
+    font-weight: 700;
+    fill: #111827;
+  }
+
+  .small {
+    font-size: 13px;
+    font-weight: 600;
+    fill: #4b5563;
+  }
+
+  .line {
+    fill: none;
+    stroke: #475569;
+    stroke-width: 2.2;
+    marker-end: url(#arrow);
+  }
+
+  .line-soft {
+    fill: none;
+    stroke: #94a3b8;
+    stroke-width: 2;
+    stroke-dasharray: 6 5;
+    marker-end: url(#arrowSoft);
+  }
+
+  .yesno {
+    font-size: 12px;
+    font-weight: 800;
+    fill: #2563eb;
+  }
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <strong>사용자 Journey 정리본</strong>
+  <button onclick="downloadPNG()">PNG 다운로드</button>
+</div>
+
+<div class="wrap">
+<svg id="journeySvg" width="1500" height="2200" viewBox="0 0 1500 2200" xmlns="http://www.w3.org/2000/svg">
+
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#475569"/>
+    </marker>
+    <marker id="arrowSoft" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#94a3b8"/>
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <text x="70" y="70" class="title">사용자 Journey</text>
+  <text x="70" y="105" class="small">접수 → 검토 → 심사 → 결과 확인 → 후속 진행 흐름</text>
+
+  <!-- Lanes -->
+  <rect x="60" y="140" width="250" height="1980" class="lane-bg"/>
+  <rect x="310" y="140" width="390" height="1980" class="lane-bg"/>
+  <rect x="700" y="140" width="260" height="1980" class="lane-bg"/>
+  <rect x="960" y="140" width="260" height="1980" class="lane-bg"/>
+  <rect x="1220" y="140" width="220" height="1980" class="lane-bg"/>
+
+  <text x="155" y="178" text-anchor="middle" class="lane-title">관리자</text>
+  <text x="505" y="178" text-anchor="middle" class="lane-title">시스템</text>
+  <text x="830" y="178" text-anchor="middle" class="lane-title">평가자</text>
+  <text x="1090" y="178" text-anchor="middle" class="lane-title">심사자</text>
+  <text x="1330" y="178" text-anchor="middle" class="lane-title">사용자</text>
+
+  <!-- Helper nodes -->
+  <!-- Admin top -->
+  <rect x="95" y="230" width="130" height="48" class="box box-blue"/>
+  <text x="160" y="260" text-anchor="middle" class="text">대상 설정</text>
+
+  <rect x="95" y="320" width="130" height="48" class="box box-blue"/>
+  <text x="160" y="350" text-anchor="middle" class="text">대상 오픈</text>
+
+  <!-- System start -->
+  <rect x="440" y="320" width="130" height="48" class="box box-green"/>
+  <text x="505" y="350" text-anchor="middle" class="text">접수 시작</text>
+
+  <!-- Evaluator setup -->
+  <rect x="760" y="250" width="140" height="50" class="box box-yellow"/>
+  <text x="830" y="280" text-anchor="middle" class="text">대상 내용 확인</text>
+
+  <rect x="750" y="340" width="160" height="54" class="box box-yellow"/>
+  <text x="830" y="362" text-anchor="middle" class="small">평가표 및</text>
+  <text x="830" y="382" text-anchor="middle" class="small">제출 항목 설정</text>
+
+  <rect x="770" y="430" width="120" height="50" class="box box-yellow"/>
+  <text x="830" y="460" text-anchor="middle" class="text">가이드 제공</text>
+
+  <!-- Submission -->
+  <rect x="435" y="570" width="140" height="52" class="box"/>
+  <text x="505" y="602" text-anchor="middle" class="text">제출물 접수</text>
+
+  <rect x="435" y="665" width="140" height="52" class="box"/>
+  <text x="505" y="697" text-anchor="middle" class="text">접수 마감</text>
+
+  <polygon points="505,780 590,840 505,900 420,840" class="diamond"/>
+  <text x="505" y="835" text-anchor="middle" class="small">접수요건</text>
+  <text x="505" y="855" text-anchor="middle" class="small">충족 여부</text>
+
+  <rect x="335" y="970" width="185" height="54" class="box box-green"/>
+  <text x="427" y="993" text-anchor="middle" class="small">통과자 대상</text>
+  <text x="427" y="1013" text-anchor="middle" class="small">자동 배정</text>
+
+  <rect x="565" y="970" width="120" height="54" class="box box-red"/>
+  <text x="625" y="1002" text-anchor="middle" class="text">미통과 종료</text>
+
+  <!-- Admin approval -->
+  <rect x="100" y="805" width="160" height="58" class="box box-blue"/>
+  <text x="180" y="828" text-anchor="middle" class="small">AI 심사 결과</text>
+  <text x="180" y="848" text-anchor="middle" class="small">검토 및 승인</text>
+
+  <!-- AI/DB -->
+  <rect x="395" y="1115" width="220" height="58" class="box box-green"/>
+  <text x="505" y="1138" text-anchor="middle" class="small">AI/자동평가</text>
+  <text x="505" y="1158" text-anchor="middle" class="small">점수 집계</text>
+
+  <rect x="445" y="1220" width="120" height="50" class="box"/>
+  <text x="505" y="1251" text-anchor="middle" class="text">DB 1차 저장</text>
+
+  <polygon points="505,1335 605,1395 505,1455 405,1395" class="diamond"/>
+  <text x="505" y="1390" text-anchor="middle" class="small">1차 결과서</text>
+  <text x="505" y="1410" text-anchor="middle" class="small">오픈 여부</text>
+
+  <rect x="350" y="1530" width="130" height="54" class="box box-yellow"/>
+  <text x="415" y="1553" text-anchor="middle" class="small">리마인드</text>
+  <text x="415" y="1573" text-anchor="middle" class="small">발송</text>
+
+  <rect x="530" y="1530" width="130" height="54" class="box box-green"/>
+  <text x="595" y="1553" text-anchor="middle" class="small">서비스</text>
+  <text x="595" y="1573" text-anchor="middle" class="small">신청</text>
+
+  <!-- Judge flow -->
+  <rect x="1015" y="1110" width="150" height="54" class="box box-yellow"/>
+  <text x="1090" y="1133" text-anchor="middle" class="small">평가 대상</text>
+  <text x="1090" y="1153" text-anchor="middle" class="small">확인</text>
+
+  <rect x="1015" y="1210" width="150" height="54" class="box box-yellow"/>
+  <text x="1090" y="1242" text-anchor="middle" class="text">검토 실행</text>
+
+  <rect x="1000" y="1310" width="180" height="58" class="box box-yellow"/>
+  <text x="1090" y="1333" text-anchor="middle" class="small">심사 참고자료</text>
+  <text x="1090" y="1353" text-anchor="middle" class="small">확인</text>
+
+  <rect x="995" y="1410" width="190" height="58" class="box box-yellow"/>
+  <text x="1090" y="1433" text-anchor="middle" class="small">심사점수 및</text>
+  <text x="1090" y="1453" text-anchor="middle" class="small">의견 입력</text>
+
+  <rect x="1030" y="1510" width="120" height="54" class="box box-yellow"/>
+  <text x="1090" y="1543" text-anchor="middle" class="text">심사 제출</text>
+
+  <!-- User results -->
+  <rect x="1250" y="980" width="160" height="54" class="box"/>
+  <text x="1330" y="1003" text-anchor="middle" class="small">평가 결과</text>
+  <text x="1330" y="1023" text-anchor="middle" class="small">확인</text>
+
+  <rect x="1240" y="1590" width="180" height="58" class="box box-green"/>
+  <text x="1330" y="1613" text-anchor="middle" class="small">결과서 및</text>
+  <text x="1330" y="1633" text-anchor="middle" class="small">분석 리포트 확인</text>
+
+  <!-- Final phase -->
+  <rect x="420" y="1710" width="170" height="56" class="box"/>
+  <text x="505" y="1733" text-anchor="middle" class="small">최종 후보</text>
+  <text x="505" y="1753" text-anchor="middle" class="small">대상 확정</text>
+
+  <rect x="330" y="1825" width="160" height="58" class="box box-blue"/>
+  <text x="410" y="1848" text-anchor="middle" class="small">최종 실사</text>
+  <text x="410" y="1868" text-anchor="middle" class="small">인터뷰 배정</text>
+
+  <rect x="520" y="1825" width="180" height="58" class="box box-blue"/>
+  <text x="610" y="1848" text-anchor="middle" class="small">지원 서류</text>
+  <text x="610" y="1868" text-anchor="middle" class="small">검토 배정</text>
+
+  <polygon points="505,1940 610,2000 505,2060 400,2000" class="diamond"/>
+  <text x="505" y="1995" text-anchor="middle" class="small">최종 선정</text>
+  <text x="505" y="2015" text-anchor="middle" class="small">여부</text>
+
+  <rect x="320" y="2110" width="130" height="50" class="box box-red"/>
+  <text x="385" y="2141" text-anchor="middle" class="text">종료</text>
+
+  <rect x="550" y="2110" width="150" height="50" class="box box-green"/>
+  <text x="625" y="2141" text-anchor="middle" class="text">후속 미팅 협의</text>
+
+  <rect x="1260" y="1780" width="140" height="54" class="box"/>
+  <text x="1330" y="1803" text-anchor="middle" class="small">개인 AI</text>
+  <text x="1330" y="1823" text-anchor="middle" class="small">리포트 확인</text>
+
+  <rect x="1260" y="1900" width="140" height="54" class="box"/>
+  <text x="1330" y="1933" text-anchor="middle" class="text">유형 확정</text>
+
+  <!-- Lines -->
+  <path d="M160 278 L160 320" class="line"/>
+  <path d="M225 344 C300 344, 360 344, 440 344" class="line"/>
+  <path d="M570 344 C645 344, 700 280, 760 275" class="line-soft"/>
+  <path d="M830 300 L830 340" class="line"/>
+  <path d="M830 394 L830 430" class="line"/>
+  <path d="M830 480 C830 545, 630 560, 575 590" class="line-soft"/>
+
+  <path d="M505 368 L505 570" class="line"/>
+  <path d="M505 622 L505 665" class="line"/>
+  <path d="M505 717 L505 780" class="line"/>
+
+  <path d="M420 840 C340 840, 290 835, 260 835" class="line-soft"/>
+  <path d="M505 900 L427 970" class="line"/>
+  <text x="450" y="940" class="yesno">YES</text>
+
+  <path d="M590 840 C630 880, 625 930, 625 970" class="line"/>
+  <text x="615" y="925" class="yesno">NO</text>
+
+  <path d="M427 1024 C440 1080, 470 1090, 505 1115" class="line"/>
+  <path d="M505 1173 L505 1220" class="line"/>
+  <path d="M505 1270 L505 1335" class="line"/>
+
+  <path d="M405 1395 C360 1435, 370 1495, 415 1530" class="line"/>
+  <text x="370" y="1455" class="yesno">NO</text>
+
+  <path d="M605 1395 C650 1435, 650 1495, 595 1530" class="line"/>
+  <text x="640" y="1455" class="yesno">YES</text>
+
+  <path d="M615 1144 C760 1144, 900 1138, 1015 1138" class="line-soft"/>
+  <path d="M1090 1164 L1090 1210" class="line"/>
+  <path d="M1090 1264 L1090 1310" class="line"/>
+  <path d="M1090 1368 L1090 1410" class="line"/>
+  <path d="M1090 1468 L1090 1510" class="line"/>
+
+  <path d="M685 997 C880 997, 1100 1007, 1250 1007" class="line-soft"/>
+  <path d="M1090 1564 C1130 1610, 1190 1618, 1240 1618" class="line-soft"/>
+
+  <path d="M595 1584 C565 1640, 535 1660, 505 1710" class="line"/>
+  <path d="M505 1766 C470 1790, 445 1805, 410 1825" class="line"/>
+  <path d="M505 1766 C535 1790, 565 1805, 610 1825" class="line"/>
+  <path d="M410 1883 C430 1915, 465 1925, 505 1940" class="line"/>
+  <path d="M610 1883 C585 1915, 545 1925, 505 1940" class="line"/>
+
+  <path d="M400 2000 C345 2035, 360 2075, 385 2110" class="line"/>
+  <text x="350" y="2048" class="yesno">NO</text>
+
+  <path d="M610 2000 C650 2035, 650 2075, 625 2110" class="line"/>
+  <text x="645" y="2048" class="yesno">YES</text>
+
+  <path d="M625 2110 C780 2045, 1110 1930, 1260 1930" class="line-soft"/>
+  <path d="M625 2110 C780 1980, 1110 1810, 1260 1810" class="line-soft"/>
+
+  <!-- Footer -->
+  <text x="70" y="2165" class="small">※ 원본 사진을 바탕으로 보기 좋게 재정리한 버전입니다. 세부 문구는 필요 시 수정 가능합니다.</text>
+
+</svg>
+</div>
+
+<script>
+function downloadPNG() {
+  const svg = document.getElementById("journeySvg");
+  const serializer = new XMLSerializer();
+  const svgString = serializer.serializeToString(svg);
+
+  const canvas = document.createElement("canvas");
+  const scale = 2;
+  canvas.width = svg.viewBox.baseVal.width * scale;
+  canvas.height = svg.viewBox.baseVal.height * scale;
+
+  const ctx = canvas.getContext("2d");
+  const img = new Image();
+
+  const svgBlob = new Blob([svgString], {type: "image/svg+xml;charset=utf-8"});
+  const url = URL.createObjectURL(svgBlob);
+
+  img.onload = function () {
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    URL.revokeObjectURL(url);
+
+    const pngUrl = canvas.toDataURL("image/png");
+    const a = document.createElement("a");
+    a.href = pngUrl;
+    a.download = "user_journey_clean.png";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
+
+  img.src = url;
+}
+</script>
+
+</body>
+</html>

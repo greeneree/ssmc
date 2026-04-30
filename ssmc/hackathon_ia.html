@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AI 해커톤 플랫폼 — IA</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Noto Sans KR', sans-serif;
+  background: #f5f5f3;
+  color: #1a1a1a;
+  min-height: 100vh;
+}
+
+header {
+  background: #111;
+  color: #fff;
+  padding: 18px 32px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.h-dot { width: 8px; height: 8px; border-radius: 50%; background: #10b981; flex-shrink: 0; }
+header h1 { font-size: 14px; font-weight: 600; letter-spacing: -0.01em; }
+.h-badge {
+  margin-left: auto;
+  font-size: 11px;
+  color: #888;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 20px;
+  padding: 3px 10px;
+}
+
+/* Legend */
+.legend {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  padding: 12px 32px;
+  background: #fff;
+  border-bottom: 1px solid rgba(0,0,0,0.07);
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  color: #555;
+}
+.legend-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+}
+
+/* Phase tags */
+.tag {
+  display: inline-block;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: 20px;
+  margin-bottom: 7px;
+}
+.tag-common  { background: #f1f0eb; color: #5f5e5a; }
+.tag-before  { background: #e1f5ee; color: #0f6e56; }
+.tag-during  { background: #eeedfe; color: #534ab7; }
+.tag-after   { background: #faeeda; color: #854f0b; }
+.tag-system  { background: #fef2f2; color: #a32d2d; }
+
+/* Grid */
+.ia-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+  padding: 20px 16px 60px;
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+/* Column */
+.ia-col {
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(0,0,0,0.07);
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+}
+
+.col-head {
+  padding: 14px 14px 12px;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+}
+.col-head .role-name {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.col-head .role-sub {
+  font-size: 10px;
+  margin-top: 2px;
+  opacity: .65;
+}
+
+/* Color themes */
+.col-teal   .col-head { background: #e1f5ee; }
+.col-teal   .col-head .role-name { color: #085041; }
+.col-green  .col-head { background: #eaf3de; }
+.col-green  .col-head .role-name { color: #27500a; }
+.col-amber  .col-head { background: #faeeda; }
+.col-amber  .col-head .role-name { color: #633806; }
+.col-purple .col-head { background: #eeedfe; }
+.col-purple .col-head .role-name { color: #3c3489; }
+.col-gray   .col-head { background: #f1f0eb; }
+.col-gray   .col-head .role-name { color: #444441; }
+
+/* Section groups */
+.section-group {
+  padding: 10px 12px 6px;
+  border-bottom: 1px solid rgba(0,0,0,0.04);
+}
+.section-group:last-child { border-bottom: none; }
+
+/* Items */
+.ia-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 3px 0;
+  font-size: 11.5px;
+  color: #222;
+  line-height: 1.45;
+}
+.ia-item .dot {
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: #aaa;
+  margin-top: 5px;
+  flex-shrink: 0;
+}
+.ia-sub { padding-left: 12px; }
+.ia-sub .ia-item {
+  font-size: 10.5px;
+  color: #666;
+}
+.ia-sub .dot {
+  width: 3px; height: 3px;
+  background: #ccc;
+  margin-top: 5px;
+}
+
+/* New badge */
+.new-badge {
+  display: inline-block;
+  font-size: 8px;
+  font-weight: 700;
+  background: #fb2c36;
+  color: #fff;
+  border-radius: 3px;
+  padding: 1px 4px;
+  margin-left: 3px;
+  vertical-align: middle;
+  letter-spacing: .02em;
+}
+
+/* Phase 2 badge */
+.p2-badge {
+  display: inline-block;
+  font-size: 8px;
+  font-weight: 700;
+  background: #7f77dd;
+  color: #fff;
+  border-radius: 3px;
+  padding: 1px 4px;
+  margin-left: 3px;
+  vertical-align: middle;
+}
+
+/* Footer note */
+.footer-note {
+  text-align: center;
+  font-size: 11px;
+  color: #aaa;
+  padding: 20px 16px 40px;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="h-dot"></div>
+  <h1>AI 해커톤 플랫폼 — Information Architecture</h1>
+  <span class="h-badge">v0.2 · engine / journey / architecture 반영</span>
+</header>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:#10b981"></div>진행 전</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#7f77dd"></div>진행 중</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#ba7517"></div>종료 후</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#a32d2d"></div>시스템/공통</div>
+  <div class="legend-item" style="margin-left:12px;">
+    <span class="new-badge">NEW</span> 이번에 추가된 항목
+  </div>
+  <div class="legend-item">
+    <span class="p2-badge">P2</span> Phase 2 SaaS 전환 시 추가
+  </div>
+</div>
+
+<div class="ia-grid">
+
+  <!-- ① 참가자 (해커톤 프론트) -->
+  <div class="ia-col col-teal">
+    <div class="col-head">
+      <div class="role-name">참가자</div>
+      <div class="role-sub">해커톤 프론트 · User</div>
+    </div>
+
+    <div class="section-group">
+      <span class="tag tag-common">공통</span>
+      <div class="ia-item"><div class="dot"></div>랜딩 페이지</div>
+      <div class="ia-sub">
+        <div class="ia-item"><div class="dot"></div>대회 소개 / 일정</div>
+        <div class="ia-item"><div class="dot"></div>규칙 안내</div>
+        <div class="ia-item"><div class="dot"></div>FAQ / 공지</div>
+      </div>
+      <div class="ia-item"><div class="dot"></div>로그인 (MLP SSO)</div>
+    </div>
+
+    <div class="section-group">
+      <span class="tag tag-before">진행 전</span>
+      <div class="ia-item"><div class="dot"></div>대회 상세 보기</div>
+      <div class="ia-item"><div class="dot"></div>팀 구성 / 등록</div>
+      <div class="ia-sub">
+        <div class="ia-item"><div class="dot"></div>팀원 초대</div>
+        <div class="ia-item"><div class="dot"></div>관심 분야 설정</div>
+      </div>
+    </div>
+
+    <div class="section-group">
+      <span class="tag tag-during">진행 중</span>
+      <div class="ia-item"><div class="dot"></div>결과물 제출 / 수정</div>
+      <div class="ia-sub">
+        <div class="ia-item"><div class="dot"></div>텍스트 / 파일 업로드</div>
+        <div class="ia-item"><div class="dot"></div>썸네일 등록</div>
+        <div class="ia-item"><div class="dot"></div>제출 이력 조회</div>
+      </div>
+      <div class="ia-item"><div class="dot"></div>갤러리</div>
+      <div class="ia-sub">
+        <div class="ia-item"><div class="dot"></div>나의 팀 제출물</div>
+        <div class="ia-item"><div class="dot"></div>타팀 제출물 (설정에 따라)</div>
+      </div>
+      <div class="ia-item"><div class="dot"></div>실시간 대시보드</div>
+      <div class="ia-sub">
+        <div class="ia-item"><div class="dot"></div>심사 진행 현황</div>
+        <div class="ia-item"><div class="dot"></div>AI 가이드 메시지</div>
+        <div class="ia-item"><div class="dot"></div>팀별 현황 조회</div>
+      </div>
+      <div class="ia-item"><div class="dot"></div>리더보드 (상위 N% 공개)</div>
+    </div>
+
+    <div class="section-group">
+      <span class="tag tag-after">종료 후</span>
+      <div class="ia-item"><div class="dot"></div>최종 리더보드</div>
+      <div class="ia-item"><div class="dot"></div>점수·순위 확인</div>
+      <div class="ia-item"><div class="dot"></div>AI 개인 리포트</div>
+      <div class="ia-sub">
+        <div class="ia-item"><div class="dot"></div>AI 피드백 요약</div>
+        <div class="ia-item"><div class="dot"></div>개선 가이드 제공</div>
+        <div class="ia-item"><div class="dot"></div>PDF 다운로드</div>
+      </div>
+      <div class="ia-item"><div class="dot"></div>적용 여부 설문 응답</div>
+    </div>
+  </div>
+
+  <!-- ② 동료평가자 -->
+  <div class="ia-col col-green">
+    <div class="col-head">
+      <div class="role-name">동료 평가자 <span class="new-badge">NEW</span></div>
+      <div class="role-sub">Peer Reviewer · 참가자 겸역</div>
+    </div>
+
+    <div class="section-group">
+      <span class="tag tag-common">공통</span>
+      <div class="ia-item"><div class="dot"></div>로그인 (MLP SSO)</div>
+      <div class="ia-item"><div class="dot"></div>배정 안내 수신</div>
+    </div>
+
+    <div class="section-group">
+      <span class="tag tag-during">진행 중</span>
+      <div class="ia-item"><div class="dot"></div>배정된 평가 대상 목록</div>
+      <div class="ia-sub">
+        <div class="ia-item"><div class="dot"></div>자기 팀 자동 제외 확인</div>
+        <div class="ia-item"><div class="dot"></div>최소 평가 수 안내 (N회)</div>
+      </div>
+      <div class="ia-item"><div class="dot"></div>제출물 상세 보기</div>
+      <div class="ia-sub">
+        <div class="ia-item"><div class="dot"></div>파일 / 텍스트 열람</div>
+        <div class="ia-item"><div class="dot"></div>익명 여부 (설정에 따라)</div>
+      </div>
+      <div class="ia-item"><div class="dot"></div>평가 입력</div>
+      <div class="ia-sub">
+        <div class="ia-item"><div class="dot"></div>점수 입력</div>
+        <div class="ia-item"><div class="dot"></div>코멘트 입력</div>
+        <div class="ia-item"><div class="dot"></div>임시저장 / 최종 제출</div>
+      </div>
+      <div class="ia-item"><div class="dot"></div>평가 현황 확인</div>
+      <div class="ia-sub">
+        <div class="ia-item"><div class="dot"></div>완료 / 미완료 목록</div>
+        <div class="ia-item"><div class="dot"></div>남은 평가 수 표시</div>
+      </div>
+    </div>
+
+    <div class="section-group">
+      <span class="tag tag-after">종료 후</span>
+      <div class="ia-item"><div class="dot"></div>내가 한 평가 이력 조회</div>
+      <div class="ia-item"><div class="dot"></div>동료 평가 결과 확인</div>
+    </div>
+  </div>
+
+  <!-- ③ 심사위원 -->
+  <div class="ia-col col-amber">
+    <div class="col-head">
+      <div class="role-name">심사위원</div>
+      <div class="role-sub">Judge · 운영자가 지정</div>
+    </div>
+
+    <div class="section-group">
+      <span class="tag tag-common">공통</span>
+      <div class="ia-item"><div class="dot"></div>로그인 (MLP SSO)</div>
+      <div class="ia-item"><div class="dot"></div>배정 안내 수신</div>
+    </div>
+
+    <div class="section-group">
+      <span class="tag tag-during">심사</span>
+      <div class="ia-item"><div class="dot"></div>배정된 참가자 목록</div>
+      <div class="ia-item"><div class="dot"></div>제출물 상세 확인</div>
+      <div class="ia-sub">
+        <div class="ia-item"><div class="dot"></div>파일 / 텍스트 열람</div>
+      </div>
+      <div class="ia-item"><div class="dot"></div>AI 코멘트 / 참고자료</div>
+      <div class="ia-sub">
+        <div class="ia-item"><div class="dot"></div>Dual-LLM 평가 요약</div>
+        <div class="ia-item"><div class="dot"></div>Anchoring 보정 결과</div>
+        <div class="ia-item"><div class="dot"></div>동료 평가 점수 참고</div>
+      </div>
+      <div class="ia-item"><div class="dot"></div>심사 점수 입력</div>
+      <div class="ia-sub">
+        <div class="ia-item"><div class="dot"></div>항목별 점수</div>
+        <div class="ia-item"><div class="dot"></div>심사 의견 작성</div>
+        <div class="ia-item"><div class="dot"></div>이의 신청 로그 조회</div>
+      </div>
+      <div class="ia-item"><div class="dot"></div>심사 제출 / 확정</div>
+    </div>
+
+    <div class="section-group">
+      <span class="tag tag-after">종료 후</span>
+      <div class="ia-item"><div class="dot"></div>심사 진척률 확인</div>
+      <div class="ia-item"><div class="dot"></div>최종 점수 리더보드</div>
+      <div class="ia-sub">
+        <div class="ia-item"><div class="dot"></div>노출 여부 설정에 따라</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ④ 어드민 (운영자) -->
+  <div class="ia-col col-purple">
+    <div class="col-head">
+      <div class="role-name">어드민 (운영자)</div>
+      <div class="role-sub">해커톤 담당자 · MLP 컴포넌트 활용</div>
+    </div>
+
+    <div class="section-group">
+      <span class="tag tag-common">운영 허브</span>
+      <div class="ia-item"><div class="dot"></div>대시보드</div>
+      <div class="ia-sub">
+        <div class="ia-item"><div class="dot"></div>참가 / 제출 / 심사 현황</div>
+        <div class="ia-item"><div class="dot"></div>대회 상태 관리</div>
+      </div>
+    </div>
+
+    <div class="section-group">
+      <span class="tag tag-before">대회 설정</span>
+      <div class="ia-item"><div class="dot"></div>기본 정보 / 일정</div>
+      <div class="ia-item"><div class="dot"></div>해커톤 유형 설정</div>
+      <div class="ia-item"><div class="dot"></div>규칙 / FAQ 관리</div>
+      <div class="ia-item"><div class="dot"></div>심사 기준 / 가중치 설정</div>
+      <div class="ia-item"><div class="dot"></div>갤러리 노출 설정</div>
+      <div class="ia-item"><div class="dot"></div>동료 평가 세부 설정</div>
+      <div class="ia-sub">
+        <div class="ia-item"><div class="dot"></div>팀당 최소 평가 수</div>
+        <div class="ia-item"><div class="dot"></div>익명 평가 여부</div>
+      </div>
+      <div class="ia-item"><div class="dot"></div>심사위원 배정</div>
+    </div>
+
+    <div class="section-group">
+      <span class="tag tag-during">심사 관리</span>
+      <div class="ia-item"><div class="dot"></div>제출 현황 / 검증 로그</div>
+      <div class="ia-item"><div class="dot"></div>AI 심사 요청 / 결과 확인</div>
+      <div class="ia-sub">
+        <div class="ia-item"><div class="dot"></div>AI 점수 1차 확인</div>
+        <div class="ia-item"><div class="dot"></div>최종 승인 / 수정</div>
+      </div>
+      <div class="ia-item"><div class="dot"></div>
+        Anchoring 검토 / 승인
+        <span class="new-badge">NEW</span>
+      </div>
+      <div class="ia-sub">
+        <div class="ia-item"><div class="dot"></div>10% 샘플 보정 결과 확인</div>
+        <div class="ia-item"><div class="dot"></div>상/중/하 기준 조정</div>
+        <div class="ia-item"><div class="dot"></div>Anchor 확정 승인</div>
+      </div>
+      <div class="ia-item"><div class="dot"></div>동료 평가 현황</div>
+      <div class="ia-item"><div class="dot"></div>심사위원 평가 현황</div>
+      <div class="ia-item"><div class="dot"></div>리더보드 설정</div>
+      <div class="ia-item"><div class="dot"></div>이의 신청 로그 조회<span class="new-badge">NEW</span></div>
+    </div>
+
+    <div class="section-group">
+      <span class="tag tag-after">결과 처리</span>
+      <div class="ia-item"><div class="dot"></div>AI 심사 기준 DB 관리<span class="new-badge">NEW</span></div>
+      <div class="ia-sub">
+        <div class="ia-item"><div class="dot"></div>Anchor 기준안 이력</div>
+        <div class="ia-item"><div class="dot"></div>프롬프트 버전 관리</div>
+        <div class="ia-item"><div class="dot"></div>평가 가중치 이력</div>
+      </div>
+      <div class="ia-item"><div class="dot"></div>개인 리포트 관리</div>
+      <div class="ia-sub">
+        <div class="ia-item"><div class="dot"></div>생성 현황 확인</div>
+        <div class="ia-item"><div class="dot"></div>개별 / 일괄 다운로드</div>
+      </div>
+      <div class="ia-item"><div class="dot"></div>메일링 발송 설정</div>
+      <div class="ia-sub">
+        <div class="ia-item"><div class="dot"></div>발송 대상 / 시점 설정</div>
+        <div class="ia-item"><div class="dot"></div>발송 이력 확인</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ⑤ 슈퍼어드민 -->
+  <div class="ia-col col-gray">
+    <div class="col-head">
+      <div class="role-name">슈퍼어드민</div>
+      <div class="role-sub">멀티캠퍼스 내부 시스템 관리자</div>
+    </div>
+
+    <div class="section-group">
+      <span class="tag tag-common">전체 관리</span>
+      <div class="ia-item"><div class="dot"></div>대회 목록 전체 조회</div>
+      <div class="ia-item"><div class="dot"></div>사용자 / 권한 관리</div>
+      <div class="ia-sub">
+        <div class="ia-item"><div class="dot"></div>어드민 계정 생성 / 수정</div>
+        <div class="ia-item"><div class="dot"></div>심사위원 계정 관리</div>
+        <div class="ia-item"><div class="dot"></div>역할 / 접근 권한 설정</div>
+      </div>
+    </div>
+
+    <div class="section-group">
+      <span class="tag tag-system">AI 엔진</span>
+      <div class="ia-item"><div class="dot"></div>AI 심사 엔진 관리<span class="new-badge">NEW</span></div>
+      <div class="ia-sub">
+        <div class="ia-item"><div class="dot"></div>파이프라인 상태 확인</div>
+        <div class="ia-item"><div class="dot"></div>Dual-LLM 모델 설정</div>
+        <div class="ia-item"><div class="dot"></div>인스턴스 확장 설정</div>
+        <div class="ia-item"><div class="dot"></div>AI 로그 조회</div>
+      </div>
+      <div class="ia-item"><div class="dot"></div>LLM 모델 설정<span class="p2-badge">P2</span></div>
+      <div class="ia-sub">
+        <div class="ia-item"><div class="dot"></div>고객사별 모델 지정</div>
+        <div class="ia-item"><div class="dot"></div>평가 기준 커스텀</div>
+        <div class="ia-item"><div class="dot"></div>Claude / GPT-4o 전환</div>
+      </div>
+    </div>
+
+    <div class="section-group">
+      <span class="tag tag-system">시스템</span>
+      <div class="ia-item"><div class="dot"></div>파일 저장소 관리 (S3)</div>
+      <div class="ia-item"><div class="dot"></div>DB 관리</div>
+      <div class="ia-sub">
+        <div class="ia-item"><div class="dot"></div>PostgreSQL / Pinecone</div>
+        <div class="ia-item"><div class="dot"></div>Vector DB 관리</div>
+      </div>
+      <div class="ia-item"><div class="dot"></div>SSO 연동 설정 (MLP)</div>
+      <div class="ia-item"><div class="dot"></div>멀티테넌트 관리<span class="p2-badge">P2</span></div>
+      <div class="ia-sub">
+        <div class="ia-item"><div class="dot"></div>테넌트별 데이터 격리</div>
+        <div class="ia-item"><div class="dot"></div>고객사 온보딩</div>
+      </div>
+    </div>
+
+    <div class="section-group">
+      <span class="tag tag-system">보안 / 감사</span>
+      <div class="ia-item"><div class="dot"></div>감사 로그 조회</div>
+      <div class="ia-item"><div class="dot"></div>이상 접근 탐지</div>
+      <div class="ia-item"><div class="dot"></div>데이터 보관 / 삭제 정책</div>
+      <div class="ia-item"><div class="dot"></div>LLM 세션 폐기 정책</div>
+      <div class="ia-sub">
+        <div class="ia-item"><div class="dot"></div>학습 미사용 확인</div>
+        <div class="ia-item"><div class="dot"></div>세션 단위 폐기 설정</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer-note">
+  AI 해커톤 플랫폼 IA v0.2 · Samsung SDS Multicampus · engine / journey / architecture 분석 반영<br/>
+  <span style="color:#bbb; margin-top:4px; display:block;">NEW = 이번 문서 분석 후 신규 추가 항목 · P2 = Phase 2 SaaS 전환 시 추가 예정</span>
+</div>
+
+</body>
+</html>
