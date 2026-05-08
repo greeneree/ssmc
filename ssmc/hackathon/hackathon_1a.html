@@ -129,26 +129,31 @@ body { background: var(--bg-hover); font-family: var(--font-family); -webkit-fon
 }
 
 /* ── Stat Wrap ── */
-.stat-wrap { padding: 0 24px; position: relative; z-index: 1; }
+.stat-wrap { padding: 0 24px 16px; position: relative; z-index: 1; }
 
 /* ── Tabs ── */
 .tabs {
-  display: flex; padding: 0 var(--gap-24); border-bottom: 1px solid var(--border-default);
+  display: flex; padding: 0 var(--gap-24);
   position: relative; z-index: 1;
 }
 .tab {
-  padding: 12px var(--gap-16); font-size: var(--sub-size); font-weight: 400;
-  color: var(--text-subtle); cursor: pointer;
-  border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all .15s;
+  display: inline-flex; height: 48px; min-width: 80px;
+  padding: 6px 16px; justify-content: center; align-items: center; gap: 4px;
+  font-size: var(--sub-size); font-weight: 400; color: var(--text-subtle);
+  cursor: pointer; transition: all .15s;
+  border-bottom: 1px solid #E6E8EA; margin-bottom: -1px;
 }
 .tab:hover { color: var(--text-basic); }
-.tab.active { color: var(--color-primary); font-weight: 600; border-bottom-color: var(--color-primary); }
+.tab.active {
+  color: var(--color-primary); font-weight: 600;
+  border-bottom: 2px solid var(--color-primary);
+}
 
 /* ── Body Scroll ── */
 .body-scroll { flex: 1; overflow-y: auto; padding: 20px 24px 24px; position: relative; z-index: 1; }
 
 /* ── Panel Box ── */
-.panel-box { background: var(--skeleton-bg); border-radius: 12px; padding: 20px; }
+.panel-box { background: #fff; border-radius: 12px; padding: 20px; }
 .panel-title {
   font-size: 15px; font-weight: 700; color: var(--text-basic);
   margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between;
@@ -157,17 +162,25 @@ body { background: var(--bg-hover); font-family: var(--font-family); -webkit-fon
 
 /* ── Right Panel ── */
 .right-panel {
-  width: 600px; flex-shrink: 0; display: flex; flex-direction: column; gap: 8px;
+  width: 360px; flex-shrink: 0; display: flex; flex-direction: column; gap: 8px;
   align-self: flex-start; position: sticky; top: 72px;
   max-height: calc(100vh - 80px); overflow-y: auto;
+  background: var(--skeleton-bg); border-radius: 12px; padding: 8px;
 }
 
 /* ── Stat Row ── */
-.stat-row { background: #3A3D50; border-radius: var(--radius-medium); padding: var(--gap-16); display: flex; gap: var(--gap-8); }
-.stat-c { flex: 1; display: flex; flex-direction: column; gap: 4px; }
-.stat-label { font-size: 12px; color: rgba(255,255,255,.65); }
-.stat-val { font-size: 26px; font-weight: 800; color: #fff; line-height: 1.2; }
-.stat-val em { font-size: 13px; font-weight: 400; margin-left: 2px; }
+.stat-row {
+  background: #3A3D50; border-radius: var(--radius-medium);
+  padding: 12px; display: flex; gap: 6px; flex-wrap: nowrap;
+}
+.stat-c {
+  flex: 1; min-width: 0;
+  background: #585D72; border-radius: 8px;
+  padding: 12px 14px; display: flex; flex-direction: column; gap: 4px;
+}
+.stat-label { font-size: 12px; color: rgba(255,255,255,.65); white-space: nowrap; }
+.stat-val { font-size: 22px; font-weight: 800; color: #fff; line-height: 1.2; white-space: nowrap; }
+.stat-val em { font-size: 11px; font-weight: 400; margin-left: 2px; }
 
 /* ── Section Title ── */
 .section-title {
@@ -198,33 +211,45 @@ body { background: var(--bg-hover); font-family: var(--font-family); -webkit-fon
 .award-desc { font-size:11px; color:var(--text-subtle); line-height:1.5; }
 
 /* ── Rank ── */
-.rank-top3 { display:grid; grid-template-columns:1fr 1.1fr 1fr; gap:var(--gap-8); align-items:end; }
-.rank-card { border-radius:var(--radius-large); padding:var(--gap-16); color:#fff; display:flex; flex-direction:column; gap:var(--gap-8); }
-.rank-card.r1 { background:var(--rank-1st-bg); padding:var(--gap-20); }
-.rank-card.r2 { background:var(--rank-2nd-bg); }
-.rank-card.r3 { background:var(--rank-3rd-bg); }
-.rc-num { font-size:36px; font-weight:800; opacity:.9; line-height:1; }
-.rc-likes { font-size:12px; display:flex; align-items:center; gap:3px; opacity:.8; }
-.rc-score { font-size:22px; font-weight:700; }
-.rc-score em { font-size:13px; font-weight:400; }
-.rc-tags { display:flex; flex-wrap:wrap; gap:3px; }
-.rc-tag { font-size:10px; background:rgba(255,255,255,.2); border-radius:4px; padding:2px 6px; }
-.rc-title { font-size:14px; font-weight:700; line-height:1.3; }
-.rc-sub { font-size:11px; opacity:.7; }
-.rc-change { font-size:11px; font-weight:700; }
-.rc-change.up { color:#FFB3C6; } .rc-change.down { color:#93C5FD; }
+.rank-scroll-wrap { overflow-x: auto; }
+.rank-top3 {
+  display: grid; grid-template-columns: 1fr 1.2fr 1fr;
+  gap: var(--gap-8); align-items: end; min-width: 480px;
+}
+.rank-card {
+  border-radius: var(--radius-large); padding: var(--gap-16);
+  color: #fff; display: flex; flex-direction: column; gap: var(--gap-8);
+  overflow: hidden;
+}
+.rank-card.r1 { background: var(--rank-1st-bg); padding: var(--gap-20); min-height: 200px; }
+.rank-card.r2 { background: var(--rank-2nd-bg); min-height: 180px; }
+.rank-card.r3 { background: var(--rank-3rd-bg); min-height: 180px; }
+.rc-num { font-size: 36px; font-weight: 800; opacity: .9; line-height: 1; }
+.rc-likes { font-size: 12px; display: flex; align-items: center; gap: 3px; opacity: .8; }
+.rc-score { font-size: 22px; font-weight: 700; }
+.rc-score em { font-size: 13px; font-weight: 400; }
+.rc-tags { display: flex; flex-wrap: wrap; gap: 3px; }
+.rc-tag { font-size: 10px; background: rgba(255,255,255,.2); border-radius: 4px; padding: 2px 6px; white-space: nowrap; }
+.rc-title { font-size: 14px; font-weight: 700; line-height: 1.3; }
+.rc-sub { font-size: 11px; opacity: .7; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rc-change { font-size: 11px; font-weight: 700; }
+.rc-change.up { color: #FFB3C6; } .rc-change.down { color: #93C5FD; }
 
-.rank-list { display:flex; flex-direction:column; gap:var(--gap-8); margin-top:var(--gap-12); }
-.rank-row { display:flex; align-items:center; gap:var(--gap-12); padding:var(--gap-12) var(--gap-16); border-radius:var(--radius-medium); border:1px solid var(--border-default); }
-.rank-row:hover { background:var(--bg-hover); }
-.rr-num { width:28px; height:28px; border-radius:50%; background:var(--color-primary); color:#fff; font-size:12px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
-.rr-info { flex:1; min-width:0; }
-.rr-title { font-size:14px; font-weight:600; }
-.rr-sub { font-size:12px; color:var(--text-subtle); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.rr-right { text-align:right; flex-shrink:0; }
-.rr-score { font-size:18px; font-weight:700; }
-.rr-likes { font-size:12px; color:var(--color-point); }
-.rr-change { font-size:11px; font-weight:600; color:var(--color-point); }
+.rank-list { display: flex; flex-direction: column; gap: var(--gap-8); margin-top: var(--gap-12); }
+.rank-row {
+  display: flex; align-items: center; gap: var(--gap-12);
+  padding: var(--gap-12) var(--gap-16); border-radius: var(--radius-medium);
+  border: 1px solid var(--border-default); background: #fff;
+}
+.rank-row:hover { background: var(--bg-hover); }
+.rr-num { width: 28px; height: 28px; border-radius: 50%; background: var(--color-primary); color: #fff; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.rr-info { flex: 1; min-width: 0; }
+.rr-title { font-size: 14px; font-weight: 600; }
+.rr-sub { font-size: 12px; color: var(--text-subtle); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rr-right { text-align: right; flex-shrink: 0; }
+.rr-score { font-size: 18px; font-weight: 700; }
+.rr-likes { font-size: 12px; color: var(--color-point); }
+.rr-change { font-size: 11px; font-weight: 600; color: var(--color-point); }
 
 /* ── My Team Bar ── */
 .myteam-bar { padding:var(--gap-16) var(--gap-24); border-bottom:1px solid var(--border-default); width:100%; position:relative; z-index:1; }
@@ -515,6 +540,7 @@ body { background: var(--bg-hover); font-family: var(--font-family); -webkit-fon
 
         <!-- 랭킹 -->
         <div id="content-rank" class="hidden">
+          <div class="rank-scroll-wrap">
           <div class="rank-top3">
             <div class="rank-card r2">
               <div class="rc-num">2</div><div class="rc-likes">♥ 12,345</div>
@@ -538,6 +564,7 @@ body { background: var(--bg-hover); font-family: var(--font-family); -webkit-fon
               <div class="rc-sub">AX 리더 준비도 진단 및 업종 별 교육 기획…</div>
             </div>
           </div>
+          </div><!-- /rank-scroll-wrap -->
           <div class="rank-list">
             <div class="rank-row"><div class="rr-num">4</div><div class="rr-info"><div class="rr-title">People그룹</div><div class="rr-sub">스타트업, 차세대(203040) 리더를 위한 SERICEO AI 자문·콘텐츠 재생성 서비스</div></div><div class="rr-right"><div class="rr-score">88점</div><div class="rr-likes">♥ 12,345</div></div><div class="rr-change" style="color:var(--text-subtle);">=-</div></div>
             <div class="rank-row"><div class="rr-num">5</div><div class="rr-info"><div class="rr-title">AI는혁신이소</div><div class="rr-sub">AI로 운명하는 AI 해커톤: Work Reboot 2025</div></div><div class="rr-right"><div class="rr-score">88점</div><div class="rr-likes">♥ 12,345</div></div><div class="rr-change" style="color:var(--text-subtle);">=-</div></div>
