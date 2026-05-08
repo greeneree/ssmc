@@ -74,12 +74,19 @@ body { background: var(--bg-hover); font-family: var(--font-family); -webkit-fon
 /* ── Page Body ── */
 .page-body { display: flex; gap: 8px; padding: 8px; flex: 1; align-items: flex-start; }
 
+/* ── LNB Outer (spacer + sticky card) ── */
+.lnb-outer {
+  width: 220px; min-width: 220px; flex-shrink: 0; flex: none;
+  display: flex; flex-direction: column; gap: 8px;
+  align-self: flex-start;
+}
+.lnb-spacer { height: 300px; flex-shrink: 0; }
+
 /* ── LNB ── */
 .lnb {
-  width: 220px; min-width: 220px; flex-shrink: 0;
   background: #fff; border-radius: 12px; padding: 16px;
   display: flex; flex-direction: column; gap: 4px;
-  align-self: flex-start; position: sticky; top: 72px;
+  position: sticky; top: 72px;
   max-height: calc(100vh - 80px); overflow-y: auto;
 }
 .lnb-section-label {
@@ -105,22 +112,22 @@ body { background: var(--bg-hover); font-family: var(--font-family); -webkit-fon
   position: relative;
 }
 
-/* ── Hero Gradient ── */
-.body-hero {
-  position: absolute; top: 0; left: 0; right: 0; height: 380px;
-  pointer-events: none; z-index: 0; overflow: hidden;
+/* ── Hero Banner ── */
+.hero-banner-wrap {
+  width: 100%; flex-shrink: 0;
+  padding: 0 40px;
 }
-.body-hero::before {
-  content: ''; position: absolute;
-  top: -60px; left: -5%; width: 55%; height: 110%;
-  background: linear-gradient(90deg, #42DDFF 0%, #1170FF 46%);
-  opacity: 0.35; filter: blur(100px); border-radius: 50%;
+.hero-banner {
+  display: block; width: 100%; height: 300px;
+  object-fit: cover; object-position: center;
+  border-radius: var(--radius-large);
 }
-.body-hero::after {
-  content: ''; position: absolute;
-  top: -40px; right: -5%; width: 50%; height: 100%;
-  background: linear-gradient(135deg, #B940FF 0%, #25F57C 50%, #7230FF 100%);
-  opacity: 0.30; filter: blur(100px); border-radius: 50%;
+@media (max-width: 1280px) {
+  .hero-banner-wrap { padding: 0 24px; }
+}
+@media (max-width: 768px) {
+  .hero-banner-wrap { padding: 0; }
+  .hero-banner { border-radius: 0; }
 }
 
 /* ── Body Head ── */
@@ -362,6 +369,8 @@ body { background: var(--bg-hover); font-family: var(--font-family); -webkit-fon
   <div class="page-body">
 
     <!-- ── LNB (해커톤 전용) ── -->
+    <div class="lnb-outer">
+    <div class="lnb-spacer"></div>
     <nav class="lnb">
       <div class="lnb-section-label">MENU</div>
       <div class="lnb-menu">
@@ -421,12 +430,15 @@ body { background: var(--bg-hover); font-family: var(--font-family); -webkit-fon
 
       </div>
     </nav>
+    </div><!-- /lnb-outer -->
 
     <!-- ── BODY ── -->
     <div class="body-area">
 
-      <!-- 히어로 그라디언트 -->
-      <div class="body-hero"></div>
+      <!-- 히어로 배너 -->
+      <div class="hero-banner-wrap">
+        <img class="hero-banner" src="./images/hero_banner.png" alt="2026 AI 해커톤"/>
+      </div>
 
       <!-- 헤더 -->
       <div class="body-head">
