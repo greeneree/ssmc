@@ -1,0 +1,129 @@
+/* ============================================
+   AI Studio Design Tokens
+   Based on Multicampus AI Studio Design System
+   ============================================ */
+
+:root {
+
+  /* ── Color: Brand ── */
+  --color-primary: #7F5DD5;
+  --color-primary-gradient: linear-gradient(139deg, #B06CFF 8.74%, #4E70FF 62.41%, #1772FF 92.67%);
+  --color-secondary: #131416;
+
+  /* ── Color: Semantic ── */
+  --color-error: #E95151;
+  --color-success: #39C89A;
+  --color-info: #2EA1FF;
+  --color-point: #E9517A;
+  --color-accent-text: #7F5DD5;
+
+  /* ── Color: Text ── */
+  --text-basic: #131416;
+  --text-subtle: #58616A;
+  --text-white: #FFFFFF;
+
+  /* ── Color: Background ── */
+  --bg-base: #FFFFFF;
+  --bg-hover: #F4F5F6;
+
+  /* ── Color: Border / Divider ── */
+  --border-default: #F4F5F6;
+  --divider: #F4F5F6;
+
+  /* ── Color: Card ── */
+  --card-dark-bg: #585D72;
+  --card-dark-radius: 8px;
+
+  /* ── Color: Hero Gradient ── */
+  --hero-gradient-1: linear-gradient(90deg, #42DDFF 0%, #1170FF 46%);
+  --hero-gradient-2: linear-gradient(135deg, #B940FF 0%, #25F57C 50%, #7230FF 100%);
+
+  /* ── Color: Skeleton / Panel ── */
+  --skeleton-bg: linear-gradient(90deg, #E0F2FE 0%, #F4EBFF 53.37%, #E0F2FE 100%);
+
+  /* ── Color: LNB ── */
+  --lnb-bg: #FFFFFF;
+  --lnb-active-bg: #F4F5F6;
+  --lnb-width: 220px;
+
+  /* ── Color: Rank Cards ── */
+  --rank-1st-bg: linear-gradient(139deg, #B06CFF 8.74%, #4E70FF 62.41%, #1772FF 92.67%);
+  --rank-2nd-bg: #585D72;
+  --rank-3rd-bg: #3D4152;
+
+  /* ── Color: Badge D-day ── */
+  --badge-dday-bg: #7F5DD5;
+  --badge-dday-text: #FFFFFF;
+  --badge-done-bg: #E0E0E0;
+  --badge-done-text: #58616A;
+
+  /* ── Color: Right Panel ── */
+  --panel-bg: var(--skeleton-bg);
+  --panel-radius: 12px;
+
+  /* ── Typography ── */
+  --font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+
+  /* H1 */
+  --h1-size: 32px;
+  --h1-weight: 700;
+  --h1-line-height: 36px;
+  --h1-letter-spacing: -0.3px;
+
+  /* H2 */
+  --h2-size: 24px;
+  --h2-weight: 700;
+  --h2-line-height: 30px;
+  --h2-letter-spacing: -0.3px;
+
+  /* Body (medium-sb) */
+  --body-size: 18px;
+  --body-weight: 600;
+  --body-line-height: 24px;
+  --body-letter-spacing: -0.3px;
+
+  /* Sub (small-r) */
+  --sub-size: 16px;
+  --sub-weight: 400;
+  --sub-line-height: 22px;
+  --sub-letter-spacing: -0.3px;
+
+  /* Caption */
+  --caption-size: 14px;
+  --caption-weight: 400;
+  --caption-line-height: 20px;
+  --caption-letter-spacing: -0.3px;
+
+  /* Label (small bold) */
+  --label-size: 12px;
+  --label-weight: 600;
+  --label-line-height: 16px;
+
+  /* ── Spacing (4px 배수) ── */
+  --gap-4:  4px;
+  --gap-8:  8px;
+  --gap-10: 10px;
+  --gap-12: 12px;
+  --gap-16: 16px;
+  --gap-20: 20px;
+  --gap-24: 24px;
+  --gap-32: 32px;
+  --gap-40: 40px;
+
+  /* ── Radius ── */
+  --radius-xsmall: 8px;
+  --radius-small:  10px;
+  --radius-medium: 12px;
+  --radius-large:  16px;
+  --radius-full:   9999px;
+
+  /* ── Button ── */
+  --btn-height: 36px;
+  --btn-height-lg: 44px;
+  --btn-radius: var(--radius-xsmall);
+
+  /* ── Shadow ── */
+  --shadow-sm: 0 1px 4px rgba(0,0,0,0.06);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.12);
+}
