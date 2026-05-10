@@ -25,9 +25,9 @@
 .state-btn.active { background: var(--color-primary); color: #fff; }
 
 /* ── Global Layout ── */
-html, body { margin: 0; padding: 0; }
+html, body { margin: 0; padding: 0; overflow-x: hidden; }
 body { background: var(--bg-hover); font-family: var(--font-family); -webkit-font-smoothing: antialiased; }
-.app-frame { display: flex; flex-direction: column; min-height: 100vh; background: var(--bg-hover); }
+.app-frame { display: flex; flex-direction: column; min-height: 100vh; max-width: 100vw; overflow-x: hidden; background: var(--bg-hover); }
 
 /* ── Global Header ── */
 .global-header {
@@ -220,22 +220,23 @@ body { background: var(--bg-hover); font-family: var(--font-family); -webkit-fon
 
 /* ── My Team Bar ── */
 .myteam-bar {
-  display: flex; align-items: center; justify-content: space-between;
+  display: flex; align-items: center; gap: 24px;
   width: 100%; box-sizing: border-box;
-  background: #fff; border-radius: 12px;
-  border: 1px solid var(--border-default);
-  padding: 16px 24px;
-  margin: 16px 0 8px;
+  background: #ffffff; border: 1px solid #F4F5F6; border-radius: 12px;
+  padding: 16px 24px; margin: 16px 0;
   position: relative; z-index: 1;
 }
+.myteam-left { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.myteam-top-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .myteam-tags { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-.myteam-link { flex-shrink: 0; margin-left: auto; padding-left: 16px; font-size: 13px; color: var(--color-primary); cursor: pointer; white-space: nowrap; }
-.myteam-members { font-size: 13px; color: var(--text-subtle); margin-bottom: 6px; }
-.myteam-title { font-size: 15px; font-weight: 700; }
-.myteam-stats { display: flex; gap: 24px; margin-top: 12px; }
-.myteam-stat { text-align: center; }
-.myteam-stat-label { font-size: 12px; color: var(--text-subtle); }
-.myteam-stat-val { font-size: 18px; font-weight: 700; }
+.myteam-link { flex-shrink: 0; font-size: 13px; color: var(--color-primary); cursor: pointer; white-space: nowrap; }
+.myteam-members { font-size: 13px; color: #58616A; line-height: 1.4; }
+.myteam-title { font-size: 14px; font-weight: 700; color: var(--text-basic); line-height: 1.4; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.myteam-right { flex-shrink: 0; display: flex; gap: 32px; align-items: center; }
+.myteam-stat { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.myteam-stat-icon { font-size: 18px; line-height: 1.2; }
+.myteam-stat-label { font-size: 12px; color: var(--text-subtle); white-space: nowrap; }
+.myteam-stat-val { font-size: 18px; font-weight: 700; color: var(--text-basic); }
 
 /* ── Project Card Grid ── */
 .proj-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
@@ -452,12 +453,40 @@ body { background: var(--bg-hover); font-family: var(--font-family); -webkit-fon
 
       <!-- 내 팀 (진행 중) -->
       <div id="myteam-bar" class="myteam-bar hidden">
-        <div class="myteam-tags">
-          <span class="tag tag-purple">아이디어톤</span>
-          <span class="tag tag-gray">주니어벤처스</span>
-          <span class="tag tag-gray">기업사업교육2그룹</span>
+
+        <!-- 좌측: 태그·팀원·프로젝트명 -->
+        <div class="myteam-left">
+          <div class="myteam-top-row">
+            <div class="myteam-tags">
+              <span class="tag tag-purple">아이디어톤</span>
+              <span class="tag tag-gray">주니어벤처스</span>
+              <span class="tag tag-gray">기업사업교육2그룹</span>
+            </div>
+            <span class="myteam-link">과제물 제출 ›</span>
+          </div>
+          <div class="myteam-members">김민준 · 이사연 · 박지호 · 최유나</div>
+          <div class="myteam-title">전통 AI + 생성형 AI 활용 역량을 통합 평가하는 인증·교육 플랫폼 구축</div>
         </div>
-        <span class="myteam-link">과제물 제출 →</span>
+
+        <!-- 우측: 통계 3개 -->
+        <div class="myteam-right">
+          <div class="myteam-stat">
+            <div class="myteam-stat-icon">🥇</div>
+            <div class="myteam-stat-label">현재순위</div>
+            <div class="myteam-stat-val">-</div>
+          </div>
+          <div class="myteam-stat">
+            <div class="myteam-stat-icon">❤️</div>
+            <div class="myteam-stat-label">동료평가</div>
+            <div class="myteam-stat-val">-</div>
+          </div>
+          <div class="myteam-stat">
+            <div class="myteam-stat-icon">🏆</div>
+            <div class="myteam-stat-label">전체랭킹</div>
+            <div class="myteam-stat-val">-</div>
+          </div>
+        </div>
+
       </div>
 
       <!-- ─────────────── 진행 전 콘텐츠 ─────────────── -->
