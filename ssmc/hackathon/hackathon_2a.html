@@ -107,8 +107,9 @@ body { background: var(--bg-hover); font-family: var(--font-family); -webkit-fon
 
 /* ── Hero Banner ── */
 .hero-banner-wrap {
-  width: 100%; flex-shrink: 0;
+  width: 100%; max-width: 100%; flex-shrink: 0;
   padding: 0 40px;
+  box-sizing: border-box;
 }
 .hero-banner {
   display: block; width: 100%; height: 300px;
@@ -136,9 +137,10 @@ body { background: var(--bg-hover); font-family: var(--font-family); -webkit-fon
 .stat-row {
   background: #3A3D50; border-radius: var(--radius-medium);
   padding: 12px; display: flex; gap: 6px; flex-wrap: nowrap;
+  overflow-x: auto;
 }
 .stat-c {
-  flex: 1; min-width: 0;
+  flex: 1 1 120px; min-width: 120px;
   background: #585D72; border-radius: 8px;
   padding: 12px 14px; display: flex; flex-direction: column; gap: 4px;
 }
@@ -218,15 +220,16 @@ body { background: var(--bg-hover); font-family: var(--font-family); -webkit-fon
 
 /* ── My Team Bar ── */
 .myteam-bar {
-  background: #ffffff; border-radius: 12px;
+  display: flex; align-items: center; justify-content: space-between;
+  width: 100%; box-sizing: border-box;
+  background: #fff; border-radius: 12px;
   border: 1px solid var(--border-default);
-  padding: 20px 24px;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-  margin: 0 16px 8px;
+  padding: 16px 24px;
+  margin: 16px 0 8px;
   position: relative; z-index: 1;
 }
-.myteam-tags { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 6px; }
-.myteam-link { margin-left: auto; font-size: 13px; color: var(--color-primary); cursor: pointer; }
+.myteam-tags { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.myteam-link { flex-shrink: 0; margin-left: auto; padding-left: 16px; font-size: 13px; color: var(--color-primary); cursor: pointer; white-space: nowrap; }
 .myteam-members { font-size: 13px; color: var(--text-subtle); margin-bottom: 6px; }
 .myteam-title { font-size: 15px; font-weight: 700; }
 .myteam-stats { display: flex; gap: 24px; margin-top: 12px; }
@@ -256,7 +259,7 @@ body { background: var(--bg-hover); font-family: var(--font-family); -webkit-fon
   background: rgba(255,255,255,.18); border-radius: 12px;
   display: flex; align-items: center; justify-content: center;
 }
-.proj-body { padding: 14px 16px; }
+.proj-body { padding: 14px 16px 16px; }
 .proj-badges { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
 .proj-title {
   font-size: 14px; font-weight: 700; line-height: 1.45;
@@ -453,24 +456,8 @@ body { background: var(--bg-hover); font-family: var(--font-family); -webkit-fon
           <span class="tag tag-purple">아이디어톤</span>
           <span class="tag tag-gray">주니어벤처스</span>
           <span class="tag tag-gray">기업사업교육2그룹</span>
-          <span class="myteam-link">과제물 제출 →</span>
         </div>
-        <div class="myteam-members">김민준 · 이사연 · 박지호 · 최유나</div>
-        <div class="myteam-title">전통 AI + 생성형 AI 활용 역량을 통합 평가하는 인증·교육 플랫폼 구축</div>
-        <div class="myteam-stats">
-          <div class="myteam-stat">
-            <div class="myteam-stat-label">현재 순위</div>
-            <div class="myteam-stat-val">-</div>
-          </div>
-          <div class="myteam-stat">
-            <div class="myteam-stat-label">동료평가</div>
-            <div class="myteam-stat-val" style="color:var(--color-point);">♥ -</div>
-          </div>
-          <div class="myteam-stat">
-            <div class="myteam-stat-label">전체 랭킹</div>
-            <div class="myteam-stat-val">-</div>
-          </div>
-        </div>
+        <span class="myteam-link">과제물 제출 →</span>
       </div>
 
       <!-- ─────────────── 진행 전 콘텐츠 ─────────────── -->
@@ -631,12 +618,12 @@ body { background: var(--bg-hover); font-family: var(--font-family); -webkit-fon
 
           <!-- 발표 자료 (placeholder) -->
           <div id="tab-presentations" class="hidden">
-            <p class="t-sub" style="text-align:center;padding:48px 0;">발표 자료는 결과 발표 후 공개됩니다.</p>
+            <p class="t-sub" style="text-align:left;padding:48px 0;">발표 자료는 결과 발표 후 공개됩니다.</p>
           </div>
 
           <!-- 공지 (placeholder) -->
           <div id="tab-notice" class="hidden">
-            <p class="t-sub" style="text-align:center;padding:48px 0;">공지사항이 없습니다.</p>
+            <p class="t-sub" style="text-align:left;padding:48px 0;">공지사항이 없습니다.</p>
           </div>
 
         </div><!-- /body-scroll -->
@@ -792,10 +779,15 @@ function setState(state, btn) {
   /* 진행 중: 배너 숨김 */
   document.querySelector('.hero-banner-wrap').classList.toggle('hidden', !isBefore);
 
-  /* LNB active 전환 */
+  /* LNB active 전환 — 진행 전·후 모두 홈 유지 */
   document.querySelectorAll('.lnb-item').forEach(i => i.classList.remove('active'));
-  const lnbTarget = document.getElementById(isBefore ? 'lnb-home' : 'lnb-rank');
-  if (lnbTarget) lnbTarget.classList.add('active');
+  document.getElementById('lnb-home').classList.add('active');
+
+  /* 진행 중: 제출 현황 탭 기본 활성화 */
+  if (!isBefore) {
+    const firstTab = document.querySelector('#content-during .tab');
+    if (firstTab) switchTab(firstTab, 'tab-submissions');
+  }
 }
 
 /* ── Tab Switch (진행 중) ── */
