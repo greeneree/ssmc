@@ -17,7 +17,7 @@ header {
 }
 .h-dot { width: 7px; height: 7px; border-radius: 50%; background: #10b981; flex-shrink: 0; }
 header h1 { font-size: 14px; font-weight: 600; }
-.h-badge { margin-left: auto; font-size: 11px; color: #888; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 3px 10px; white-space: nowrap; }
+.h-badge { margin-left: auto; font-size: 13px; color: #888; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 3px 10px; white-space: nowrap; }
 
 .toolbar {
   background: #fff; border-bottom: 1px solid rgba(0,0,0,0.08);
@@ -26,14 +26,14 @@ header h1 { font-size: 14px; font-weight: 600; }
 }
 .filter-label { font-size: 11px; color: #999; margin-right: 2px; white-space: nowrap; }
 .filter-btn {
-  font-size: 11px; font-family: 'Noto Sans KR', sans-serif;
+  font-size: 12px; font-family: 'Noto Sans KR', sans-serif;
   padding: 4px 10px; border-radius: 20px; border: 1px solid rgba(0,0,0,0.12);
   background: #fff; cursor: pointer; font-weight: 500; color: #555; transition: all .15s;
 }
 .filter-btn:hover { border-color: #10b981; color: #10b981; }
 .filter-btn.active { background: #111; color: #fff; border-color: #111; }
 .sep { width: 1px; height: 18px; background: rgba(0,0,0,0.1); margin: 0 2px; }
-.count-badge { font-size: 11px; color: #aaa; margin-left: auto; white-space: nowrap; }
+.count-badge { font-size: 12px; color: #aaa; margin-left: auto; white-space: nowrap; }
 
 .table-wrap { padding: 14px 12px 60px; overflow-x: auto; }
 
@@ -44,11 +44,11 @@ tbody tr:hover { background: #fafaf8; }
 tbody tr:last-child { border-bottom: none; }
 tbody td { padding: 7px 12px; vertical-align: middle; line-height: 1.5; }
 
-.badge { display: inline-block; font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 20px; white-space: nowrap; }
+.badge { display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 20px; white-space: nowrap; }
 .badge-front { background: #e1f5ee; color: #0f6e56; }
 .badge-admin { background: #eeedfe; color: #3c3489; }
 
-.target { display: inline-block; font-size: 10px; font-weight: 500; padding: 2px 7px; border-radius: 4px; white-space: nowrap; }
+.target { display: inline-block; font-size: 11px; font-weight: 500; padding: 2px 7px; border-radius: 4px; white-space: nowrap; }
 .target-참가자 { background: #e1f5ee; color: #085041; }
 .target-동료 { background: #eaf3de; color: #27500a; }
 .target-심사 { background: #faeeda; color: #633806; }
@@ -63,7 +63,7 @@ td.dash { color: #e0e0e0; }
 .login-o { color: #059669; font-weight: 700; text-align: center; }
 .note { color: #777; font-size: 11px; line-height: 1.45; }
 
-.change { display: inline-block; font-size: 9px; font-weight: 700; border-radius: 3px; padding: 1px 5px; margin-left: 4px; vertical-align: middle; white-space: nowrap; }
+.change { display: inline-block; font-size: 10px; font-weight: 700; border-radius: 3px; padding: 1px 5px; margin-left: 4px; vertical-align: middle; white-space: nowrap; }
 .add   { background: #10b981; color: #fff; }
 .del   { background: #9ca3af; color: #fff; }
 .mod   { background: #f59e0b; color: #fff; }
@@ -150,7 +150,7 @@ const data = [
   {gb:'Front',tg:'동료',d1:'',d2:'평가이력조회',d3:'',d4:'',login:'O',note:'갤러리 내 하트 개수 노출 (전체 공개)',ch:'mod'},
   {gb:'Front',tg:'동료',d1:'동료평가_팀별현황조회',d2:'',d3:'',d4:'',login:'O',note:'',ch:''},
   {gb:'Front',tg:'동료',d1:'랭킹 / 리더보드',d2:'',d3:'',d4:'',login:'O',note:'공통 뷰 사용',ch:''},
-  {gb:'Front',tg:'동료',d1:'최종리더보드',d2:'',d3:'',d4:'',login:'O',note:'',ch:''},
+  {gb:'Front',tg:'동료',d1:'최종리더보드',d2:'',d3:'',d4:'',login:'O',note:'공통 뷰 사용',ch:''},
 
   // ── FRONT / 심사위원 ──
   {gb:'Front',tg:'심사',d1:'심사_평가목록',d2:'',d3:'',d4:'',login:'O',note:'',ch:''},
