@@ -3,442 +3,643 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>해커톤 — 1안 (과정 내 메뉴)</title>
+<title>해커톤 1안 — AI 스튜디오 과정 내 메뉴</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="./assets/css/tokens.css"/>
 <link rel="stylesheet" href="./assets/css/components.css"/>
 <link rel="stylesheet" href="./assets/css/layout.css"/>
 <style>
-  body { background: #F4F5F6; }
-  
-  /* 상태 토글 버튼 */
-  .state-toggle {
-    position: fixed; top: 8px; left: 50%; transform: translateX(-50%);
-    z-index: 999;
-    display: flex; gap: 0;
-    background: #fff; border-radius: var(--radius-full);
-    border: 1px solid var(--border-default);
-    box-shadow: var(--shadow-md);
-    overflow: hidden;
-  }
-  .state-btn {
-    padding: 6px 16px; font-size: 12px; font-weight: 600;
-    cursor: pointer; border: none; background: transparent;
-    color: var(--text-subtle); font-family: var(--font-family);
-    transition: all .15s;
-  }
-  .state-btn.active { background: var(--color-primary); color: #fff; }
+/* ── SVG Icons ── */
+.ico { display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; flex-shrink:0; }
 
-  /* 글로벌 헤더 */
-  .global-header {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 0 var(--gap-16); height: 48px;
-    background: var(--bg-base); border-bottom: 1px solid var(--border-default);
-    position: sticky; top: 0; z-index: 50;
-  }
-  .breadcrumb { display: flex; align-items: center; gap: 6px; font-size: 14px; color: var(--text-subtle); }
-  .breadcrumb span { color: var(--text-basic); font-weight: 600; }
-  .header-icons { display: flex; align-items: center; gap: var(--gap-16); }
-  .header-icon { width: 32px; height: 32px; border-radius: var(--radius-full); background: var(--bg-hover); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; position: relative; }
-  .notif-dot { position: absolute; top: 4px; right: 4px; width: 6px; height: 6px; border-radius: 50%; background: var(--color-error); }
-  .avatar { width: 32px; height: 32px; border-radius: var(--radius-full); background: var(--color-primary-gradient); display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: 700; }
+/* ── State Toggle (목업 전용) ── */
+.state-toggle {
+  position: fixed; top: 10px; left: 50%; transform: translateX(-50%);
+  z-index: 9999; display: flex;
+  background: #fff; border-radius: var(--radius-full);
+  border: 1px solid var(--border-default); box-shadow: var(--shadow-lg); overflow: hidden;
+}
+.state-btn {
+  padding: 6px 18px; font-size: 12px; font-weight: 600;
+  cursor: pointer; border: none; background: transparent;
+  color: var(--text-subtle); font-family: var(--font-family); transition: all .15s;
+}
+.state-btn.active { background: var(--color-primary); color: #fff; }
 
-  /* 레이아웃 */
-  .page-wrap { display: flex; min-height: calc(100vh - 48px); gap: var(--gap-8); padding: var(--gap-8); }
+/* ── Global Layout ── */
+html, body { margin: 0; padding: 0; }
+body { background: var(--bg-hover); font-family: var(--font-family); -webkit-font-smoothing: antialiased; }
+.app-frame { display: flex; flex-direction: column; min-height: 100vh; background: var(--bg-hover); }
 
-  /* LNB */
-  .lnb { background: var(--bg-base); border-radius: var(--radius-medium); width: 180px; flex-shrink: 0; padding: var(--gap-16) var(--gap-12); display: flex; flex-direction: column; gap: var(--gap-4); }
-  .lnb-item { display: flex; align-items: center; gap: var(--gap-10); padding: var(--gap-8) var(--gap-10); border-radius: var(--radius-xsmall); font-size: 14px; color: var(--text-subtle); cursor: pointer; transition: background .15s; }
-  .lnb-item:hover { background: var(--bg-hover); color: var(--text-basic); }
-  .lnb-item.active { background: var(--bg-hover); color: var(--text-basic); font-weight: 600; }
-  .lnb-item .ico { font-size: 16px; width: 20px; text-align: center; }
-  .lnb-badge { margin-left: auto; font-size: 10px; font-weight: 700; background: rgba(127,93,213,0.12); color: var(--color-primary); border-radius: var(--radius-full); padding: 1px 6px; }
+/* ── Global Header ── */
+.global-header {
+  height: 64px; background: #fff;
+  border-bottom: 1px solid var(--border-default);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 24px; flex-shrink: 0;
+  position: sticky; top: 0; z-index: 100;
+}
+.header-left { display: flex; align-items: center; gap: 16px; height: 32px; flex: 1 0 0; }
+.header-logo {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 15px; font-weight: 700; color: var(--text-basic);
+  letter-spacing: -0.3px; white-space: nowrap;
+}
+.header-logo-icon {
+  width: 28px; height: 28px; border-radius: 8px;
+  background: var(--color-primary-gradient);
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 13px; font-weight: 700;
+}
+.breadcrumb-sep { color: var(--text-subtle); font-size: 14px; }
+.breadcrumb-current { font-size: 14px; color: var(--text-subtle); }
+.header-right { display: flex; align-items: center; gap: 8px; }
+.header-icon-btn {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: transparent; border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  position: relative; transition: background .15s; flex-shrink: 0;
+}
+.header-icon-btn:hover { background: var(--bg-hover); }
+.notif-dot {
+  position: absolute; top: 5px; right: 5px;
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--color-error); border: 1.5px solid #fff;
+}
+.header-avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: var(--color-primary); color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 600; letter-spacing: -0.3px; flex-shrink: 0;
+}
 
-  /* 바디 + 우측 패널 */
-  .content-wrap { flex: 1; display: flex; gap: var(--gap-8); min-width: 0; }
-  .body-area { flex: 1; background: var(--bg-base); border-radius: var(--radius-medium); overflow: hidden; min-width: 0; }
-  .body-head { padding: var(--gap-20) var(--gap-24) var(--gap-16); border-bottom: 1px solid var(--border-default); display: flex; align-items: flex-start; justify-content: space-between; }
-  .body-scroll { padding: var(--gap-20) var(--gap-24); display: flex; flex-direction: column; gap: var(--gap-24); }
-  .right-panel { width: 280px; flex-shrink: 0; display: flex; flex-direction: column; gap: var(--gap-8); }
-  .panel-box { background: linear-gradient(90deg, #E0F2FE 0%, #F4EBFF 53.37%, #E0F2FE 100%); border-radius: var(--radius-medium); padding: var(--gap-16); }
+/* ── Page Body (3-column) ── */
+.page-body { display: flex; gap: 8px; padding: 8px; flex: 1; align-items: flex-start; }
 
-  /* 통계 카드 영역 */
-  .stat-area { background: #3A3D50; border-radius: var(--radius-medium); padding: var(--gap-16); display: flex; gap: var(--gap-8); }
-  .stat-c { flex: 1; display: flex; flex-direction: column; gap: 4px; }
-  .stat-c-label { font-size: 12px; color: rgba(255,255,255,.65); }
-  .stat-c-val { font-size: 24px; font-weight: 800; color: #fff; line-height: 1.2; }
-  .stat-c-val em { font-size: 13px; font-weight: 400; margin-left: 2px; }
+/* ── LNB ── */
+.lnb {
+  width: 220px; min-width: 220px; flex-shrink: 0;
+  background: #fff; border-radius: 12px; padding: 16px;
+  display: flex; flex-direction: column; gap: 4px;
+  align-self: flex-start; position: sticky; top: 72px;
+  max-height: calc(100vh - 80px); overflow-y: auto;
+}
+.lnb-menu { display: flex; flex-direction: column; gap: 2px; width: 100%; }
+.lnb-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 10px; border-radius: 8px;
+  font-size: 14px; font-weight: 500; line-height: 20px; letter-spacing: -0.3px;
+  color: var(--text-subtle); cursor: pointer; transition: background .15s;
+}
+.lnb-item:hover { background: var(--bg-hover); }
+.lnb-item.active { background: var(--bg-hover); color: var(--text-basic); font-weight: 600; }
+.lnb-icon { width: 16px; height: 16px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+.lnb-badge { margin-left: auto; font-size: 10px; font-weight: 700; background: var(--color-primary); color: #fff; border-radius: 9999px; padding: 1px 6px; }
 
-  /* 탭 */
-  .tabs { display: flex; border-bottom: 1px solid var(--border-default); }
-  .tab { padding: 10px var(--gap-16); font-size: 14px; color: var(--text-subtle); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; }
-  .tab.active { color: var(--color-primary); font-weight: 600; border-bottom-color: var(--color-primary); }
+/* ── Body Area ── */
+.body-area {
+  flex: 1; min-width: 0; background: #fff; border-radius: 12px;
+  display: flex; flex-direction: column; overflow: hidden;
+  position: relative;
+}
 
-  /* 일정 타임라인 */
-  .steps { display: flex; gap: 0; }
-  .step { flex: 1; display: flex; flex-direction: column; align-items: center; position: relative; }
-  .step::after { content: ''; position: absolute; top: 14px; left: 50%; right: -50%; height: 2px; background: var(--border-default); z-index: 0; }
-  .step:last-child::after { display: none; }
-  .step.done::after { background: var(--color-primary); }
-  .step-dot { width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--border-default); background: var(--bg-base); display: flex; align-items: center; justify-content: center; font-size: 14px; z-index: 1; position: relative; }
-  .step.done .step-dot { background: var(--color-primary); border-color: var(--color-primary); }
-  .step.active .step-dot { border-color: var(--color-primary); }
-  .step-name { font-size: 13px; font-weight: 600; margin-top: 8px; text-align: center; color: var(--text-subtle); }
-  .step.active .step-name, .step.done .step-name { color: var(--color-primary); }
-  .step-period { font-size: 11px; color: var(--text-subtle); text-align: center; margin-top: 2px; }
-  .step-note { font-size: 10px; color: var(--text-subtle); text-align: center; margin-top: 4px; line-height: 1.4; }
+/* ── Hero Gradient ── */
+.body-hero {
+  position: absolute; top: 0; left: 0; right: 0; height: 380px;
+  pointer-events: none; z-index: 0; overflow: hidden;
+}
+.body-hero::before {
+  content: ''; position: absolute;
+  top: -60px; left: -5%; width: 55%; height: 110%;
+  background: linear-gradient(90deg, #42DDFF 0%, #1170FF 46%);
+  opacity: 0.35; filter: blur(100px); border-radius: 50%;
+}
+.body-hero::after {
+  content: ''; position: absolute;
+  top: -40px; right: -5%; width: 50%; height: 100%;
+  background: linear-gradient(135deg, #B940FF 0%, #25F57C 50%, #7230FF 100%);
+  opacity: 0.30; filter: blur(100px); border-radius: 50%;
+}
 
-  /* 수상 카드 */
-  .award-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--gap-8); }
-  .award-c { background: var(--bg-base); border: 1px solid var(--border-default); border-radius: var(--radius-medium); padding: var(--gap-16); }
-  .award-trophy { font-size: 20px; margin-bottom: 6px; }
-  .award-name { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
-  .award-prize { font-size: 12px; color: var(--color-primary); font-weight: 600; margin-bottom: 6px; }
-  .award-desc { font-size: 11px; color: var(--text-subtle); line-height: 1.5; }
+/* ── Body Head ── */
+.body-head {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  padding: 32px 24px 20px; position: relative; z-index: 1; gap: 16px;
+}
 
-  /* 랭킹 카드 3위 */
-  .rank-top3 { display: grid; grid-template-columns: 1fr 1.15fr 1fr; gap: var(--gap-8); align-items: end; }
-  .rank-card { border-radius: var(--radius-large); padding: var(--gap-16); color: #fff; display: flex; flex-direction: column; gap: var(--gap-8); }
-  .rank-card.r1 { background: linear-gradient(139deg, #B06CFF 8.74%, #4E70FF 62.41%, #1772FF 92.67%); padding: var(--gap-20); }
-  .rank-card.r2 { background: #585D72; }
-  .rank-card.r3 { background: #3D4152; }
-  .rc-num { font-size: 36px; font-weight: 800; opacity: .9; line-height: 1; }
-  .rc-likes { font-size: 12px; display: flex; align-items: center; gap: 3px; opacity: .8; }
-  .rc-score { font-size: 22px; font-weight: 700; }
-  .rc-score em { font-size: 13px; font-weight: 400; }
-  .rc-tags { display: flex; flex-wrap: wrap; gap: 3px; }
-  .rc-tag { font-size: 10px; background: rgba(255,255,255,.2); border-radius: 4px; padding: 2px 6px; }
-  .rc-title { font-size: 14px; font-weight: 700; line-height: 1.3; }
-  .rc-sub { font-size: 11px; opacity: .7; }
-  .rc-change { font-size: 11px; font-weight: 700; }
-  .rc-change.up { color: #FFB3C6; }
-  .rc-change.down { color: #93C5FD; }
+/* ── Stat Wrap ── */
+.stat-wrap { padding: 0 24px 16px; position: relative; z-index: 1; }
 
-  /* 랭킹 리스트 */
-  .rank-list { display: flex; flex-direction: column; gap: var(--gap-8); margin-top: var(--gap-12); }
-  .rank-row { display: flex; align-items: center; gap: var(--gap-12); padding: var(--gap-12) var(--gap-16); border-radius: var(--radius-medium); border: 1px solid var(--border-default); background: var(--bg-base); }
-  .rank-row:hover { background: var(--bg-hover); }
-  .rr-num { width: 28px; height: 28px; border-radius: 50%; background: var(--color-primary); color: #fff; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-  .rr-info { flex: 1; min-width: 0; }
-  .rr-title { font-size: 14px; font-weight: 600; }
-  .rr-sub { font-size: 12px; color: var(--text-subtle); }
-  .rr-score { font-size: 18px; font-weight: 700; text-align: right; }
-  .rr-likes { font-size: 12px; color: var(--color-point); display: flex; align-items: center; gap: 2px; }
-  .rr-change { font-size: 11px; font-weight: 600; color: var(--color-point); }
+/* ── Tabs ── */
+.tabs {
+  display: flex; padding: 0 var(--gap-24);
+  position: relative; z-index: 1;
+}
+.tab {
+  display: inline-flex; height: 48px; min-width: 80px;
+  padding: 6px 16px; justify-content: center; align-items: center; gap: 4px;
+  font-size: var(--sub-size); font-weight: 400; color: var(--text-subtle);
+  cursor: pointer; transition: all .15s;
+  border-bottom: 1px solid #E6E8EA; margin-bottom: -1px;
+}
+.tab:hover { color: var(--text-basic); }
+.tab.active {
+  color: var(--color-primary); font-weight: 600;
+  border-bottom: 2px solid var(--color-primary);
+}
 
-  /* 일정 패널 */
-  .sch-item { padding: var(--gap-12) 0; border-bottom: 1px solid rgba(0,0,0,.06); }
-  .sch-item:last-child { border-bottom: none; }
-  .sch-row { display: flex; align-items: center; gap: var(--gap-10); }
-  .sch-num { width: 22px; height: 22px; border-radius: 50%; background: var(--color-primary); color: #fff; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-  .sch-num.done { background: #D0D5DD; color: var(--text-subtle); }
-  .sch-title { font-size: 14px; font-weight: 600; flex: 1; }
-  .sch-date { font-size: 11px; color: var(--text-subtle); margin-top: 2px; }
-  .sch-btn { margin-top: var(--gap-8); }
+/* ── Body Scroll ── */
+.body-scroll { flex: 1; overflow-y: auto; padding: 20px 24px 24px; position: relative; z-index: 1; }
 
-  /* FAQ */
-  .faq-item { border-bottom: 1px solid rgba(0,0,0,.06); }
-  .faq-q { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; cursor: pointer; font-size: 13px; font-weight: 500; gap: 8px; }
-  .faq-q-ico { color: var(--color-primary); font-size: 14px; flex-shrink: 0; }
-  .faq-q-arr { color: var(--text-subtle); font-size: 12px; flex-shrink: 0; transition: transform .2s; }
-  .faq-item.open .faq-q-arr { transform: rotate(180deg); }
-  .faq-a { display: none; padding: 0 0 12px; font-size: 13px; color: var(--text-subtle); line-height: 1.65; }
-  .faq-item.open .faq-a { display: block; }
+/* ── Panel Box ── */
+.panel-box { background: #fff; border-radius: 12px; padding: 20px; }
+.panel-title {
+  font-size: 15px; font-weight: 700; color: var(--text-basic);
+  margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between;
+}
+.panel-title-link { font-size: 13px; font-weight: 400; color: var(--color-primary); cursor: pointer; }
+
+/* ── Right Panel ── */
+.right-panel {
+  width: 360px; flex-shrink: 0; display: flex; flex-direction: column; gap: 8px;
+  align-self: flex-start; position: sticky; top: 72px;
+  max-height: calc(100vh - 80px); overflow-y: auto;
+  background: var(--skeleton-bg); border-radius: 12px; padding: 8px;
+}
+
+/* ── Stat Row ── */
+.stat-row {
+  background: #3A3D50; border-radius: var(--radius-medium);
+  padding: 12px; display: flex; gap: 6px; flex-wrap: nowrap;
+}
+.stat-c {
+  flex: 1; min-width: 0;
+  background: #585D72; border-radius: 8px;
+  padding: 12px 14px; display: flex; flex-direction: column; gap: 4px;
+}
+.stat-label { font-size: 12px; color: rgba(255,255,255,.65); white-space: nowrap; }
+.stat-val { font-size: 22px; font-weight: 800; color: #fff; line-height: 1.2; white-space: nowrap; }
+.stat-val em { font-size: 11px; font-weight: 400; margin-left: 2px; }
+
+/* ── Section Title ── */
+.section-title {
+  font-size: 14px; font-weight: 600; color: var(--text-basic);
+  margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
+}
+
+/* ── Steps ── */
+.steps { display: flex; }
+.step { flex: 1; display: flex; flex-direction: column; align-items: center; position: relative; }
+.step::after { content:''; position:absolute; top:13px; left:50%; right:-50%; height:2px; background:var(--border-default); z-index:0; }
+.step:last-child::after { display:none; }
+.step.done::after { background: var(--color-primary); }
+.step-dot { width:26px; height:26px; border-radius:50%; border:2px solid var(--border-default); background:var(--bg-base); display:flex; align-items:center; justify-content:center; font-size:13px; z-index:1; position:relative; }
+.step.done .step-dot { background:var(--color-primary); border-color:var(--color-primary); }
+.step.active .step-dot { border-color:var(--color-primary); }
+.step-label { font-size:12px; font-weight:600; margin-top:8px; text-align:center; color:var(--text-subtle); }
+.step.active .step-label, .step.done .step-label { color:var(--color-primary); }
+.step-period { font-size:11px; color:var(--text-subtle); text-align:center; margin-top:2px; line-height:1.4; }
+.step-note { font-size:10px; color:var(--text-subtle); text-align:center; margin-top:4px; }
+
+/* ── Award Grid ── */
+.award-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:var(--gap-8); }
+.award-c { background:var(--bg-base); border:1px solid var(--border-default); border-radius:var(--radius-medium); padding:var(--gap-16); }
+.award-trophy { font-size:20px; margin-bottom:6px; }
+.award-name { font-size:14px; font-weight:700; margin-bottom:4px; }
+.award-prize { font-size:12px; color:var(--color-primary); font-weight:600; margin-bottom:6px; }
+.award-desc { font-size:11px; color:var(--text-subtle); line-height:1.5; }
+
+/* ── Rank ── */
+.rank-scroll-wrap { overflow-x: auto; }
+.rank-top3 {
+  display: grid; grid-template-columns: 1fr 1.2fr 1fr;
+  gap: var(--gap-8); align-items: end; min-width: 480px;
+}
+.rank-card {
+  border-radius: var(--radius-large); padding: var(--gap-16);
+  color: #fff; display: flex; flex-direction: column; gap: var(--gap-8);
+  overflow: hidden;
+}
+.rank-card.r1 { background: var(--rank-1st-bg); padding: var(--gap-20); min-height: 200px; }
+.rank-card.r2 { background: var(--rank-2nd-bg); min-height: 180px; }
+.rank-card.r3 { background: var(--rank-3rd-bg); min-height: 180px; }
+.rc-num { font-size: 36px; font-weight: 800; opacity: .9; line-height: 1; }
+.rc-likes { font-size: 12px; display: flex; align-items: center; gap: 3px; opacity: .8; }
+.rc-score { font-size: 22px; font-weight: 700; }
+.rc-score em { font-size: 13px; font-weight: 400; }
+.rc-tags { display: flex; flex-wrap: wrap; gap: 3px; }
+.rc-tag { font-size: 10px; background: rgba(255,255,255,.2); border-radius: 4px; padding: 2px 6px; white-space: nowrap; }
+.rc-title { font-size: 14px; font-weight: 700; line-height: 1.3; }
+.rc-sub { font-size: 11px; opacity: .7; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rc-change { font-size: 11px; font-weight: 700; }
+.rc-change.up { color: #FFB3C6; } .rc-change.down { color: #93C5FD; }
+
+.rank-list { display: flex; flex-direction: column; gap: var(--gap-8); margin-top: var(--gap-12); }
+.rank-row {
+  display: flex; align-items: center; gap: var(--gap-12);
+  padding: var(--gap-12) var(--gap-16); border-radius: var(--radius-medium);
+  border: 1px solid var(--border-default); background: #fff;
+}
+.rank-row:hover { background: var(--bg-hover); }
+.rr-num { width: 28px; height: 28px; border-radius: 50%; background: var(--color-primary); color: #fff; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.rr-info { flex: 1; min-width: 0; }
+.rr-title { font-size: 14px; font-weight: 600; }
+.rr-sub { font-size: 12px; color: var(--text-subtle); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rr-right { text-align: right; flex-shrink: 0; }
+.rr-score { font-size: 18px; font-weight: 700; }
+.rr-likes { font-size: 12px; color: var(--color-point); }
+.rr-change { font-size: 11px; font-weight: 600; color: var(--color-point); }
+
+/* ── My Team Bar ── */
+.myteam-bar { padding:var(--gap-16) var(--gap-24); border-bottom:1px solid var(--border-default); width:100%; position:relative; z-index:1; }
+.myteam-tags { display:flex; align-items:center; gap:var(--gap-8); flex-wrap:wrap; margin-bottom:6px; }
+.myteam-link { margin-left:auto; font-size:13px; color:var(--color-primary); cursor:pointer; }
+.myteam-members { font-size:13px; color:var(--text-subtle); margin-bottom:6px; }
+.myteam-title { font-size:15px; font-weight:700; }
+.myteam-stats { display:flex; gap:var(--gap-24); margin-top:var(--gap-12); }
+.myteam-stat { text-align:center; }
+.myteam-stat-label { font-size:12px; color:var(--text-subtle); }
+.myteam-stat-val { font-size:18px; font-weight:700; }
+
+/* ── Schedule Items ── */
+.sch-item { padding:var(--gap-12) 0; border-bottom:1px solid rgba(0,0,0,.06); }
+.sch-item:last-child { border-bottom:none; }
+.sch-row { display:flex; align-items:center; gap:var(--gap-10); }
+.sch-num { width:22px; height:22px; border-radius:50%; background:var(--color-primary); color:#fff; font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.sch-num.done { background:#D0D5DD; color:var(--text-subtle); }
+.sch-title-row { display:flex; align-items:center; gap:var(--gap-8); flex:1; }
+.sch-title { font-size:14px; font-weight:600; }
+.sch-date { font-size:11px; color:var(--text-subtle); margin-left:auto; white-space:nowrap; }
+.sch-action { margin-top:var(--gap-8); padding-left:32px; }
+
+/* ── FAQ ── */
+.faq-item { border-bottom:1px solid rgba(0,0,0,.06); }
+.faq-item:last-child { border-bottom:none; }
+.faq-q { display:flex; align-items:center; gap:6px; padding:12px 0; cursor:pointer; }
+.faq-q-ico { color:var(--color-primary); font-size:14px; flex-shrink:0; }
+.faq-q-text { font-size:13px; font-weight:500; flex:1; }
+.faq-q-arr { color:var(--text-subtle); font-size:11px; flex-shrink:0; transition:transform .2s; }
+.faq-item.open .faq-q-arr { transform:rotate(180deg); }
+.faq-a { display:none; padding:0 0 12px 20px; font-size:13px; color:var(--text-subtle); line-height:1.65; }
+.faq-item.open .faq-a { display:block; }
 </style>
 </head>
 <body>
 
-<!-- 상태 토글 (목업용) -->
+<!-- 목업용 상태 토글 -->
 <div class="state-toggle">
-  <button class="state-btn active" data-state="before" onclick="setState('before',this)">진행 전</button>
-  <button class="state-btn" data-state="during" onclick="setState('during',this)">진행 중</button>
+  <button class="state-btn active" onclick="setState('before',this)">진행 전</button>
+  <button class="state-btn" onclick="setState('during',this)">진행 중</button>
 </div>
 
-<!-- 글로벌 헤더 -->
-<header class="global-header">
-  <div class="breadcrumb">
-    2026 멀티캠퍼스 해커톤
-    <span style="color:var(--text-subtle)">›</span>
-    <span>김학습</span>
-  </div>
-  <div class="header-icons">
-    <div class="header-icon">🔔<div class="notif-dot"></div></div>
-    <div class="header-icon">🌙</div>
-    <div class="avatar">김</div>
-  </div>
-</header>
+<div class="app-frame">
 
-<div class="page-wrap">
+  <!-- ── HEADER ── -->
+  <header class="global-header">
+    <div class="header-left">
+      <div class="header-logo">
+        <div class="header-logo-icon">M</div>
+        2026 멀티캠퍼스 해커톤
+      </div>
+      <span class="breadcrumb-sep">›</span>
+      <span class="breadcrumb-current">김학습</span>
+    </div>
+    <div class="header-right">
+      <!-- 알림 -->
+      <button class="header-icon-btn">
+        <div class="notif-dot"></div>
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M8 1.5a4.5 4.5 0 0 0-4.5 4.5v2.25L2 10h12l-1.5-1.75V6A4.5 4.5 0 0 0 8 1.5zM6.5 12a1.5 1.5 0 0 0 3 0H6.5z" fill="#131416"/>
+        </svg>
+      </button>
+      <!-- 다크모드 -->
+      <button class="header-icon-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M8 2a6 6 0 1 0 6 6A6 6 0 0 0 8 2zm0 10.5A4.5 4.5 0 1 1 12.5 8 4.5 4.5 0 0 1 8 12.5z" fill="#131416"/>
+        </svg>
+      </button>
+      <!-- 아바타 -->
+      <div class="header-avatar">김</div>
+    </div>
+  </header>
 
-  <!-- LNB -->
-  <nav class="lnb">
-    <div class="lnb-item"><span class="ico">🏠</span>대시보드</div>
-    <div class="lnb-item"><span class="ico">🤖</span>AI갤러리</div>
-    <div class="lnb-item"><span class="ico">💻</span>IDE</div>
-    <div class="lnb-item"><span class="ico">📋</span>과제 <span class="lnb-badge">D-6</span></div>
-    <div class="lnb-item"><span class="ico">📚</span>학습자료</div>
-    <div class="lnb-item"><span class="ico">📝</span>설문</div>
-    <div class="lnb-item"><span class="ico">▶️</span>라이브강의</div>
-    <div class="lnb-item"><span class="ico">🖥️</span>VM</div>
-    <div class="lnb-item active"><span class="ico">🏆</span>해커톤</div>
-  </nav>
+  <!-- ── PAGE BODY ── -->
+  <div class="page-body">
 
-  <!-- 컨텐츠 -->
-  <div class="content-wrap">
+    <!-- ── LNB ── -->
+    <nav class="lnb">
+      <div class="lnb-menu">
 
-    <!-- 바디 -->
+        <div class="lnb-item muted">
+          <span class="lnb-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <rect x="2" y="2" width="5" height="5" rx="1" fill="#58616A"/>
+              <rect x="9" y="2" width="5" height="5" rx="1" fill="#58616A"/>
+              <rect x="2" y="9" width="5" height="5" rx="1" fill="#58616A"/>
+              <rect x="9" y="9" width="5" height="5" rx="1" fill="#58616A"/>
+            </svg>
+          </span>
+          대시보드
+        </div>
+
+        <div class="lnb-item muted">
+          <span class="lnb-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <circle cx="8" cy="8" r="5.5" stroke="#58616A" stroke-width="1.2"/>
+              <path d="M8 5v3l2 1.5" stroke="#58616A" stroke-width="1.2" stroke-linecap="round"/>
+            </svg>
+          </span>
+          AI갤러리
+        </div>
+
+        <div class="lnb-item muted">
+          <span class="lnb-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <polyline points="5,4 2,8 5,12" stroke="#58616A" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+              <polyline points="11,4 14,8 11,12" stroke="#58616A" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+              <line x1="9" y1="3" x2="7" y2="13" stroke="#58616A" stroke-width="1.3" stroke-linecap="round"/>
+            </svg>
+          </span>
+          IDE
+        </div>
+
+        <div class="lnb-item muted">
+          <span class="lnb-icon">
+            <!-- 과제 아이콘 (제공된 SVG 샘플) -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M7.39978 5.33398V3.2666H5.33337C5.002 3.2666 4.73376 2.99836 4.73376 2.66699C4.73376 2.33562 5.002 2.06738 5.33337 2.06738H8.00037C8.33159 2.06756 8.59998 2.33573 8.59998 2.66699V5.33398C8.5998 5.6651 8.33148 5.93342 8.00037 5.93359C7.6691 5.93359 7.39996 5.66521 7.39978 5.33398Z" fill="#58616A"/>
+              <path d="M12.7331 6.66667C12.7329 6.26181 12.4046 5.93327 11.9997 5.93327H3.99972C3.59496 5.93344 3.26649 6.26192 3.26632 6.66667V12.0007C3.26649 12.4054 3.59496 12.7339 3.99972 12.734H11.9997C12.4046 12.734 12.7329 12.4055 12.7331 12.0007V6.66667ZM13.9333 12.0007C13.9331 13.0683 13.0674 13.9333 11.9997 13.9333H3.99972C2.93222 13.9331 2.06727 13.0681 2.0671 12.0007V6.66667C2.06727 5.59917 2.93222 4.73423 3.99972 4.73405H11.9997C13.0674 4.73405 13.9331 5.59907 13.9333 6.66667V12.0007Z" fill="#58616A"/>
+              <path d="M2.66638 8.73405C2.99775 8.73405 3.26697 9.00229 3.26697 9.33366C3.26697 9.66503 2.99775 9.93327 2.66638 9.93327H1.33337C1.002 9.93327 0.733765 9.66503 0.733765 9.33366C0.733765 9.00229 1.002 8.73405 1.33337 8.73405H2.66638Z" fill="#58616A"/>
+              <path d="M14.6664 8.73405C14.9978 8.73405 15.267 9.00229 15.267 9.33366C15.267 9.66503 14.9978 9.93327 14.6664 9.93327H13.3334C13.002 9.93327 12.7338 9.66503 12.7338 9.33366C12.7338 9.00229 13.002 8.73405 13.3334 8.73405H14.6664Z" fill="#58616A"/>
+              <path d="M9.40043 10V8.66699C9.40043 8.33562 9.66867 8.06738 10 8.06738C10.3314 8.06738 10.5997 8.33562 10.5997 8.66699V10C10.5997 10.3314 10.3314 10.6006 10 10.6006C9.66867 10.6006 9.40043 10.3314 9.40043 10Z" fill="#58616A"/>
+              <path d="M5.40043 10V8.66699C5.40043 8.33562 5.66867 8.06738 6.00004 8.06738C6.33141 8.06738 6.59965 8.33562 6.59965 8.66699V10C6.59965 10.3314 6.33141 10.6006 6.00004 10.6006C5.66867 10.6006 5.40043 10.3314 5.40043 10Z" fill="#58616A"/>
+            </svg>
+          </span>
+          과제
+          <span class="lnb-badge">D-6</span>
+        </div>
+
+        <div class="lnb-item muted">
+          <span class="lnb-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <rect x="2" y="3" width="12" height="10" rx="1.5" stroke="#58616A" stroke-width="1.2" fill="none"/>
+              <line x1="5" y1="7" x2="11" y2="7" stroke="#58616A" stroke-width="1.2" stroke-linecap="round"/>
+              <line x1="5" y1="9.5" x2="9" y2="9.5" stroke="#58616A" stroke-width="1.2" stroke-linecap="round"/>
+            </svg>
+          </span>
+          학습자료
+        </div>
+
+        <div class="lnb-item muted">
+          <span class="lnb-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M2 3h12v2H2zM2 7h8v2H2zM2 11h10v2H2z" fill="#58616A"/>
+            </svg>
+          </span>
+          설문
+        </div>
+
+        <div class="lnb-item muted">
+          <span class="lnb-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <circle cx="8" cy="8" r="5.5" stroke="#58616A" stroke-width="1.2" fill="none"/>
+              <polygon points="6.5,5.5 11,8 6.5,10.5" fill="#58616A"/>
+            </svg>
+          </span>
+          라이브강의
+        </div>
+
+        <div class="lnb-item muted">
+          <span class="lnb-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <rect x="1.5" y="3" width="13" height="9" rx="1.5" stroke="#58616A" stroke-width="1.2" fill="none"/>
+              <line x1="5.5" y1="14" x2="10.5" y2="14" stroke="#58616A" stroke-width="1.2" stroke-linecap="round"/>
+              <line x1="8" y1="12" x2="8" y2="14" stroke="#58616A" stroke-width="1.2" stroke-linecap="round"/>
+            </svg>
+          </span>
+          VM
+        </div>
+
+        <div class="lnb-item active">
+          <span class="lnb-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M8 1l1.8 3.6L14 5.4l-3 2.9.7 4.1L8 10.4l-3.7 1.9.7-4.1L2 5.4l4.2-.8L8 1z" fill="#7F5DD5"/>
+            </svg>
+          </span>
+          해커톤
+        </div>
+
+      </div>
+    </nav><!-- /lnb -->
+
+    <!-- ── BODY ── -->
     <div class="body-area">
+
+      <!-- 히어로 그라디언트 -->
+      <div class="body-hero"></div>
+
+      <!-- 헤더 -->
       <div class="body-head">
         <div>
           <h1 class="t-h1">2026 AI 해커톤</h1>
-          <p id="sub-before" class="t-sub" style="margin-top:6px">AI로 세상을 바꾸는 48시간의 여정 아이디어에서 실전 AI 솔루션까지, 지금 도전하세요.</p>
-          <p id="sub-during" class="t-sub hidden" style="margin-top:6px">2026.05.22(금) 18:00까지 결과물 제출 · 현재 62팀 제출 완료</p>
+          <p id="sub-before" class="t-sub" style="margin-top:6px;">AI로 세상을 바꾸는 48시간의 여정. 아이디어에서 실전 AI 솔루션까지, 지금 도전하세요.</p>
+          <p id="sub-during" class="t-sub hidden" style="margin-top:6px;">2026.05.22(금) 18:00까지 결과물 제출 · 현재 62팀 제출 완료</p>
         </div>
-        <button id="cta-before" class="btn btn-primary">참가 신청</button>
-        <button id="cta-during" class="btn btn-primary hidden">결과물 제출</button>
+        <button id="cta-before" class="btn btn-primary btn-lg">참가 신청</button>
+        <button id="cta-during" class="btn btn-primary btn-lg hidden">결과물 제출</button>
       </div>
 
-      <!-- 내 팀 정보 (진행중) -->
-      <div id="myteam-during" class="hidden" style="padding:0 var(--gap-24) var(--gap-16); border-bottom:1px solid var(--border-default);">
-        <div style="display:flex; align-items:center; gap:var(--gap-8); flex-wrap:wrap;">
+      <!-- 내 팀 (진행중) -->
+      <div id="myteam-bar" class="myteam-bar hidden">
+        <div class="myteam-tags">
           <span class="tag tag-purple">아이디어톤</span>
           <span class="tag tag-gray">주니어벤처스</span>
           <span class="tag tag-gray">기업사업교육2그룹</span>
-          <span style="margin-left:auto; font-size:13px; color:var(--color-primary); cursor:pointer;">과제물 제출 →</span>
+          <span class="myteam-link">과제물 제출 →</span>
         </div>
-        <p style="font-size:13px; color:var(--text-subtle); margin:4px 0;">김민준 · 이사연 · 박지호 · 최유나</p>
-        <p style="font-size:15px; font-weight:700; margin-top:4px;">전통 AI + 생성형 AI 활용 역량을 통합 평가하는 인증·교육 플랫폼 구축</p>
-        <div style="display:flex; gap:var(--gap-24); margin-top:10px; font-size:13px;">
-          <div style="text-align:center;"><div style="color:var(--text-subtle)">현재 순위</div><div style="font-weight:700; font-size:18px;">-</div></div>
-          <div style="text-align:center;"><div style="color:var(--text-subtle)">동료평가</div><div style="font-weight:700; font-size:18px; color:var(--color-point)">♥ -</div></div>
-          <div style="text-align:center;"><div style="color:var(--text-subtle)">전체 랭킹</div><div style="font-weight:700; font-size:18px;">-</div></div>
+        <div class="myteam-members">김민준 · 이사연 · 박지호 · 최유나</div>
+        <div class="myteam-title">전통 AI + 생성형 AI 활용 역량을 통합 평가하는 인증·교육 플랫폼 구축</div>
+        <div class="myteam-stats">
+          <div class="myteam-stat">
+            <div class="myteam-stat-label">현재 순위</div>
+            <div class="myteam-stat-val">-</div>
+          </div>
+          <div class="myteam-stat">
+            <div class="myteam-stat-label">동료평가</div>
+            <div class="myteam-stat-val" style="color:var(--color-point);">♥ -</div>
+          </div>
+          <div class="myteam-stat">
+            <div class="myteam-stat-label">전체 랭킹</div>
+            <div class="myteam-stat-val">-</div>
+          </div>
         </div>
       </div>
 
       <!-- 통계 카드 -->
-      <div style="padding:var(--gap-16) var(--gap-24) 0;">
-        <div class="stat-area">
-          <div class="stat-c"><div class="stat-c-label">총상금</div><div class="stat-c-val">1,000<em>만원</em></div></div>
-          <div class="stat-c"><div class="stat-c-label">최대 참가팀</div><div class="stat-c-val">100<em>팀</em></div></div>
-          <div class="stat-c"><div class="stat-c-label">전문 심사위원</div><div class="stat-c-val">10<em>명</em></div></div>
-          <div class="stat-c"><div class="stat-c-label">진행 기간</div><div class="stat-c-val">30<em>일</em></div></div>
-          <div class="stat-c"><div class="stat-c-label">현재 참가팀</div><div class="stat-c-val" id="current-teams">23<em>팀</em></div></div>
+      <div class="stat-wrap">
+        <div class="stat-row">
+          <div class="stat-c"><div class="stat-label">총상금</div><div class="stat-val">1,000<em>만원</em></div></div>
+          <div class="stat-c"><div class="stat-label">최대 참가팀</div><div class="stat-val">100<em>팀</em></div></div>
+          <div class="stat-c"><div class="stat-label">전문 심사위원</div><div class="stat-val">10<em>명</em></div></div>
+          <div class="stat-c"><div class="stat-label">진행 기간</div><div class="stat-val">30<em>일</em></div></div>
+          <div class="stat-c"><div class="stat-label">현재 참가팀</div><div class="stat-val">23<em>팀</em></div></div>
         </div>
       </div>
 
       <!-- 탭 -->
-      <div class="tabs" style="margin:var(--gap-16) var(--gap-24) 0; padding:0;">
-        <div class="tab active" id="tab-main" data-target="content-main" onclick="switchTab(this)">대회 소개</div>
-        <div class="tab" id="tab-rank" data-target="content-rank" onclick="switchTab(this)">랭킹</div>
-        <div class="tab" id="tab-leader" data-target="content-leader" onclick="switchTab(this)">리더보드</div>
-        <div class="tab" id="tab-schedule" data-target="content-schedule" onclick="switchTab(this)">일정 규칙</div>
+      <div class="tabs" style="margin-top:16px;">
+        <div class="tab active" id="tab-intro" onclick="switchTab(this,'content-intro')">대회 소개</div>
+        <div class="tab" id="tab-rank" onclick="switchTab(this,'content-rank')">랭킹</div>
+        <div class="tab" onclick="switchTab(this,'content-leader')">리더보드</div>
+        <div class="tab" onclick="switchTab(this,'content-rule')">일정 규칙</div>
       </div>
 
       <!-- 탭 컨텐츠 -->
       <div class="body-scroll">
 
-        <!-- 대회소개 탭 -->
-        <div id="content-main">
-          <!-- 일정 -->
-          <div>
-            <div class="section-title">대회 일정 <span style="font-size:12px; font-weight:400; color:var(--text-subtle);">2026년 5월 1일 접수 시작 · 전 과정 온라인 진행</span></div>
-            <div class="steps">
-              <div class="step done">
-                <div class="step-dot">🎨</div>
-                <div class="step-name">STEP 01<br/>참가 접수</div>
-                <div class="step-period">2026.05.01(금)<br/>~ 2026.05.15(금)</div>
-                <div class="step-note">팀 구성 후 신청 · 최대 4인</div>
-              </div>
-              <div class="step active">
-                <div class="step-dot">💡</div>
-                <div class="step-name">STEP 02<br/>본선 제출</div>
-                <div class="step-period">2026.05.20(수)<br/>~ 2026.05.22(수) 18:00</div>
-                <div class="step-note">결과물 + 발표자료 제출</div>
-              </div>
-              <div class="step">
-                <div class="step-dot">🔍</div>
-                <div class="step-name">STEP 03<br/>심사 · 평가</div>
-                <div class="step-period">2026.05.25(월)<br/>~ 2026.05.27(수)</div>
-                <div class="step-note">전문 심사위원 정량·정성 평가</div>
-              </div>
-              <div class="step">
-                <div class="step-dot">🎉</div>
-                <div class="step-name">STEP 04<br/>결과 발표 · 시상</div>
-                <div class="step-period">2026.05.30(토)<br/>오후 2:00</div>
-                <div class="step-note">온라인 시상식 · 수상작 공개</div>
-              </div>
+        <!-- 대회소개 -->
+        <div id="content-intro">
+          <div class="section-title">대회 일정 <span style="font-size:12px;font-weight:400;color:var(--text-subtle);">2026년 5월 1일 접수 시작 · 전 과정 온라인 진행</span></div>
+          <div class="steps">
+            <div class="step done">
+              <div class="step-dot">🎨</div>
+              <div class="step-label">STEP 01<br/>참가 접수</div>
+              <div class="step-period">2026.05.01(금)<br/>~ 2026.05.15(금)</div>
+              <div class="step-note">팀 구성 후 신청 · 최대 4인</div>
+            </div>
+            <div class="step active">
+              <div class="step-dot">💡</div>
+              <div class="step-label">STEP 02<br/>본선 제출</div>
+              <div class="step-period">2026.05.20(수)<br/>~ 2026.05.22(수) 18:00</div>
+              <div class="step-note">결과물 + 발표자료 제출</div>
+            </div>
+            <div class="step">
+              <div class="step-dot">🔍</div>
+              <div class="step-label">STEP 03<br/>심사 · 평가</div>
+              <div class="step-period">2026.05.25(월)<br/>~ 2026.05.27(수)</div>
+              <div class="step-note">전문 심사위원 정량·정성 평가</div>
+            </div>
+            <div class="step">
+              <div class="step-dot">🎉</div>
+              <div class="step-label">STEP 04<br/>결과 발표 · 시상</div>
+              <div class="step-period">2026.05.30(토)<br/>오후 2:00</div>
+              <div class="step-note">온라인 시상식 · 수상작 공개</div>
             </div>
           </div>
-
-          <!-- 수상 카테고리 -->
-          <div>
-            <div class="section-title">수상 카테고리</div>
-            <div class="award-grid">
-              <div class="award-c">
-                <div class="award-trophy">🥇</div>
-                <div class="award-name">대상</div>
-                <div class="award-prize">상금 000 만원</div>
-                <div class="award-desc">전 분야를 통틀어 혁신성·완성도·영향력 종합 1위 팀에게 수여</div>
-              </div>
-              <div class="award-c">
-                <div class="award-trophy">🏆</div>
-                <div class="award-name">최우수상 — 아이디어톤</div>
-                <div class="award-prize">상금 000 만원</div>
-                <div class="award-desc">아이디어톤 대상 중 혁신성·완성도·발표력 종합 심사 기준 2위에 선정된 팀</div>
-              </div>
-              <div class="award-c">
-                <div class="award-trophy">🥈</div>
-                <div class="award-name">최우수상 — MVP톤</div>
-                <div class="award-prize">상금 000 만원</div>
-                <div class="award-desc">MVP톤 대상 중 혁신성·완성도·발표력 종합 심사 기준 2위에 선정된 팀</div>
-              </div>
-              <div class="award-c">
-                <div class="award-trophy">👍</div>
-                <div class="award-name">인기상</div>
-                <div class="award-prize">상금 000 만원</div>
-                <div class="award-desc">동료 평가 좋아요 최다 득표 팀</div>
-              </div>
-              <div class="award-c">
-                <div class="award-trophy">💡</div>
-                <div class="award-name">아이디어상</div>
-                <div class="award-prize">상금 000 만원</div>
-                <div class="award-desc">기획·전략 영역 AI 평가 점수 1위 팀</div>
-              </div>
-              <div class="award-c">
-                <div class="award-trophy">⚡</div>
-                <div class="award-name">도전상</div>
-                <div class="award-prize">상금 000 만원</div>
-                <div class="award-desc">완주 팀 중 운영자 픽 · 도전 정신 최고 팀</div>
-              </div>
-            </div>
+          <div class="section-title" style="margin-top:var(--gap-24);">수상 카테고리</div>
+          <div class="award-grid">
+            <div class="award-c"><div class="award-trophy">🥇</div><div class="award-name">대상</div><div class="award-prize">상금 000 만원</div><div class="award-desc">전 분야 혁신성·완성도·영향력 종합 1위</div></div>
+            <div class="award-c"><div class="award-trophy">🏆</div><div class="award-name">최우수상 — 아이디어톤</div><div class="award-prize">상금 000 만원</div><div class="award-desc">아이디어톤 종합 심사 기준 2위 팀</div></div>
+            <div class="award-c"><div class="award-trophy">🥈</div><div class="award-name">최우수상 — MVP톤</div><div class="award-prize">상금 000 만원</div><div class="award-desc">MVP톤 종합 심사 기준 2위 팀</div></div>
+            <div class="award-c"><div class="award-trophy">👍</div><div class="award-name">인기상</div><div class="award-prize">상금 000 만원</div><div class="award-desc">동료 평가 좋아요 최다 득표 팀</div></div>
+            <div class="award-c"><div class="award-trophy">💡</div><div class="award-name">아이디어상</div><div class="award-prize">상금 000 만원</div><div class="award-desc">기획·전략 AI 평가 점수 1위</div></div>
+            <div class="award-c"><div class="award-trophy">⚡</div><div class="award-name">도전상</div><div class="award-prize">상금 000 만원</div><div class="award-desc">완주 팀 중 운영자 픽</div></div>
           </div>
         </div>
 
-        <!-- 랭킹 탭 -->
+        <!-- 랭킹 -->
         <div id="content-rank" class="hidden">
+          <div class="rank-scroll-wrap">
           <div class="rank-top3">
             <div class="rank-card r2">
-              <div class="rc-num">2</div>
-              <div class="rc-likes">♥ 12,345</div>
-              <div class="rc-score">92<em>점</em></div>
-              <div class="rc-change up">▲ 1</div>
+              <div class="rc-num">2</div><div class="rc-likes">♥ 12,345</div>
+              <div class="rc-score">92<em>점</em></div><div class="rc-change up">▲ 1</div>
               <div class="rc-tags"><span class="rc-tag">아이디어톤</span><span class="rc-tag">기업사업교육2그룹</span></div>
               <div class="rc-title">수주만생각하는남프로</div>
-              <div class="rc-sub">AI 기반 재무업무 자동화로 반복업무 효율 극...</div>
+              <div class="rc-sub">AI 기반 재무업무 자동화로 반복업무 효율 극…</div>
             </div>
             <div class="rank-card r1">
-              <div class="rc-num">1</div>
-              <div class="rc-likes">♥ 12,345</div>
-              <div class="rc-score">92<em>점</em></div>
-              <div class="rc-change up">▲ 1</div>
+              <div class="rc-num">1</div><div class="rc-likes">♥ 12,345</div>
+              <div class="rc-score">92<em>점</em></div><div class="rc-change up">▲ 1</div>
               <div class="rc-tags"><span class="rc-tag">아이디어톤</span><span class="rc-tag">기업사업교육2그룹</span></div>
               <div class="rc-title">팀이름은최대열글자로</div>
-              <div class="rc-sub">AI 기반 재무업무 자동화로 반복업무 효율 극...</div>
+              <div class="rc-sub">AI 기반 재무업무 자동화로 반복업무 효율 극…</div>
             </div>
             <div class="rank-card r3">
-              <div class="rc-num">3</div>
-              <div class="rc-likes">♥ 12,345</div>
-              <div class="rc-score">92<em>점</em></div>
-              <div class="rc-change down">▼ 1</div>
+              <div class="rc-num">3</div><div class="rc-likes">♥ 12,345</div>
+              <div class="rc-score">92<em>점</em></div><div class="rc-change down">▼ 1</div>
               <div class="rc-tags"><span class="rc-tag">아이디어톤</span><span class="rc-tag">경영리더십프렌즈그룹</span></div>
               <div class="rc-title">가나다라마바사</div>
-              <div class="rc-sub">AX 리더 준비도 진단 및 업종 별 교육 기획 자...</div>
+              <div class="rc-sub">AX 리더 준비도 진단 및 업종 별 교육 기획…</div>
             </div>
           </div>
+          </div><!-- /rank-scroll-wrap -->
           <div class="rank-list">
-            <div class="rank-row">
-              <div class="rr-num">4</div>
-              <div class="rr-info">
-                <div class="rr-title">People그룹</div>
-                <div class="rr-sub">스타트업, 차세대(203040) 리더를 위한 SERICEO AI 자문·콘텐츠 재생성 서비스</div>
-              </div>
-              <div>
-                <div class="rr-score">88점</div>
-                <div class="rr-likes">♥ 12,345</div>
-              </div>
-              <div class="rr-change" style="color:var(--text-subtle);">=-</div>
-            </div>
-            <div class="rank-row">
-              <div class="rr-num">5</div>
-              <div class="rr-info">
-                <div class="rr-title">AI는혁신이소</div>
-                <div class="rr-sub">AI로 운명하는 AI 해커톤: Work Reboot 2025</div>
-              </div>
-              <div>
-                <div class="rr-score">88점</div>
-                <div class="rr-likes">♥ 12,345</div>
-              </div>
-              <div class="rr-change" style="color:var(--text-subtle);">=-</div>
-            </div>
-            <div class="rank-row">
-              <div class="rr-num">6</div>
-              <div class="rr-info">
-                <div class="rr-title">AIDE</div>
-                <div class="rr-sub">AI로 다시 쓰는 업무의 방식: AI Counseling & AI News Clipping</div>
-              </div>
-              <div>
-                <div class="rr-score">88점</div>
-                <div class="rr-likes">♥ 12,345</div>
-              </div>
-              <div class="rr-change up">▲ 1</div>
-            </div>
+            <div class="rank-row"><div class="rr-num">4</div><div class="rr-info"><div class="rr-title">People그룹</div><div class="rr-sub">스타트업, 차세대(203040) 리더를 위한 SERICEO AI 자문·콘텐츠 재생성 서비스</div></div><div class="rr-right"><div class="rr-score">88점</div><div class="rr-likes">♥ 12,345</div></div><div class="rr-change" style="color:var(--text-subtle);">=-</div></div>
+            <div class="rank-row"><div class="rr-num">5</div><div class="rr-info"><div class="rr-title">AI는혁신이소</div><div class="rr-sub">AI로 운명하는 AI 해커톤: Work Reboot 2025</div></div><div class="rr-right"><div class="rr-score">88점</div><div class="rr-likes">♥ 12,345</div></div><div class="rr-change" style="color:var(--text-subtle);">=-</div></div>
+            <div class="rank-row"><div class="rr-num">6</div><div class="rr-info"><div class="rr-title">AIDE</div><div class="rr-sub">AI로 다시 쓰는 업무의 방식: AI Counseling & AI News Clipping</div></div><div class="rr-right"><div class="rr-score">88점</div><div class="rr-likes">♥ 12,345</div></div><div class="rr-change up">▲ 1</div></div>
           </div>
         </div>
 
-        <!-- 리더보드 탭 -->
+        <!-- 리더보드 -->
         <div id="content-leader" class="hidden">
-          <p class="t-sub" style="text-align:center; padding:var(--gap-40) 0;">심사 완료 후 공개됩니다.</p>
+          <p class="t-sub" style="text-align:center;padding:var(--gap-40) 0;">심사 완료 후 공개됩니다.</p>
         </div>
 
-        <!-- 일정규칙 탭 -->
-        <div id="content-schedule" class="hidden">
+        <!-- 일정규칙 -->
+        <div id="content-rule" class="hidden">
           <p class="t-sub">대회 규칙 및 심사 기준 내용이 여기에 표시됩니다.</p>
         </div>
 
-      </div>
+      </div><!-- /body-scroll -->
     </div><!-- /body-area -->
 
-    <!-- 우측 패널 -->
+    <!-- ── RIGHT PANEL ── -->
     <div class="right-panel">
+
       <!-- 해커톤 일정 -->
       <div class="panel-box">
         <div class="panel-title">해커톤 일정 <span class="panel-title-link">모두보기 →</span></div>
         <div class="sch-item">
           <div class="sch-row">
             <div class="sch-num done">1</div>
-            <div class="sch-title">참가 신청<span class="badge badge-done" style="margin-left:6px;">완료</span></div>
-            <span style="font-size:11px; color:var(--text-subtle); margin-left:auto;">2026.05.30 18:00</span>
+            <div class="sch-title-row">
+              <span class="sch-title">참가 신청</span>
+              <span class="badge badge-done">완료</span>
+              <span class="sch-date">2026.05.30 18:00</span>
+            </div>
           </div>
         </div>
         <div class="sch-item">
           <div class="sch-row">
             <div class="sch-num">2</div>
-            <div class="sch-title">기획서 제출<span class="badge badge-dday" style="margin-left:6px;">D-14</span></div>
-            <span style="font-size:11px; color:var(--text-subtle); margin-left:auto;">2026.06.13 18:00</span>
+            <div class="sch-title-row">
+              <span class="sch-title">기획서 제출</span>
+              <span class="badge badge-dday">D-14</span>
+              <span class="sch-date">2026.06.13 18:00</span>
+            </div>
           </div>
-          <div class="sch-btn"><button class="btn btn-primary" style="font-size:12px; height:30px; padding:0 12px;">기획서 제출</button></div>
+          <div class="sch-action"><button class="btn btn-primary" style="height:30px;font-size:12px;padding:0 12px;">기획서 제출</button></div>
         </div>
         <div class="sch-item">
           <div class="sch-row">
             <div class="sch-num">3</div>
-            <div class="sch-title">개발산출물 제출<span class="badge badge-dday" style="margin-left:6px;">D-30</span></div>
-            <span style="font-size:11px; color:var(--text-subtle); margin-left:auto;">2026.06.28 18:00</span>
+            <div class="sch-title-row">
+              <span class="sch-title">개발산출물 제출</span>
+              <span class="badge badge-dday">D-30</span>
+              <span class="sch-date">2026.06.28 18:00</span>
+            </div>
           </div>
-          <div class="sch-btn"><button class="btn btn-secondary" style="font-size:12px; height:30px; padding:0 12px;" disabled>참가 신청을 해 주세요.</button></div>
         </div>
         <div class="sch-item">
           <div class="sch-row">
             <div class="sch-num">4</div>
-            <div class="sch-title">심사<span class="badge badge-dday" style="margin-left:6px; background:#AAA;">D-37</span></div>
-            <span style="font-size:11px; color:var(--text-subtle); margin-left:auto;">YYYY.MM.DD HH:SS</span>
+            <div class="sch-title-row">
+              <span class="sch-title">심사</span>
+              <span class="badge" style="background:#E0E0E0;color:#58616A;">D-37</span>
+              <span class="sch-date">YYYY.MM.DD HH:SS</span>
+            </div>
           </div>
         </div>
         <div class="sch-item">
           <div class="sch-row">
             <div class="sch-num">5</div>
-            <div class="sch-title">결과발표<span class="badge badge-dday" style="margin-left:6px; background:#AAA;">D-45</span></div>
-            <span style="font-size:11px; color:var(--text-subtle); margin-left:auto;">YYYY.MM.DD HH:SS</span>
+            <div class="sch-title-row">
+              <span class="sch-title">결과발표</span>
+              <span class="badge" style="background:#E0E0E0;color:#58616A;">D-45</span>
+              <span class="sch-date">YYYY.MM.DD HH:SS</span>
+            </div>
           </div>
         </div>
       </div>
@@ -448,103 +649,90 @@
         <div class="panel-title">자주 묻는 질문 <span class="panel-title-link">모두보기 →</span></div>
         <div class="faq-item open">
           <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
-            <div style="display:flex; align-items:center; gap:6px; flex:1;">
-              <span class="faq-q-ico">💬</span>
-              <span>해커톤 참가 자격이 궁금해요?</span>
-            </div>
+            <span class="faq-q-ico">💬</span>
+            <span class="faq-q-text">해커톤 참가 자격이 궁금해요?</span>
             <span class="faq-q-arr">▲</span>
           </div>
           <div class="faq-a">팀 구성은 플랫폼 내에서 직접 하실 수 있습니다. 참가 신청 시 팀명을 설정하고, 함께할 팀원을 직접 초대하는 방식으로 진행됩니다. 팀 규모 기준은 운영자가 설정한 대회 조건에 따라 달라질 수 있으니 해커톤 공지를 확인해 주세요.</div>
         </div>
         <div class="faq-item">
           <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
-            <div style="display:flex; align-items:center; gap:6px; flex:1;">
-              <span class="faq-q-ico">💬</span>
-              <span>기간 내 기획문서나 개발 산출물을 제출하지 못하면 어떻게 되나요?</span>
-            </div>
+            <span class="faq-q-ico">💬</span>
+            <span class="faq-q-text">기간 내 기획문서나 개발 산출물을 제출하지 못하면 어떻게 되나요?</span>
             <span class="faq-q-arr">▼</span>
           </div>
           <div class="faq-a">제출 기한 내 미제출 시 해당 단계에서 자동 탈락 처리됩니다.</div>
         </div>
         <div class="faq-item">
           <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
-            <div style="display:flex; align-items:center; gap:6px; flex:1;">
-              <span class="faq-q-ico">💬</span>
-              <span>팀은 어떻게 구성하나요? 개인 참가도 가능한가요?</span>
-            </div>
+            <span class="faq-q-ico">💬</span>
+            <span class="faq-q-text">팀은 어떻게 구성하나요? 개인 참가도 가능한가요?</span>
             <span class="faq-q-arr">▼</span>
           </div>
           <div class="faq-a">팀 구성은 최소 1인에서 최대 4인까지 가능합니다.</div>
         </div>
         <div class="faq-item">
           <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
-            <div style="display:flex; align-items:center; gap:6px; flex:1;">
-              <span class="faq-q-ico">💬</span>
-              <span>참가신청 이후 멤버를 추가할 수 있나요?</span>
-            </div>
+            <span class="faq-q-ico">💬</span>
+            <span class="faq-q-text">참가신청 이후 멤버를 추가할 수 있나요?</span>
             <span class="faq-q-arr">▼</span>
           </div>
           <div class="faq-a">접수 기간 내에는 팀원 추가가 가능합니다.</div>
         </div>
         <div class="faq-item">
           <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
-            <div style="display:flex; align-items:center; gap:6px; flex:1;">
-              <span class="faq-q-ico">💬</span>
-              <span>AI 심사가 뭔가요?</span>
-            </div>
+            <span class="faq-q-ico">💬</span>
+            <span class="faq-q-text">AI 심사가 뭔가요?</span>
             <span class="faq-q-arr">▼</span>
           </div>
-          <div class="faq-a">제출된 결과물을 AI가 자동으로 평가하는 1차 심사입니다.</div>
+          <div class="faq-a">제출된 결과물을 AI가 자동으로 평가하는 1차 심사입니다. Dual-LLM이 기획·전략, 기술논리, 구현실증, 임팩트 4개 영역을 독립 평가합니다.</div>
         </div>
         <div class="faq-item">
           <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
-            <div style="display:flex; align-items:center; gap:6px; flex:1;">
-              <span class="faq-q-ico">💬</span>
-              <span>아이디어톤과 MVP톤 두 개 모두 참가 가능한가요?</span>
-            </div>
+            <span class="faq-q-ico">💬</span>
+            <span class="faq-q-text">아이디어톤과 MVP톤 두 개 모두 참가 가능한가요?</span>
             <span class="faq-q-arr">▼</span>
           </div>
           <div class="faq-a">동시 참가는 불가합니다. 참가 신청 시 한 가지 유형을 선택하셔야 합니다.</div>
         </div>
       </div>
+
     </div><!-- /right-panel -->
 
-  </div><!-- /content-wrap -->
-</div><!-- /page-wrap -->
+  </div><!-- /page-body -->
+</div><!-- /app-frame -->
 
 <script src="./assets/js/common.js"></script>
 <script>
-// 탭 전환
-function switchTab(el) {
+const TABS = ['content-intro','content-rank','content-leader','content-rule'];
+
+function switchTab(el, targetId) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
-  const targets = ['content-main','content-rank','content-leader','content-schedule'];
-  targets.forEach(id => {
-    const el2 = document.getElementById(id);
-    if(el2) el2.classList.add('hidden');
-  });
-  const target = document.getElementById(el.dataset.target);
-  if(target) target.classList.remove('hidden');
+  TABS.forEach(id => document.getElementById(id)?.classList.add('hidden'));
+  document.getElementById(targetId)?.classList.remove('hidden');
 }
 
-// 진행전/진행중 상태 전환
 function setState(state, btn) {
   document.querySelectorAll('.state-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  const before = ['sub-before','cta-before'];
-  const during = ['sub-during','cta-during','myteam-during'];
-  before.forEach(id => { const el = document.getElementById(id); if(el) el.classList.toggle('hidden', state !== 'before'); });
-  during.forEach(id => { const el = document.getElementById(id); if(el) el.classList.toggle('hidden', state !== 'during'); });
-  if(state === 'during') {
+  const showBefore = state === 'before';
+  document.getElementById('sub-before')?.classList.toggle('hidden', !showBefore);
+  document.getElementById('sub-during')?.classList.toggle('hidden', showBefore);
+  document.getElementById('cta-before')?.classList.toggle('hidden', !showBefore);
+  document.getElementById('cta-during')?.classList.toggle('hidden', showBefore);
+  document.getElementById('myteam-bar')?.classList.toggle('hidden', showBefore);
+
+  if (state === 'during') {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    document.getElementById('tab-rank').classList.add('active');
-    ['content-main','content-leader','content-schedule'].forEach(id => document.getElementById(id)?.classList.add('hidden'));
+    document.getElementById('tab-rank')?.classList.add('active');
+    TABS.forEach(id => document.getElementById(id)?.classList.add('hidden'));
     document.getElementById('content-rank')?.classList.remove('hidden');
   } else {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    document.getElementById('tab-main').classList.add('active');
-    ['content-rank','content-leader','content-schedule'].forEach(id => document.getElementById(id)?.classList.add('hidden'));
-    document.getElementById('content-main')?.classList.remove('hidden');
+    document.getElementById('tab-intro')?.classList.add('active');
+    TABS.forEach(id => document.getElementById(id)?.classList.add('hidden'));
+    document.getElementById('content-intro')?.classList.remove('hidden');
   }
 }
 </script>
