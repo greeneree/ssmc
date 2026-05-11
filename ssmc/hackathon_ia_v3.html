@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>AI 해커톤 IA v3 Final</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'Noto Sans KR', sans-serif; background: #f5f5f3; font-size: 13px; color: #1a1a1a; }
@@ -79,6 +80,7 @@ tr.gb-sys   { border-left: 3px solid #9ca3af; }
   <div class="h-dot"></div>
   <h1>AI 해커톤 플랫폼 IA</h1>
   <span class="h-badge">v3 Final · 공지사항 기존 활용 / 리포트 하위 탭 확정</span>
+  <button onclick="downloadExcel()" style="margin-left:8px;padding:5px 14px;border-radius:20px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.1);color:#fff;font-size:11px;font-weight:600;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">⬇ 엑셀 다운로드</button>
 </header>
 
 <div class="toolbar">
@@ -277,6 +279,38 @@ function setFilter(type, val, btn) {
 }
 
 render();
+
+function downloadExcel() {
+  const changeLabel = {'add':'추가','del':'삭제','mod':'수정','exist':'기존활용','':''};
+  const targetLabel = {'참가자':'참가자','동료':'동료평가자','심사':'심사위원','운영자':'운영자','시스템관리자':'시스템관리자'};
+
+  const header = ['구분','Target','1Depth','2Depth','3Depth','4Depth','로그인 여부','비고','변경사항'];
+  const rows = data.map(r => [
+    r.gb,
+    targetLabel[r.tg],
+    r.d1, r.d2, r.d3, r.d4,
+    r.login,
+    r.note,
+    changeLabel[r.ch] || ''
+  ]);
+
+  const ws = XLSX.utils.aoa_to_sheet([header, ...rows]);
+
+  // 컬럼 너비
+  ws['!cols'] = [
+    {wch:8},{wch:12},{wch:16},{wch:18},{wch:20},{wch:22},{wch:8},{wch:40},{wch:8}
+  ];
+
+  // 헤더 스타일
+  header.forEach((_, i) => {
+    const cell = ws[XLSX.utils.encode_cell({r:0, c:i})];
+    if (cell) cell.s = { font:{bold:true}, fill:{fgColor:{rgb:'111111'}}, font:{color:{rgb:'FFFFFF'}, bold:true} };
+  });
+
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'IA v3 Final');
+  XLSX.writeFile(wb, 'AI해커톤_IA_v3_Final.xlsx');
+}
 </script>
 </body>
 </html>
