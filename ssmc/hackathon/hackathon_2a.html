@@ -678,6 +678,83 @@ textarea.apply-input { height:auto; padding:10px 12px; resize:none; line-height:
 .apply-team-summary-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
 .apply-team-summary-name { font-size:15px; font-weight:700; }
 .apply-team-summary-topic { font-size:13px; color:var(--text-subtle); line-height:1.6; }
+
+/* ── 헤더 알림 배지 ── */
+.notif-badge {
+  position:absolute; top:-4px; right:-4px;
+  min-width:16px; height:16px; border-radius:20px;
+  background:#E95151; color:#fff;
+  font-size:10px; font-weight:500; letter-spacing:-0.3px;
+  display:flex; align-items:center; justify-content:center;
+  padding:0 4px; border:1.5px solid #fff; pointer-events:none;
+}
+
+/* ── 알림 패널 공통 ── */
+.notif-panel {
+  position:fixed; top:68px; right:16px;
+  width:420px; max-height:calc(100vh - 84px);
+  background:#fff; border-radius:16px;
+  box-shadow:0 3px 6px rgba(19,20,22,.08), 0 12px 40px rgba(19,20,22,.14);
+  z-index:800; display:flex; flex-direction:column; overflow:hidden;
+}
+.notif-ph {
+  display:flex; align-items:center; gap:12px;
+  padding:20px 24px 20px 32px; flex-shrink:0;
+}
+.notif-ph-title { font-size:20px; font-weight:600; color:#131416; letter-spacing:-0.3px; flex:1; }
+.notif-new-count { background:#EAF6FF; color:#2EA1FF; font-size:13px; font-weight:500; padding:2px 8px; border-radius:6px; letter-spacing:-0.3px; white-space:nowrap; flex-shrink:0; }
+.notif-ph-close { width:28px; height:28px; border:none; background:none; cursor:pointer; border-radius:4px; font-size:18px; color:#58616A; display:flex; align-items:center; justify-content:center; font-family:var(--font-family); transition:background .15s; flex-shrink:0; }
+.notif-ph-close:hover { background:#F4F5F6; }
+.notif-ph-back { border:none; background:none; cursor:pointer; font-size:13px; font-weight:500; color:var(--color-primary); font-family:var(--font-family); display:flex; align-items:center; gap:4px; padding:0; flex-shrink:0; }
+
+/* ── 알림 목록 ── */
+.notif-list { overflow-y:auto; }
+.notif-item { display:flex; align-items:flex-start; gap:16px; padding:16px 24px; border-bottom:1px solid #E6E8EA; cursor:pointer; transition:background .1s; }
+.notif-item:last-child { border-bottom:none; }
+.notif-item:hover { background:#F7FAFE; }
+.notif-item.is-unread { background:#F5FBFF; }
+.notif-item.is-unread:hover { background:#EAF6FF; }
+.notif-item-body { flex:1; min-width:0; display:flex; flex-direction:column; gap:3px; }
+.notif-item-title-row { display:flex; align-items:center; gap:8px; }
+.notif-item-title { font-size:16px; font-weight:600; color:#131416; letter-spacing:-0.3px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1; min-width:0; }
+.notif-n-badge { background:#E95151; color:#fff; font-size:10px; font-weight:500; height:16px; padding:0 4px; border-radius:20px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.notif-item-preview { font-size:14px; color:#58616A; letter-spacing:-0.3px; line-height:1.5; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.notif-item-time { font-size:13px; font-weight:500; color:#8A949E; flex-shrink:0; letter-spacing:-0.3px; margin-top:1px; }
+
+/* ── 알림 상세 ── */
+.notif-detail-title-area { padding:20px 24px; border-bottom:1px solid #E6E8EA; flex-shrink:0; }
+.notif-detail-title { font-size:18px; font-weight:600; color:#131416; line-height:1.45; letter-spacing:-0.3px; margin-bottom:8px; }
+.notif-detail-meta { display:flex; gap:12px; font-size:13px; font-weight:500; color:#8A949E; letter-spacing:-0.3px; }
+.notif-detail-body { padding:20px 24px; font-size:14px; font-weight:500; color:#131416; line-height:1.8; letter-spacing:-0.3px; white-space:pre-line; overflow-y:auto; flex:1; }
+.notif-detail-footer { padding:16px 24px; border-top:1px solid #E6E8EA; display:flex; align-items:center; justify-content:space-between; flex-shrink:0; }
+.notif-detail-check-label { display:flex; align-items:center; gap:6px; font-size:14px; color:#131416; letter-spacing:-0.3px; cursor:pointer; }
+.notif-detail-check-label input[type=checkbox] { accent-color:var(--color-primary); width:16px; height:16px; flex-shrink:0; }
+
+/* ── 일정·규칙 페이지 ── */
+#content-schedule { display:none; flex-direction:column; width:100%; box-sizing:border-box; min-width:0; }
+#content-schedule.visible { display:flex; }
+.sch-page-banner { background:var(--color-primary-gradient); padding:20px 24px; width:100%; box-sizing:border-box; display:flex; align-items:flex-start; gap:16px; flex-shrink:0; }
+.sch-page-scroll { overflow-y:auto; max-height:calc(100vh - 170px); }
+.sch-page-content { display:flex; flex-direction:column; gap:40px; padding:28px 24px 64px; }
+.sch-page-section-title { font-size:20px; font-weight:700; color:var(--text-basic); margin-bottom:20px; padding-bottom:12px; border-bottom:2px solid var(--border-default); display:flex; align-items:center; gap:8px; }
+
+/* ── FAQ 페이지 ── */
+#content-faq { display:none; flex-direction:column; width:100%; box-sizing:border-box; min-width:0; }
+#content-faq.visible { display:flex; }
+.faq-page-banner { background:var(--color-primary-gradient); padding:20px 24px; width:100%; box-sizing:border-box; flex-shrink:0; }
+.faq-page-scroll { overflow-y:auto; max-height:calc(100vh - 170px); }
+.faq-page-content { padding:28px 24px 64px; }
+.faq-acc-item { border:1px solid var(--border-default); border-radius:12px; margin-bottom:8px; overflow:hidden; transition:box-shadow .15s; }
+.faq-acc-item:hover { box-shadow:var(--shadow-sm); }
+.faq-acc-item.open { border-color:rgba(127,93,213,.3); box-shadow:0 2px 12px rgba(127,93,213,.1); }
+.faq-acc-q { display:flex; align-items:center; gap:12px; padding:18px 20px; cursor:pointer; background:#fff; }
+.faq-acc-q-text { flex:1; font-size:15px; font-weight:600; color:var(--text-basic); line-height:1.5; }
+.faq-acc-q-num { width:28px; height:28px; border-radius:50%; background:rgba(127,93,213,.1); color:var(--color-primary); font-size:13px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.faq-acc-item.open .faq-acc-q-num { background:var(--color-primary); color:#fff; }
+.faq-acc-chevron { width:20px; height:20px; flex-shrink:0; display:flex; align-items:center; justify-content:center; color:var(--text-subtle); transition:transform .2s; }
+.faq-acc-item.open .faq-acc-chevron { transform:rotate(180deg); color:var(--color-primary); }
+.faq-acc-a { display:none; padding:0 20px 18px 60px; font-size:14px; color:var(--text-subtle); line-height:1.8; background:#fff; }
+.faq-acc-item.open .faq-acc-a { display:block; }
 </style>
 </head>
 <body>
@@ -701,15 +778,17 @@ textarea.apply-input { height:auto; padding:10px 12px; resize:none; line-height:
       <span class="breadcrumb-current">산학</span>
     </div>
     <div class="header-right">
-      <button class="header-icon-btn">
-        <div class="notif-dot"></div>
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
-          <path d="M8 1.5a4.5 4.5 0 0 0-4.5 4.5v2.25L2 10h12l-1.5-1.75V6A4.5 4.5 0 0 0 8 1.5zM6.5 12a1.5 1.5 0 0 0 3 0H6.5z" fill="#131416"/>
+      <!-- 알림(종) 버튼 -->
+      <button class="header-icon-btn" id="notif-bell-btn" onclick="toggleNotifPanel()" style="position:relative;">
+        <div class="notif-badge" id="notif-badge-count">2</div>
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M10 2a5.5 5.5 0 0 0-5.5 5.5v2.75L3 12.5h14l-1.5-2.25V7.5A5.5 5.5 0 0 0 10 2zM8 14.5a2 2 0 0 0 4 0H8z" fill="#131416"/>
         </svg>
       </button>
+      <!-- 달(다크모드) 버튼 — 모양만 표시 -->
       <button class="header-icon-btn">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
-          <path d="M8 2a6 6 0 1 0 6 6A6 6 0 0 0 8 2zm0 10.5A4.5 4.5 0 1 1 12.5 8 4.5 4.5 0 0 1 8 12.5z" fill="#131416"/>
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M17.3 13.1A7.5 7.5 0 0 1 6.9 2.7 7.5 7.5 0 1 0 17.3 13.1z" stroke="#131416" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
         </svg>
       </button>
       <div class="header-avatar">김</div>
@@ -745,7 +824,7 @@ textarea.apply-input { height:auto; padding:10px 12px; resize:none; line-height:
           대회소개
         </div>
 
-        <div class="lnb-item">
+        <div class="lnb-item" id="lnb-schedule">
           <span class="lnb-icon">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
               <rect x="2" y="3" width="12" height="10" rx="1.5" stroke="#58616A" stroke-width="1.2" fill="none"/>
@@ -766,7 +845,7 @@ textarea.apply-input { height:auto; padding:10px 12px; resize:none; line-height:
           랭킹·제출
         </div>
 
-        <div class="lnb-item">
+        <div class="lnb-item" id="lnb-faq">
           <span class="lnb-icon">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
               <circle cx="8" cy="8" r="5.5" stroke="#58616A" stroke-width="1.2"/>
@@ -1451,68 +1530,7 @@ textarea.apply-input { height:auto; padding:10px 12px; resize:none; line-height:
               </div>
             </div>
 
-            <!-- ③ 규칙 -->
-            <div class="info-section" id="sec-rules">
-              <div class="info-section-title"><span class="sec-icon">📋</span> 규칙</div>
-              <div class="rule-list">
-                <div class="rule-item"><div class="rule-dot"></div><span>제출물은 재현 가능한 실행 절차를 포함해야 합니다.</span></div>
-                <div class="rule-item"><div class="rule-dot"></div><span>환경 제약 내 실행 가능해야 하며, 초과 시 실격 또는 감점될 수 있습니다.</span></div>
-                <div class="rule-item"><div class="rule-dot"></div><span>외부 API 및 비공개 리소스 사용 시 사전 고지가 필요합니다.</span></div>
-                <div class="rule-item"><div class="rule-dot"></div><span>제출 파일은 압축 기준(10GB) 및 해제 기준(32GB) 용량 제한을 준수해야 합니다.</span></div>
-                <div class="rule-item"><div class="rule-dot"></div><span>표절, 무단 활용, 라이선스 위반을 엄격히 금지합니다.</span></div>
-                <div class="rule-item"><div class="rule-dot"></div><span>평가 산식의 세부 min/max 및 내부 보정 기준은 공개하지 않습니다.</span></div>
-                <div class="rule-item"><div class="rule-dot"></div><span>본선 진출 시 발표 자료와 데모 준비가 필수입니다.</span></div>
-              </div>
-            </div>
-
-            <!-- ④ 일정 -->
-            <div class="info-section" id="sec-schedule">
-              <div class="info-section-title"><span class="sec-icon">📅</span> 일정</div>
-              <div class="timeline-list">
-                <div class="tl-item done">
-                  <div class="tl-dot">✅</div>
-                  <div class="tl-body">
-                    <div class="tl-title">참가 신청 및 팀 빌딩</div>
-                    <div class="tl-date">2026.05.01 – 2026.05.15</div>
-                    <div class="tl-desc">대회 안내 및 참가자 모집, 팀 구성 완료</div>
-                  </div>
-                </div>
-                <div class="tl-item active">
-                  <div class="tl-dot" style="color:#fff;font-size:13px;font-weight:700;">2</div>
-                  <div class="tl-body">
-                    <div class="tl-title">예선 개발 기간 <span class="badge badge-dday" style="font-size:11px;height:18px;vertical-align:middle;">진행 중</span></div>
-                    <div class="tl-date">2026.05.16 – 2026.06.13</div>
-                    <div class="tl-desc">제시된 주제에 맞춘 모델 경량화 및 솔루션 개발</div>
-                  </div>
-                </div>
-                <div class="tl-item">
-                  <div class="tl-dot">3</div>
-                  <div class="tl-body">
-                    <div class="tl-title">중간 제출 및 자동 점검</div>
-                    <div class="tl-date">2026.06.14 – 2026.06.21</div>
-                    <div class="tl-desc">실행 환경 테스트 및 기본 요건 만족 여부 확인</div>
-                  </div>
-                </div>
-                <div class="tl-item">
-                  <div class="tl-dot">4</div>
-                  <div class="tl-body">
-                    <div class="tl-title">Phase 3 / 오프라인 발표</div>
-                    <div class="tl-date">2026.06.28</div>
-                    <div class="tl-desc">상위 팀 대상 현장 발표 및 데모 시연</div>
-                  </div>
-                </div>
-                <div class="tl-item">
-                  <div class="tl-dot">🏆</div>
-                  <div class="tl-body">
-                    <div class="tl-title">최종 결과 발표</div>
-                    <div class="tl-date">2026.07.05</div>
-                    <div class="tl-desc">최종 심사 및 수상팀 선정</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- ⑤ 상금 -->
+            <!-- ③ 상금 -->
             <div class="info-section" id="sec-prize">
               <div class="info-section-title"><span class="sec-icon">🏆</span> 상금</div>
               <div class="prize-grid">
@@ -1584,6 +1602,193 @@ textarea.apply-input { height:auto; padding:10px 12px; resize:none; line-height:
           </div><!-- /info-content -->
         </div><!-- /info-inner-scroll -->
       </div><!-- /content-info -->
+
+      <!-- ─────────────── 일정·규칙 콘텐츠 ─────────────── -->
+      <div id="content-schedule">
+
+        <div class="sch-page-banner">
+          <div style="display:flex;flex-direction:column;gap:10px;flex:1;min-width:0;">
+            <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+              <span class="tag tag-purple" style="background:rgba(255,255,255,.2);color:#fff;">아이디어톤</span>
+              <span class="badge badge-dday" style="height:22px;background:rgba(255,255,255,.2);color:#fff;">D-14</span>
+            </div>
+            <div style="font-size:20px;font-weight:700;color:#fff;line-height:1.3;letter-spacing:-0.3px;">2026 AI 해커톤 — 일정·규칙</div>
+            <div style="font-size:13px;color:rgba(255,255,255,.78);">대회 전체 일정과 참가 규칙을 확인하세요.</div>
+          </div>
+        </div>
+
+        <div class="sch-page-scroll">
+          <div class="sch-page-content">
+
+            <div>
+              <div class="sch-page-section-title"><span>📅</span> 일정</div>
+              <div class="timeline-list">
+                <div class="tl-item done">
+                  <div class="tl-dot">✅</div>
+                  <div class="tl-body">
+                    <div class="tl-title">참가 신청 및 팀 빌딩</div>
+                    <div class="tl-date">2026.05.01 – 2026.05.15</div>
+                    <div class="tl-desc">대회 안내 및 참가자 모집, 팀 구성 완료</div>
+                  </div>
+                </div>
+                <div class="tl-item active">
+                  <div class="tl-dot" style="color:#fff;font-size:13px;font-weight:700;">2</div>
+                  <div class="tl-body">
+                    <div class="tl-title">예선 개발 기간 <span class="badge badge-dday" style="font-size:11px;height:18px;vertical-align:middle;">진행 중</span></div>
+                    <div class="tl-date">2026.05.16 – 2026.06.13</div>
+                    <div class="tl-desc">제시된 주제에 맞춘 모델 경량화 및 솔루션 개발</div>
+                  </div>
+                </div>
+                <div class="tl-item">
+                  <div class="tl-dot">3</div>
+                  <div class="tl-body">
+                    <div class="tl-title">중간 제출 및 자동 점검</div>
+                    <div class="tl-date">2026.06.14 – 2026.06.21</div>
+                    <div class="tl-desc">실행 환경 테스트 및 기본 요건 만족 여부 확인</div>
+                  </div>
+                </div>
+                <div class="tl-item">
+                  <div class="tl-dot">4</div>
+                  <div class="tl-body">
+                    <div class="tl-title">Phase 3 / 오프라인 발표</div>
+                    <div class="tl-date">2026.06.28</div>
+                    <div class="tl-desc">상위 팀 대상 현장 발표 및 데모 시연</div>
+                  </div>
+                </div>
+                <div class="tl-item">
+                  <div class="tl-dot">🏆</div>
+                  <div class="tl-body">
+                    <div class="tl-title">최종 결과 발표</div>
+                    <div class="tl-date">2026.07.05</div>
+                    <div class="tl-desc">최종 심사 및 수상팀 선정</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <div class="sch-page-section-title"><span>📋</span> 규칙</div>
+              <div class="rule-list">
+                <div class="rule-item"><div class="rule-dot"></div><span>제출물은 재현 가능한 실행 절차를 포함해야 합니다.</span></div>
+                <div class="rule-item"><div class="rule-dot"></div><span>환경 제약 내 실행 가능해야 하며, 초과 시 실격 또는 감점될 수 있습니다.</span></div>
+                <div class="rule-item"><div class="rule-dot"></div><span>외부 API 및 비공개 리소스 사용 시 사전 고지가 필요합니다.</span></div>
+                <div class="rule-item"><div class="rule-dot"></div><span>제출 파일은 압축 기준(10GB) 및 해제 기준(32GB) 용량 제한을 준수해야 합니다.</span></div>
+                <div class="rule-item"><div class="rule-dot"></div><span>표절, 무단 활용, 라이선스 위반을 엄격히 금지합니다.</span></div>
+                <div class="rule-item"><div class="rule-dot"></div><span>평가 산식의 세부 min/max 및 내부 보정 기준은 공개하지 않습니다.</span></div>
+                <div class="rule-item"><div class="rule-dot"></div><span>본선 진출 시 발표 자료와 데모 준비가 필수입니다.</span></div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div><!-- /content-schedule -->
+
+      <!-- ─────────────── FAQ 콘텐츠 ─────────────── -->
+      <div id="content-faq">
+
+        <div class="faq-page-banner">
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <div style="font-size:20px;font-weight:700;color:#fff;line-height:1.3;letter-spacing:-0.3px;">자주 묻는 질문</div>
+            <div style="font-size:13px;color:rgba(255,255,255,.78);">해커톤 참가 전 꼭 확인해 주세요.</div>
+          </div>
+        </div>
+
+        <div class="faq-page-scroll">
+          <div class="faq-page-content">
+
+            <div class="faq-acc-item open">
+              <div class="faq-acc-q" onclick="toggleFaq(this)">
+                <div class="faq-acc-q-num">1</div>
+                <div class="faq-acc-q-text">활용 예정 AI 툴 결제 방식은 어떻게 되나요?</div>
+                <div class="faq-acc-chevron"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              </div>
+              <div class="faq-acc-a">가급적 무료 Tool을 활용하는 것을 권장합니다. 유료 사용이 필요한 경우, 부서 예산을 활용하거나 개인이 부담해야 합니다. 회사 차원의 별도 지원은 없습니다.</div>
+            </div>
+
+            <div class="faq-acc-item">
+              <div class="faq-acc-q" onclick="toggleFaq(this)">
+                <div class="faq-acc-q-num">2</div>
+                <div class="faq-acc-q-text">Track A, Track B 두 가지 모두 참가할 수 있나요?</div>
+                <div class="faq-acc-chevron"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              </div>
+              <div class="faq-acc-a">두 트랙 중 하나만 선택하여 참가할 수 있습니다. 중복 참가는 불가합니다.</div>
+            </div>
+
+            <div class="faq-acc-item">
+              <div class="faq-acc-q" onclick="toggleFaq(this)">
+                <div class="faq-acc-q-num">3</div>
+                <div class="faq-acc-q-text">'부서별 1팀 이상 참가 필수'에서 팀 단위가 어떻게 되나요?</div>
+                <div class="faq-acc-chevron"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              </div>
+              <div class="faq-acc-a">부서 단위가 아닌 그룹별로 1팀 이상 참가하는 것을 의미합니다. 구체적인 팀 구성은 각 그룹 내에서 자율적으로 결정할 수 있습니다.</div>
+            </div>
+
+            <div class="faq-acc-item">
+              <div class="faq-acc-q" onclick="toggleFaq(this)">
+                <div class="faq-acc-q-num">4</div>
+                <div class="faq-acc-q-text">팀 구성 인원이 2명도 가능한가요?</div>
+                <div class="faq-acc-chevron"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              </div>
+              <div class="faq-acc-a">4명 이하 규모의 그룹의 경우 2인 팀 구성도 가능합니다. 단, 그룹 규모가 4명을 초과하는 경우에는 3~4인 구성을 권장합니다.</div>
+            </div>
+
+            <div class="faq-acc-item">
+              <div class="faq-acc-q" onclick="toggleFaq(this)">
+                <div class="faq-acc-q-num">5</div>
+                <div class="faq-acc-q-text">멀티캠퍼스 Chat GPT만 사용해야 하나요?</div>
+                <div class="faq-acc-chevron"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              </div>
+              <div class="faq-acc-a">해커톤 기간 중 외부 사이트도 11월 한 달간 한시적으로 허용됩니다. 단, 회사 보안 정책을 준수하여 민감 정보 입력 등은 삼가주세요.</div>
+            </div>
+
+            <div class="faq-acc-item">
+              <div class="faq-acc-q" onclick="toggleFaq(this)">
+                <div class="faq-acc-q-num">6</div>
+                <div class="faq-acc-q-text">사외 tool을 사내 업무에 활용할 수 있나요?</div>
+                <div class="faq-acc-chevron"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              </div>
+              <div class="faq-acc-a">사외 Tool 사용 전 보안 검토가 필요합니다. 회사 내부 데이터나 개인정보가 포함된 내용을 외부 AI Tool에 입력하지 않도록 주의해 주세요.</div>
+            </div>
+
+            <div class="faq-acc-item">
+              <div class="faq-acc-q" onclick="toggleFaq(this)">
+                <div class="faq-acc-q-num">7</div>
+                <div class="faq-acc-q-text">각 트랙별로 별개로 시상하나요?</div>
+                <div class="faq-acc-chevron"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              </div>
+              <div class="faq-acc-a">트랙별 별도 시상이 아닌 전체 참가팀을 통합하여 시상합니다. 모든 트랙의 참가팀이 동일한 시상 기준으로 평가됩니다.</div>
+            </div>
+
+            <div class="faq-acc-item">
+              <div class="faq-acc-q" onclick="toggleFaq(this)">
+                <div class="faq-acc-q-num">8</div>
+                <div class="faq-acc-q-text">다른 부서원과 함께 팀을 이룰 수 있나요?</div>
+                <div class="faq-acc-chevron"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              </div>
+              <div class="faq-acc-a">가능합니다. 다른 그룹이나 사업팀 소속 직원과 함께 팀을 구성할 수 있습니다. 부서나 그룹에 관계없이 자유롭게 팀을 이룰 수 있습니다.</div>
+            </div>
+
+            <div class="faq-acc-item">
+              <div class="faq-acc-q" onclick="toggleFaq(this)">
+                <div class="faq-acc-q-num">9</div>
+                <div class="faq-acc-q-text">과제 제출 양식을 변경할 수 있나요?</div>
+                <div class="faq-acc-chevron"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              </div>
+              <div class="faq-acc-a">양식은 자유롭게 작성하셔도 됩니다. 기본 양식은 참고용이며, 팀의 특성과 아이디어를 가장 잘 표현할 수 있는 방식으로 자유롭게 구성하실 수 있습니다.</div>
+            </div>
+
+            <div class="faq-acc-item">
+              <div class="faq-acc-q" onclick="toggleFaq(this)">
+                <div class="faq-acc-q-num">10</div>
+                <div class="faq-acc-q-text">NASCA 문서 암호화 해제 신청이 가능한가요?</div>
+                <div class="faq-acc-chevron"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              </div>
+              <div class="faq-acc-a">내부 개인정보 또는 대외비가 포함된 문서는 외부 AI Tool에 업로드하는 것이 금지되어 있습니다. NASCA 문서 암호화 해제 신청은 정보보안팀에 문의해 주세요.</div>
+            </div>
+
+          </div>
+        </div>
+      </div><!-- /content-faq -->
 
     </div><!-- /body-area -->
 
@@ -1938,6 +2143,44 @@ textarea.apply-input { height:auto; padding:10px 12px; resize:none; line-height:
   </div>
 </div>
 
+<!-- ══ 알림 목록 패널 ══ -->
+<div id="notif-panel" class="notif-panel hidden">
+  <div class="notif-ph">
+    <span class="notif-ph-title">알림</span>
+    <span class="notif-new-count" id="notif-new-count-label">2개의 새 알림</span>
+    <button class="notif-ph-close" onclick="closeNotifPanel()">×</button>
+  </div>
+  <div class="notif-list" id="notif-list-body">
+    <!-- JS로 렌더링 -->
+  </div>
+</div>
+
+<!-- ══ 알림 상세 패널 ══ -->
+<div id="notif-detail" class="notif-panel hidden">
+  <div class="notif-ph">
+    <button class="notif-ph-back" onclick="openNotifList()">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 12L6 8l4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      목록
+    </button>
+    <span class="notif-ph-title" style="text-align:center;">알림</span>
+    <button class="notif-ph-close" onclick="closeNotifPanel()">×</button>
+  </div>
+  <div class="notif-detail-title-area">
+    <div class="notif-detail-title" id="nd-title"></div>
+    <div class="notif-detail-meta">
+      <span id="nd-author"></span>
+      <span id="nd-date"></span>
+    </div>
+  </div>
+  <div class="notif-detail-body" id="nd-body"></div>
+  <div class="notif-detail-footer">
+    <label class="notif-detail-check-label">
+      <input type="checkbox" id="nd-no-show"> 오늘 하루 다시보지 않기
+    </label>
+    <button class="btn btn-primary" onclick="closeNotifPanel()">확인</button>
+  </div>
+</div>
+
 <script src="./assets/js/common.js"></script>
 <script>
 /* ── Apply Modal Logic ── */
@@ -2173,6 +2416,8 @@ function showInfoContent() {
   document.getElementById('right-panel').classList.add('hidden');
   document.querySelector('.hero-banner-wrap').classList.add('hidden');
   hideRankingContent();
+  hideScheduleContent();
+  hideFaqContent();
   const el = document.getElementById('content-info');
   el.classList.add('visible');
   el.style.display = 'flex';
@@ -2199,6 +2444,8 @@ function showRankingContent() {
   document.getElementById('content-before').classList.add('hidden');
   document.getElementById('content-during').classList.add('hidden');
   document.querySelector('.hero-banner-wrap').classList.add('hidden');
+  hideScheduleContent();
+  hideFaqContent();
   const r = document.getElementById('content-ranking');
   r.classList.remove('hidden');
   r.style.display = 'flex';
@@ -2217,6 +2464,8 @@ function setState(state, btn) {
 
   hideRankingContent();
   hideInfoContent();
+  hideScheduleContent();
+  hideFaqContent();
 
   const isBefore = state === 'before';
   document.getElementById('body-head').classList.remove('hidden');
@@ -2261,6 +2510,8 @@ document.getElementById('lnb-home').addEventListener('click', function() {
   this.classList.add('active');
   hideRankingContent();
   hideInfoContent();
+  hideScheduleContent();
+  hideFaqContent();
   const activeStateBtn = document.querySelector('.state-btn.active');
   const currentState = activeStateBtn ? activeStateBtn.dataset.state : 'before';
   document.getElementById('body-head').classList.remove('hidden');
@@ -2282,6 +2533,163 @@ function switchTab(el, targetId) {
   DURING_TABS.forEach(id => document.getElementById(id)?.classList.add('hidden'));
   document.getElementById(targetId)?.classList.remove('hidden');
 }
+
+/* ── 알림(공지) 패널 ── */
+const NOTIF_DATA = [
+  {
+    title: '🎉 해커톤 접수 시작 안내',
+    preview: '2026 AI 해커톤 참가 접수가 시작되었습니다. 지금 바로 신청하세요.',
+    time: '방금 전', isNew: true,
+    author: '운영팀', date: '2026.05.12 09:00',
+    body: `안녕하세요, 해커톤 참가자 여러분.\n\n2026 AI 해커톤 참가 접수가 공식 시작되었습니다.\n\n▪ 접수 기간: 2026.05.01 ~ 2026.05.15 (18:00 마감)\n▪ 참가 자격: Samsung SDS Multicampus AI 스튜디오 수강생\n▪ 팀 구성: 1~4인 (개인 참가 가능)\n\n지금 바로 [참가 신청하기] 버튼을 눌러 신청을 완료해 주세요.\n\n감사합니다.`
+  },
+  {
+    title: '📋 기획서 제출 가이드 업로드',
+    preview: '기획서 작성 양식 및 제출 가이드가 자료실에 업로드되었습니다.',
+    time: '1시간 전', isNew: true,
+    author: '운영팀', date: '2026.05.12 08:00',
+    body: `안녕하세요, 해커톤 참가팀 여러분.\n\n기획서 제출 가이드와 작성 양식이 업로드되었습니다.\n\n주요 내용:\n- 기획서 작성 양식 (PPT/PDF)\n- 제출 체크리스트\n- 평가 기준 안내\n\n제출 마감: 2026.06.13 (금) 18:00\n\n감사합니다.`
+  },
+  {
+    title: '📢 해커톤 진행 중 공지',
+    preview: '해커톤이 공식 시작되었습니다. 제출 마감일을 꼭 확인해 주세요.',
+    time: '2026.05.10', isNew: false,
+    author: '운영팀', date: '2026.05.10 10:00',
+    body: `안녕하세요, 해커톤 참가팀 여러분.\n\n2026 AI 해커톤이 공식 시작되었습니다.\n\n▪ 예선 개발 기간: 2026.05.16 ~ 2026.06.13\n▪ 최종 제출 마감: 2026.06.13 (금) 18:00 엄수\n▪ 결과 발표: 2026.07.05\n\n궁금한 사항은 FAQ 메뉴를 먼저 확인해 주시고,\n추가 문의는 운영팀으로 연락 주세요.\n\n화이팅하세요!`
+  },
+  {
+    title: '🏆 결과 발표 일정 안내',
+    preview: '해커톤 최종 결과 발표 및 시상식 일정이 확정되었습니다.',
+    time: '2026.05.01', isNew: false,
+    author: '운영팀', date: '2026.05.01 09:00',
+    body: `안녕하세요, 해커톤 참가자 여러분.\n\n최종 결과 발표 및 시상식 일정을 안내드립니다.\n\n▪ 최종 결과 발표: 2026.07.05 (일)\n▪ 온라인 시상식: 2026.07.05 오후 2:00\n▪ 수상팀 개별 연락: 2026.07.03 예정\n\n본선 진출팀은 발표 자료와 실행 가능한 데모를 준비해 주세요.\n\n모든 참가팀의 건승을 빕니다!`
+  }
+];
+
+function renderNotifList() {
+  const newCount = NOTIF_DATA.filter(n => n.isNew).length;
+  document.getElementById('notif-new-count-label').textContent = `${newCount}개의 새 알림`;
+  document.getElementById('notif-badge-count').textContent = newCount;
+  document.getElementById('notif-badge-count').style.display = newCount > 0 ? 'flex' : 'none';
+  const html = NOTIF_DATA.map((n, i) => `
+    <div class="notif-item${n.isNew ? ' is-unread' : ''}" onclick="openNotifDetail(${i})">
+      <div class="notif-item-body">
+        <div class="notif-item-title-row">
+          <span class="notif-item-title">${n.title}</span>
+          ${n.isNew ? '<span class="notif-n-badge">N</span>' : ''}
+        </div>
+        <div class="notif-item-preview">${n.preview}</div>
+      </div>
+      <span class="notif-item-time">${n.time}</span>
+    </div>`).join('');
+  document.getElementById('notif-list-body').innerHTML = html;
+}
+
+function toggleNotifPanel() {
+  const panel = document.getElementById('notif-panel');
+  const detail = document.getElementById('notif-detail');
+  detail.classList.add('hidden');
+  if (panel.classList.contains('hidden')) {
+    renderNotifList();
+    panel.classList.remove('hidden');
+  } else {
+    panel.classList.add('hidden');
+  }
+}
+function closeNotifPanel() {
+  document.getElementById('notif-panel').classList.add('hidden');
+  document.getElementById('notif-detail').classList.add('hidden');
+}
+function openNotifList() {
+  document.getElementById('notif-detail').classList.add('hidden');
+  renderNotifList();
+  document.getElementById('notif-panel').classList.remove('hidden');
+}
+function openNotifDetail(idx) {
+  const n = NOTIF_DATA[idx];
+  n.isNew = false;
+  document.getElementById('notif-panel').classList.add('hidden');
+  document.getElementById('nd-title').textContent = n.title;
+  document.getElementById('nd-author').textContent = `작성자: ${n.author}`;
+  document.getElementById('nd-date').textContent = n.date;
+  document.getElementById('nd-body').textContent = n.body;
+  document.getElementById('notif-detail').classList.remove('hidden');
+}
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('#notif-panel') &&
+      !e.target.closest('#notif-detail') &&
+      !e.target.closest('#notif-bell-btn')) {
+    document.getElementById('notif-panel').classList.add('hidden');
+    document.getElementById('notif-detail').classList.add('hidden');
+  }
+});
+
+/* ── Schedule Show/Hide ── */
+function showScheduleContent() {
+  document.getElementById('body-head').classList.add('hidden');
+  document.getElementById('myteam-bar').classList.add('hidden');
+  document.getElementById('content-before').classList.add('hidden');
+  document.getElementById('content-during').classList.add('hidden');
+  document.getElementById('right-panel').classList.add('hidden');
+  document.querySelector('.hero-banner-wrap').classList.add('hidden');
+  hideRankingContent();
+  hideInfoContent();
+  hideFaqContent();
+  const el = document.getElementById('content-schedule');
+  el.classList.add('visible');
+  el.style.display = 'flex';
+  const scrollEl = document.querySelector('#content-schedule .sch-page-scroll');
+  if (scrollEl) scrollEl.scrollTop = 0;
+}
+function hideScheduleContent() {
+  const el = document.getElementById('content-schedule');
+  if (!el) return;
+  el.classList.remove('visible');
+  el.style.display = 'none';
+}
+
+/* ── FAQ Show/Hide ── */
+function showFaqContent() {
+  document.getElementById('body-head').classList.add('hidden');
+  document.getElementById('myteam-bar').classList.add('hidden');
+  document.getElementById('content-before').classList.add('hidden');
+  document.getElementById('content-during').classList.add('hidden');
+  document.getElementById('right-panel').classList.add('hidden');
+  document.querySelector('.hero-banner-wrap').classList.add('hidden');
+  hideRankingContent();
+  hideInfoContent();
+  hideScheduleContent();
+  const el = document.getElementById('content-faq');
+  el.classList.add('visible');
+  el.style.display = 'flex';
+  const scrollEl = document.querySelector('#content-faq .faq-page-scroll');
+  if (scrollEl) scrollEl.scrollTop = 0;
+}
+function hideFaqContent() {
+  const el = document.getElementById('content-faq');
+  if (!el) return;
+  el.classList.remove('visible');
+  el.style.display = 'none';
+}
+
+/* ── FAQ Accordion ── */
+function toggleFaq(btn) {
+  btn.closest('.faq-acc-item').classList.toggle('open');
+}
+
+/* ── LNB: 일정·규칙 ── */
+document.getElementById('lnb-schedule').addEventListener('click', function() {
+  document.querySelectorAll('.lnb-item').forEach(i => i.classList.remove('active'));
+  this.classList.add('active');
+  showScheduleContent();
+});
+
+/* ── LNB: FAQ ── */
+document.getElementById('lnb-faq').addEventListener('click', function() {
+  document.querySelectorAll('.lnb-item').forEach(i => i.classList.remove('active'));
+  this.classList.add('active');
+  showFaqContent();
+});
 
 /* ── Countdown ── */
 function updateCountdown() {
