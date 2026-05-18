@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AI 해커톤 IA v4</title>
+<link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --primary: #7F5DD5;
+    --grad: linear-gradient(139deg, #B06CFF 8.74%, #4E70FF 62.41%, #1772FF 92.67%);
+    --text: #131416; --subtle: #58616A; --border: #E8EAED; --bg: #F7F8FA;
+    --add: #E8F5E9; --add-b: #43A047;
+    --mod: #FFF8E1; --mod-b: #FB8C00;
+    --del: #FFEBEE; --del-b: #E53935;
+    --exist: #E3F2FD; --exist-b: #1976D2;
+    --cond: #FFF3CD; --cond-b: #FFC107;
+    --unresolved: #FFE0E0; --unresolved-b: #E53935;
+    --confirmed: #F3E5F5; --confirmed-b: #7B1FA2;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Pretendard', sans-serif; }
+  body { background: var(--bg); color: var(--text); }
+
+  header {
+    background: var(--grad); color: white; padding: 28px 40px 24px;
+  }
+  header h1 { font-size: 22px; font-weight: 800; margin-bottom: 6px; }
+  header p { font-size: 13px; opacity: .75; }
+  .version-badge { display: inline-block; background: rgba(255,255,255,.2); border: 1px solid rgba(255,255,255,.35); padding: 3px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; margin-right: 8px; }
+
+  .toolbar {
+    background: white; border-bottom: 1px solid var(--border);
+    padding: 14px 40px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap;
+    position: sticky; top: 0; z-index: 50;
+  }
+  .filter-group { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .filter-label { font-size: 12px; font-weight: 700; color: var(--subtle); }
+  .filter-btn {
+    font-size: 12px; font-weight: 600; padding: 5px 12px; border-radius: 20px;
+    border: 1.5px solid var(--border); background: white; color: var(--subtle);
+    cursor: pointer; transition: all .15s;
+  }
+  .filter-btn.active { border-color: var(--primary); color: var(--primary); background: #F5F2FF; }
+  .filter-btn[data-label="추가"].active { border-color: var(--add-b); color: var(--add-b); background: var(--add); }
+  .filter-btn[data-label="수정"].active { border-color: var(--mod-b); color: var(--mod-b); background: var(--mod); }
+  .filter-btn[data-label="기존활용"].active { border-color: var(--exist-b); color: var(--exist-b); background: var(--exist); }
+  .filter-btn[data-label="조건부"].active { border-color: var(--cond-b); color: var(--cond-b); background: var(--cond); }
+  .filter-btn[data-label="⚠️미결"].active { border-color: var(--unresolved-b); color: var(--unresolved-b); background: var(--unresolved); }
+
+  .dl-btn {
+    margin-left: auto; font-size: 12px; font-weight: 700; padding: 7px 16px;
+    border-radius: 8px; border: none; background: var(--grad); color: white; cursor: pointer;
+  }
+
+  .legend { padding: 10px 40px; display: flex; gap: 16px; flex-wrap: wrap; background: white; border-bottom: 1px solid var(--border); }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--subtle); }
+  .legend-dot { width: 10px; height: 10px; border-radius: 2px; }
+
+  .table-wrap { overflow-x: auto; padding: 20px 40px 60px; }
+  table { border-collapse: collapse; width: 100%; min-width: 1200px; background: white; border-radius: 14px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,.06); font-size: 13px; }
+  thead tr { background: #1a1040; }
+  th { color: white; font-size: 11px; font-weight: 700; letter-spacing: .05em; padding: 13px 14px; text-align: left; white-space: nowrap; }
+  td { padding: 10px 14px; border-bottom: 1px solid var(--border); vertical-align: top; line-height: 1.5; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #FAFAFA; }
+
+  .cell-section { font-weight: 800; font-size: 12px; padding: 4px 10px; border-radius: 4px; display: inline-block; }
+  .front { background: #E8F4FD; color: #1565C0; }
+  .admin { background: #F3E5F5; color: #6A1B9A; }
+  .sysadmin { background: #E8F5E9; color: #2E7D32; }
+
+  .cell-target { font-size: 12px; font-weight: 600; padding: 3px 9px; border-radius: 20px; display: inline-block; white-space: nowrap; }
+  .t-participant { background: #E3F2FD; color: #1565C0; }
+  .t-peer { background: #E8F5E9; color: #2E7D32; }
+  .t-judge { background: #FFF8E1; color: #E65100; }
+  .t-operator { background: #F3E5F5; color: #6A1B9A; }
+  .t-sysadmin { background: #ECEFF1; color: #37474F; }
+
+  .depth1 { font-weight: 700; color: var(--text); }
+  .depth2 { padding-left: 12px; color: var(--subtle); }
+  .depth3 { padding-left: 24px; color: #8FA0B0; font-size: 12px; }
+  .depth4 { padding-left: 36px; color: #AAB5C0; font-size: 12px; }
+
+  .badge { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 4px; display: inline-block; }
+  .b-add { background: var(--add); color: var(--add-b); border: 1px solid #A5D6A7; }
+  .b-mod { background: var(--mod); color: var(--mod-b); border: 1px solid #FFE082; }
+  .b-exist { background: var(--exist); color: var(--exist-b); border: 1px solid #90CAF9; }
+  .b-cond { background: var(--cond); color: #5D4037; border: 1px solid var(--cond-b); }
+  .b-unresolved { background: var(--unresolved); color: var(--unresolved-b); border: 1px solid #FFCDD2; }
+  .b-confirmed { background: var(--confirmed); color: var(--confirmed-b); border: 1px solid #CE93D8; }
+
+  .feedback-cell { font-size: 11px; color: #5D4037; line-height: 1.6; }
+  .feedback-confirmed { color: #4A148C; font-weight: 600; }
+
+  .login-o { color: var(--primary); font-weight: 700; }
+
+  .note { font-size: 11px; color: var(--subtle); line-height: 1.6; }
+
+  /* row bg overrides */
+  tr.row-add td { background: #FAFFF9; }
+  tr.row-mod td { background: #FFFDF5; }
+  tr.row-exist td { background: #F9FDFF; }
+  tr.row-cond td { background: #FFFDF0; border-left: 3px solid var(--cond-b); }
+  tr.row-unresolved td { background: #FFF8F8; border-left: 3px solid var(--unresolved-b); }
+  tr.row-confirmed td { background: #FCF9FF; }
+
+  .section-divider td { background: linear-gradient(90deg, #F0EFF8 0%, #F7F8FA 100%); font-weight: 800; font-size: 12px; color: var(--primary); padding: 8px 14px; letter-spacing: .06em; border-bottom: 2px solid #E0D8FF; }
+
+  /* hidden */
+  tr.hidden { display: none; }
+</style>
+</head>
+<body>
+
+<header>
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+    <span class="version-badge">v4</span>
+    <span style="font-size:13px;opacity:.7;">최종 수정: 2026-05-18 | 5/12 피드백 + 회의록 반영</span>
+  </div>
+  <h1>AI 해커톤 플랫폼 — IA (Information Architecture)</h1>
+  <p>Samsung SDS Multicampus · Front / Admin / SystemAdmin · 5개 역할</p>
+</header>
+
+<div class="toolbar">
+  <div class="filter-group">
+    <span class="filter-label">구분</span>
+    <button class="filter-btn active" data-filter="section" data-val="all">전체</button>
+    <button class="filter-btn" data-filter="section" data-val="Front">Front</button>
+    <button class="filter-btn" data-filter="section" data-val="Admin">Admin</button>
+  </div>
+  <div class="filter-group">
+    <span class="filter-label">역할</span>
+    <button class="filter-btn active" data-filter="target" data-val="all">전체</button>
+    <button class="filter-btn" data-filter="target" data-val="참가자">참가자</button>
+    <button class="filter-btn" data-filter="target" data-val="동료평가자">동료평가자</button>
+    <button class="filter-btn" data-filter="target" data-val="심사위원">심사위원</button>
+    <button class="filter-btn" data-filter="target" data-val="운영자">운영자</button>
+    <button class="filter-btn" data-filter="target" data-val="시스템관리자">시스템관리자</button>
+  </div>
+  <div class="filter-group">
+    <span class="filter-label">변경</span>
+    <button class="filter-btn" data-filter="change" data-val="추가" data-label="추가">추가</button>
+    <button class="filter-btn" data-filter="change" data-val="수정" data-label="수정">수정</button>
+    <button class="filter-btn" data-filter="change" data-val="기존활용" data-label="기존활용">기존활용</button>
+    <button class="filter-btn" data-filter="change" data-val="조건부" data-label="조건부">조건부</button>
+    <button class="filter-btn" data-filter="change" data-val="⚠️미결" data-label="⚠️미결">⚠️미결</button>
+  </div>
+  <button class="dl-btn" onclick="downloadCSV()">⬇ CSV 다운로드</button>
+</div>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:var(--add-b)"></div> 추가</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--mod-b)"></div> 수정</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--exist-b)"></div> 기존활용</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--cond-b)"></div> 조건부 — 계정방식(MLP SSO vs Expert Hub) 확정 후 결정</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--unresolved-b)"></div> ⚠️미결 — 고객 확인 대기</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--confirmed-b)"></div> 🔵확정 — 회의록 기반 확정</div>
+</div>
+
+<div class="table-wrap">
+<table id="iaTable">
+<thead>
+<tr>
+  <th>구분</th><th>Target</th><th>1Depth</th><th>2Depth</th><th>3Depth</th><th>4Depth</th>
+  <th>로그인</th><th>비고</th><th>변경사항</th><th>5/12 피드백 / 회의록</th>
+</tr>
+</thead>
+<tbody>
+
+<!-- ────────── FRONT / 참가자 ────────── -->
+<tr class="section-divider"><td colspan="10">▸ FRONT — 참가자</td></tr>
+
+<tr class="row-confirmed" data-section="Front" data-target="참가자" data-change="수정">
+  <td><span class="cell-section front">Front</span></td>
+  <td><span class="cell-target t-participant">참가자</span></td>
+  <td class="depth1">랜딩 (홈)</td><td></td><td></td><td></td>
+  <td class="login-o">O</td>
+  <td class="note">MLP: MLP 과정 → SSO<br/>맞춤집합(Expert Hub): 직접 로그인 (임시PW → 신규PW 설정)<br/>비밀번호 재설정은 운영자 통해서만 가능<br/>로그인 후 → 나의 과정 목록 이동</td>
+  <td><span class="badge b-mod">수정</span></td>
+  <td class="feedback-cell feedback-confirmed">🔵 회의록 확정: MLP SSO / Expert Hub 직접로그인 두 방식 확정<br/>랜딩 정책: 로그인 후 나의 과정 목록 이동</td>
+</tr>
+
+<tr data-section="Front" data-target="참가자" data-change="">
+  <td><span class="cell-section front">Front</span></td><td><span class="cell-target t-participant">참가자</span></td>
+  <td class="depth1">해커톤 홈</td><td></td><td></td><td></td>
+  <td class="login-o">O</td><td class="note">구분용 — 별도 페이지 없음</td><td></td><td></td>
+</tr>
+
+<tr data-section="Front" data-target="참가자" data-change="">
+  <td><span class="cell-section front">Front</span></td><td><span class="cell-target t-participant">참가자</span></td>
+  <td></td><td class="depth2">대회소개 / 일정</td><td></td><td></td>
+  <td class="login-o">O</td><td class="note">HTML 등록 가능 / 참가신청 버튼 포함</td><td></td><td></td>
+</tr>
+
+<tr data-section="Front" data-target="참가자" data-change="">
+  <td><span class="cell-section front">Front</span></td><td><span class="cell-target t-participant">참가자</span></td>
+  <td></td><td class="depth2">규칙안내</td><td></td><td></td>
+  <td class="login-o">O</td><td></td><td></td><td></td>
+</tr>
+
+<tr class="row-mod" data-section="Front" data-target="참가자" data-change="수정">
+  <td><span class="cell-section front">Front</span></td><td><span class="cell-target t-participant">참가자</span></td>
+  <td></td><td class="depth2">FAQ</td><td></td><td></td>
+  <td class="login-o">O</td><td class="note">추가 문의는 메일 버튼으로 제공 (게시판 미구현)</td>
+  <td><span class="badge b-mod">수정</span></td><td></td>
+</tr>
+
+<tr class="row-exist" data-section="Front" data-target="참가자" data-change="기존활용">
+  <td><span class="cell-section front">Front</span></td><td><span class="cell-target t-participant">참가자</span></td>
+  <td></td><td class="depth2">공지</td><td></td><td></td>
+  <td class="login-o">O</td><td class="note">기존 AI Studio 공지사항 기능 활용 / 학습자·강사 메인 노출</td>
+  <td><span class="badge b-exist">기존활용</span></td><td></td>
+</tr>
+
+<tr class="row-mod" data-section="Front" data-target="참가자" data-change="수정">
+  <td><span class="cell-section front">Front</span></td><td><span class="cell-target t-participant">참가자</span></td>
+  <td></td><td class="depth2">참여신청</td><td></td><td></td>
+  <td class="login-o">O</td><td class="note">팀이름·참가주제·팀원정보 (필수) / 교육지원·기술멘토링 필요여부 (선택)</td>
+  <td><span class="badge b-mod">수정</span></td><td></td>
+</tr>
+
+<tr data-section="Front" data-target="참가자" data-change="">
+  <td><span class="cell-section front">Front</span></td><td><span class="cell-target t-participant">참가자</span></td>
+  <td></td><td class="depth2">팀관리</td><td></td><td></td>
+  <td class="login-o">O</td><td class="note">팀 구성 / 입력 정보 수정</td><td></td><td></td>
+</tr>
+
+<tr data-section="Front" data-target="참가자" data-change="">
+  <td><span class="cell-section front">Front</span></td><td><span class="cell-target t-participant">참가자</span></td>
+  <td></td><td class="depth2">대회 상세</td><td></td><td></td>
+  <td class="login-o">O</td><td class="note">참가현황 (전체 팀 등) 조회</td><td></td><td></td>
+</tr>
+
+<tr data-section="Front" data-target="참가자" data-change="">
+  <td><span class="cell-section front">Front</span></td><td><span class="cell-target t-participant">참가자</span></td>
+  <td></td><td class="depth2">결과물 제출</td><td></td><td></td>
+  <td class="login-o">O</td><td></td><td></td><td></td>
+</tr>
+
+<tr data-section="Front" data-target="참가자" data-change="">
+  <td><span class="cell-section front">Front</span></td><td><span class="cell-target t-participant">참가자</span></td>
+  <td></td><td></td><td class="depth3">파일 업로드</td><td></td>
+  <td class="login-o">O</td><td class="note">기능</td><td></td><td></td>
+</tr>
+
+<tr class="row-add" data-section="Front" data-target="참가자" data-change="추가">
+  <td><span class="cell-section front">Front</span></td><td><span class="cell-target t-participant">참가자</span></td>
+  <td></td><td></td><td class="depth3">구현결과물 시연 및 Git URL</td><td></td>
+  <td class="login-o">O</td><td class="note">운영자 설정에 따라 필드 활성화</td>
+  <td><span class="badge b-add">추가</span></td><td></td>
+</tr>
+
+<tr data-section="Front" data-target="참가자" data-change="">
+  <td><span class="cell-section front">Front</span></td><td><span class="cell-target t-participant">참가자</span></td>
+  <td></td><td></td><td class="depth3">썸네일 등록</td><td></td>
+  <td class="login-o">O</td><td class="note">기능</td><td></td><td></td>
+</tr>
+
+<tr data-section="Front" data-target="참가자" data-change="">
+  <td><span class="cell-section front">Front</span></td><td><span class="cell-target t-participant">참가자</span></td>
+  <td></td><td></td><td class="depth3">제출이력조회</td><td></td>
+  <td class="login-o">O</td><td></td><td></td><td></td>
+</tr>
+
+<tr class="row-mod" data-section="Front" data-target="참가자" data-change="수정">
+  <td><span class="cell-section front">Front</span></td><td><span class="cell-target t-participant">참가자</span></td>
+  <td></td><td class="depth2">참여 결과물 목록</td><td></td><td></td>
+  <td class="login-o">O</td><td class="note">별도 메뉴 없음 — 일정 단계에 따라 자동 활성화</td>
+  <td><span class="badge b-mod">수정</span></td><td></td>
+</tr>
+
+<tr data-section="Front" data-target="참가자" data-change="">
+  <td><span class="cell-section front">Front</span></td><td><span class="cell-target t-participant">참가자</span></td>
+  <td></td><td></td><td class="depth3">심사진행현황</td><td></td>
+  <td class="login-o">O</td><td></td><td></td><td></td>
+</tr>
+
+<tr data-section="Front" data-target="참가자" data-change="">
+  <td><span class="cell-section front">Front</span></td><td><span class="cell-target t-participant">참가자</span></td>
+  <td></td><td></td><td class="depth3">AI 가이드 (피드백)</td><td></td>
+  <td class="login-o">O</td><td class="note">AI 피드백</td><td></td><td></td>
+</tr>
+
+<!-- ────────── FRONT / 동료평가자 ────────── -->
+<tr class="section-divider"><td colspan="10">▸ FRONT — 동료평가자</td></tr>
+
+<tr class="row-mod" data-section="Front" data-target="동료평가자" data-change="수정">
+  <td><span class="cell-section front">Front</span></td><td><span class="cell-target t-peer">동료평가자</span></td>
+  <td class="depth1">갤러리</td><td></td><td></td><td></td>
+  <td class="login-o">O</td><td class="note">AI Studio 로그인자 전체 열람 / 평가(좋아요)는 동료(팀장·팀원)만 가능</td>
+  <td><span class="badge b-mod">수정</span></td><td></td>
+</tr>
+
+<tr class="row-mod" data-section="Front" data-target="동료평가자" data-change="수정">
+  <td><span class="cell-section front">Front</span></td><td><span class="cell-target t-peer">동료평가자</span></td>
+  <td></td><td class="depth2">좋아요 투표</td><td></td><td></td>
+  <td class="login-o">O</td><td class="note">하트 클릭 형태 / 투표권 갯수 운영자 설정</td>
+  <td><span class="badge b-mod">수정</span></td><td></td>
+</tr>
+
+<tr class="row-mod" data-section="Front" data-target="동료평가자" data-change="수정">
+  <td><span class="cell-section front">Front</span></td><td><span class="cell-target t-peer">동료평가자</span></td>
+  <td></td><td class="depth2">평가이력조회</td><td></td><td></td>
+  <td class="login-o">O</td><td class="note">갤러리 내 하트 개수 노출 (전체 공개)</td>
+  <td><span class="badge b-mod">수정</span></td><td></td>
+</tr>
+
+<tr data-section="Front" data-target="동료평가자" data-change="">
+  <td><span class="cell-section front">Front</span></td><td><span class="cell-target t-peer">동료평가자</span></td>
+  <td class="depth1">동료평가_팀별현황조회</td><td></td><td></td><td></td>
+  <td class="login-o">O</td><td></td><td></td><td></td>
+</tr>
+
+<tr data-section="Front" data-target="동료평가자" data-change="">
+  <td><span class="cell-section front">Front</span></td><td><span class="cell-target t-peer">동료평가자</span></td>
+  <td class="depth1">랭킹 / 리더보드</td><td></td><td></td><td></td>
+  <td class="login-o">O</td><td class="note">공통 뷰 사용</td><td></td><td></td>
+</tr>
+
+<tr data-section="Front" data-target="동료평가자" data-change="">
+  <td><span class="cell-section front">Front</span></td><td><span class="cell-target t-peer">동료평가자</span></td>
+  <td class="depth1">최종리더보드</td><td></td><td></td><td></td>
+  <td class="login-o">O</td><td class="note">공통 뷰 사용</td><td></td><td></td>
+</tr>
+
+<!-- ────────── FRONT / 심사위원 ────────── -->
+<tr class="section-divider"><td colspan="10">▸ FRONT — 심사위원</td></tr>
+
+<tr data-section="Front" data-target="심사위원" data-change="">
+  <td><span class="cell-section front">Front</span></td><td><span class="cell-target t-judge">심사위원</span></td>
+  <td class="depth1">심사_평가목록</td><td></td><td></td><td></td>
+  <td class="login-o">O</td><td></td><td></td><td></td>
+</tr>
+
+<tr data-section="Front" data-target="심사위원" data-change="">
+  <td><span class="cell-section front">Front</span></td><td><span class="cell-target t-judge">심사위원</span></td>
+  <td></td><td class="depth2">제출물 상세</td><td></td><td></td>
+  <td class="login-o">O</td><td></td><td></td><td></td>
+</tr>
+
+<tr data-section="Front" data-target="심사위원" data-change="">
+  <td><span class="cell-section front">Front</span></td><td><span class="cell-target t-judge">심사위원</span></td>
+  <td></td><td></td><td class="depth3">AI 참고자료</td><td></td>
+  <td class="login-o">O</td><td></td><td></td><td></td>
+</tr>
+
+<tr class="row-mod" data-section="Front" data-target="심사위원" data-change="수정">
+  <td><span class="cell-section front">Front</span></td><td><span class="cell-target t-judge">심사위원</span></td>
+  <td></td><td class="depth2">심사점수 입력</td><td></td><td></td>
+  <td class="login-o">O</td><td class="note">온라인 입력 or 오프라인 엑셀 업로드</td>
+  <td><span class="badge b-mod">수정</span></td><td></td>
+</tr>
+
+<tr data-section="Front" data-target="심사위원" data-change="">
+  <td><span class="cell-section front">Front</span></td><td><span class="cell-target t-judge">심사위원</span></td>
+  <td></td><td class="depth2">심사진척률 확인</td><td></td><td></td>
+  <td class="login-o">O</td><td></td><td></td><td></td>
+</tr>
+
+<tr data-section="Front" data-target="심사위원" data-change="">
+  <td><span class="cell-section front">Front</span></td><td><span class="cell-target t-judge">심사위원</span></td>
+  <td></td><td class="depth2">최종점수 리더보드</td><td></td><td></td>
+  <td class="login-o">O</td><td class="note">랭킹과 동일 뷰 — 사용 여부 확인 필요</td><td></td><td></td>
+</tr>
+
+<!-- ────────── ADMIN / 운영자 ────────── -->
+<tr class="section-divider"><td colspan="10">▸ ADMIN — 운영자</td></tr>
+
+<tr class="row-cond" data-section="Admin" data-target="운영자" data-change="조건부">
+  <td><span class="cell-section admin">Admin</span></td><td><span class="cell-target t-operator">운영자</span></td>
+  <td class="depth1">대상자 등록</td><td></td><td></td><td></td>
+  <td class="login-o">O</td><td class="note">맞춤집합(Expert Hub) 방식 시 필요<br/>MLP SSO 방식 시 불필요</td>
+  <td><span class="badge b-cond">조건부</span></td>
+  <td class="feedback-cell feedback-confirmed">🔵 회의록 확정: Expert Hub 방식 시에만 해당</td>
+</tr>
+
+<tr class="row-cond" data-section="Admin" data-target="운영자" data-change="조건부">
+  <td><span class="cell-section admin">Admin</span></td><td><span class="cell-target t-operator">운영자</span></td>
+  <td></td><td class="depth2">참가 대상자 등록</td><td></td><td></td>
+  <td class="login-o">O</td><td></td>
+  <td><span class="badge b-cond">조건부</span></td>
+  <td class="feedback-cell feedback-confirmed">🔵 회의록 확정: Expert Hub 방식 시에만 해당</td>
+</tr>
+
+<tr class="row-cond" data-section="Admin" data-target="운영자" data-change="조건부">
+  <td><span class="cell-section admin">Admin</span></td><td><span class="cell-target t-operator">운영자</span></td>
+  <td></td><td class="depth2">심사자 등록</td><td></td><td></td>
+  <td class="login-o">O</td><td></td>
+  <td><span class="badge b-cond">조건부</span></td>
+  <td class="feedback-cell feedback-confirmed">🔵 회의록 확정: Expert Hub 방식 시에만 해당</td>
+</tr>
+
+<tr class="row-mod" data-section="Admin" data-target="운영자" data-change="수정">
+  <td><span class="cell-section admin">Admin</span></td><td><span class="cell-target t-operator">운영자</span></td>
+  <td class="depth1">대시보드</td><td></td><td></td><td></td>
+  <td class="login-o">O</td><td class="note">참가/제출 현황 (등록팀수·팀원·유형·완주율) / AI심사 진행 정도 / 동료평가 결과</td>
+  <td><span class="badge b-mod">수정</span></td><td></td>
+</tr>
+
+<tr class="row-add" data-section="Admin" data-target="운영자" data-change="추가">
+  <td><span class="cell-section admin">Admin</span></td><td><span class="cell-target t-operator">운영자</span></td>
+  <td class="depth1">운영 결과</td><td></td><td></td><td></td>
+  <td class="login-o">O</td><td class="note">종료 후 활성화 — 대회 통계 / 전년대비 비교 / 최종수상자</td>
+  <td><span class="badge b-add">추가</span></td><td></td>
+</tr>
+
+<tr data-section="Admin" data-target="운영자" data-change="">
+  <td><span class="cell-section admin">Admin</span></td><td><span class="cell-target t-operator">운영자</span></td>
+  <td class="depth1">대회설정</td><td></td><td></td><td></td>
+  <td class="login-o">O</td><td></td><td></td><td></td>
+</tr>
+
+<tr class="row-mod" data-section="Admin" data-target="운영자" data-change="수정">
+  <td><span class="cell-section admin">Admin</span></td><td><span class="cell-target t-operator">운영자</span></td>
+  <td></td><td class="depth2">일정설정</td><td></td><td></td>
+  <td class="login-o">O</td><td class="note">신청·오리엔·제출·동료평가·본선발표·현장심사·결과발표·갤러리 운영기간</td>
+  <td><span class="badge b-mod">수정</span></td><td></td>
+</tr>
+
+<tr class="row-mod" data-section="Admin" data-target="운영자" data-change="수정">
+  <td><span class="cell-section admin">Admin</span></td><td><span class="cell-target t-operator">운영자</span></td>
+  <td></td><td class="depth2">대회소개내용 설정</td><td></td><td></td>
+  <td class="login-o">O</td><td class="note">HTML 편집 / 참가신청 버튼 포함</td>
+  <td><span class="badge b-mod">수정</span></td><td></td>
+</tr>
+
+<tr class="row-add" data-section="Admin" data-target="운영자" data-change="추가">
+  <td><span class="cell-section admin">Admin</span></td><td><span class="cell-target t-operator">운영자</span></td>
+  <td></td><td class="depth2">해커톤 유형 설정</td><td></td><td></td>
+  <td class="login-o">O</td><td class="note">아이디어톤/MVP톤 / 기획서 세팅 / 구현결과 필수여부 / 교육·멘토 지원여부</td>
+  <td><span class="badge b-add">추가</span></td><td></td>
+</tr>
+
+<tr class="row-add row-confirmed" data-section="Admin" data-target="운영자" data-change="추가">
+  <td><span class="cell-section admin">Admin</span></td><td><span class="cell-target t-operator">운영자</span></td>
+  <td></td><td class="depth2">심사 단계 설정</td><td></td><td></td>
+  <td class="login-o">O</td><td class="note">1차 AI / 2차 동료 투표 / 3차 심사위원<br/>심사 루브릭 항목 추가/수정 가능 (기본값 멀캠 제공, 고객사 커스텀 허용)<br/>어드민 입력값 → 포지큐브 파라미터로 동적 전달</td>
+  <td><span class="badge b-add">추가</span></td>
+  <td class="feedback-cell feedback-confirmed">🔵 회의록 확정: 루브릭 유연 구성 방식 채택. 기본값 제공 + 담당자 수정 가능. 포지큐브 동적 파라미터 연동 필요</td>
+</tr>
+
+<tr class="row-mod" data-section="Admin" data-target="운영자" data-change="수정">
+  <td><span class="cell-section admin">Admin</span></td><td><span class="cell-target t-operator">운영자</span></td>
+  <td></td><td class="depth2">가중치 설정</td><td></td><td></td>
+  <td class="login-o">O</td><td class="note">유형·단계 설정에 따라 항목 활성화 / 1+2차 100점 자동검증 / 3차 가산점</td>
+  <td><span class="badge b-mod">수정</span></td><td></td>
+</tr>
+
+<tr class="row-add" data-section="Admin" data-target="운영자" data-change="추가">
+  <td><span class="cell-section admin">Admin</span></td><td><span class="cell-target t-operator">운영자</span></td>
+  <td></td><td class="depth2">노출 설정</td><td></td><td></td>
+  <td class="login-o">O</td><td class="note">갤러리·리더보드 노출 통합 관리</td>
+  <td><span class="badge b-add">추가</span></td><td></td>
+</tr>
+
+<tr class="row-add" data-section="Admin" data-target="운영자" data-change="추가">
+  <td><span class="cell-section admin">Admin</span></td><td><span class="cell-target t-operator">운영자</span></td>
+  <td></td><td></td><td class="depth3">본선 진출자 노출 여부</td><td></td>
+  <td class="login-o">O</td><td class="note">체크된 팀 기준 뱃지 노출</td>
+  <td><span class="badge b-add">추가</span></td><td></td>
+</tr>
+
+<tr class="row-add" data-section="Admin" data-target="운영자" data-change="추가">
+  <td><span class="cell-section admin">Admin</span></td><td><span class="cell-target t-operator">운영자</span></td>
+  <td></td><td></td><td class="depth3">최종 수상자 노출 여부</td><td></td>
+  <td class="login-o">O</td><td class="note">수상명 노출 / 활성화 시 본선 뱃지 자동 해제</td>
+  <td><span class="badge b-add">추가</span></td><td></td>
+</tr>
+
+<tr class="row-add" data-section="Admin" data-target="운영자" data-change="추가">
+  <td><span class="cell-section admin">Admin</span></td><td><span class="cell-target t-operator">운영자</span></td>
+  <td></td><td></td><td class="depth3">현업 적용 여부 노출 설정</td><td></td>
+  <td class="login-o">O</td><td class="note">적용자 체크 팀 기준 노출</td>
+  <td><span class="badge b-add">추가</span></td><td></td>
+</tr>
+
+<tr class="row-add" data-section="Admin" data-target="운영자" data-change="추가">
+  <td><span class="cell-section admin">Admin</span></td><td><span class="cell-target t-operator">운영자</span></td>
+  <td></td><td></td><td class="depth3">리더보드 노출 여부 / 내용 설정</td><td></td>
+  <td class="login-o">O</td><td class="note">본선+수상자 or 전체 점수 노출 선택</td>
+  <td><span class="badge b-add">추가</span></td><td></td>
+</tr>
+
+<tr class="row-add" data-section="Admin" data-target="운영자" data-change="추가">
+  <td><span class="cell-section admin">Admin</span></td><td><span class="cell-target t-operator">운영자</span></td>
+  <td></td><td class="depth2">메일링 설정</td><td></td><td></td>
+  <td class="login-o">O</td><td class="note">참가자 대상 현업 적용여부 문의</td>
+  <td><span class="badge b-add">추가</span></td><td></td>
+</tr>
+
+<tr class="row-add" data-section="Admin" data-target="운영자" data-change="추가">
+  <td><span class="cell-section admin">Admin</span></td><td><span class="cell-target t-operator">운영자</span></td>
+  <td></td><td></td><td class="depth3">메일링 내용 구성</td><td></td>
+  <td class="login-o">O</td><td></td><td><span class="badge b-add">추가</span></td><td></td>
+</tr>
+
+<tr class="row-add" data-section="Admin" data-target="운영자" data-change="추가">
+  <td><span class="cell-section admin">Admin</span></td><td><span class="cell-target t-operator">운영자</span></td>
+  <td></td><td></td><td class="depth3">예약 / 즉시 발송</td><td></td>
+  <td class="login-o">O</td><td></td><td><span class="badge b-add">추가</span></td><td></td>
+</tr>
+
+<tr class="row-exist" data-section="Admin" data-target="운영자" data-change="기존활용">
+  <td><span class="cell-section admin">Admin</span></td><td><span class="cell-target t-operator">운영자</span></td>
+  <td></td><td class="depth2">공지사항</td><td></td><td></td>
+  <td class="login-o">O</td><td class="note">기존 AI Studio 공지사항 관리 기능 활용</td>
+  <td><span class="badge b-exist">기존활용</span></td><td></td>
+</tr>
+
+<tr data-section="Admin" data-target="운영자" data-change="">
+  <td><span class="cell-section admin">Admin</span></td><td><span class="cell-target t-operator">운영자</span></td>
+  <td></td><td class="depth2">FAQ</td><td></td><td></td>
+  <td class="login-o">O</td><td></td><td></td><td></td>
+</tr>
+
+<tr data-section="Admin" data-target="운영자" data-change="">
+  <td><span class="cell-section admin">Admin</span></td><td><span class="cell-target t-operator">운영자</span></td>
+  <td class="depth1">심사/평가관리</td><td></td><td></td><td></td>
+  <td class="login-o">O</td><td class="note">심사결과 확정 기능</td><td></td><td></td>
+</tr>
+
+<tr class="row-mod" data-section="Admin" data-target="운영자" data-change="수정">
+  <td><span class="cell-section admin">Admin</span></td><td><span class="cell-target t-operator">운영자</span></td>
+  <td></td><td class="depth2">목록</td><td></td><td></td>
+  <td class="login-o">O</td><td class="note">AI 심사 + 동료평가 완료 시 심사 완료 처리</td>
+  <td><span class="badge b-mod">수정</span></td><td></td>
+</tr>
+
+<tr data-section="Admin" data-target="운영자" data-change="">
+  <td><span class="cell-section admin">Admin</span></td><td><span class="cell-target t-operator">운영자</span></td>
+  <td></td><td></td><td class="depth3">상세</td><td></td>
+  <td class="login-o">O</td><td></td><td></td><td></td>
+</tr>
+
+<tr class="row-mod" data-section="Admin" data-target="운영자" data-change="수정">
+  <td><span class="cell-section admin">Admin</span></td><td><span class="cell-target t-operator">운영자</span></td>
+  <td></td><td></td><td></td><td class="depth4">AI 심사요청</td>
+  <td class="login-o">O</td><td class="note">점수 확인 → 운영자 승인(확정만) / 본선 진출자 체크<br/><span style="color:#E53935;font-size:11px;">※ 수정 가능 기능 제거</span><br/>LLM 심사 일배치 방식 (재제출 시 추가 심사 가능 구조)</td>
+  <td><span class="badge b-mod">수정</span></td>
+  <td class="feedback-cell">5/12: 수정 가능 부분 삭제<br/><span class="feedback-confirmed">🔵 회의록: LLM 심사 일배치, 재제출 시 추가 가능 구조로 검토</span></td>
+</tr>
+
+<tr class="row-mod" data-section="Admin" data-target="운영자" data-change="수정">
+  <td><span class="cell-section admin">Admin</span></td><td><span class="cell-target t-operator">운영자</span></td>
+  <td></td><td></td><td></td><td class="depth4">심사위원</td>
+  <td class="login-o">O</td><td class="note">점수 입력 or 엑셀 업로드 (양식 다운로드 후 일괄 업로드)</td>
+  <td><span class="badge b-mod">수정</span></td><td></td>
+</tr>
+
+<tr data-section="Admin" data-target="운영자" data-change="">
+  <td><span class="cell-section admin">Admin</span></td><td><span class="cell-target t-operator">운영자</span></td>
+  <td></td><td></td><td></td><td class="depth4">동료평가 확인</td>
+  <td class="login-o">O</td><td class="note">확인완료 후 심사완료 처리</td><td></td><td></td>
+</tr>
+
+<tr class="row-add" data-section="Admin" data-target="운영자" data-change="추가">
+  <td><span class="cell-section admin">Admin</span></td><td><span class="cell-target t-operator">운영자</span></td>
+  <td></td><td></td><td></td><td class="depth4">AI 피드백 생성 확인 / 일괄 다운로드</td>
+  <td class="login-o">O</td><td class="note">심사 참고용 AI 데이터 생성 여부 확인</td>
+  <td><span class="badge b-add">추가</span></td><td></td>
+</tr>
+
+<tr class="row-add" data-section="Admin" data-target="운영자" data-change="추가">
+  <td><span class="cell-section admin">Admin</span></td><td><span class="cell-target t-operator">운영자</span></td>
+  <td></td><td></td><td></td><td class="depth4">총점 확인 / 최종 수상자 체크 / 수상명 입력</td>
+  <td class="login-o">O</td><td></td><td><span class="badge b-add">추가</span></td><td></td>
+</tr>
+
+<tr class="row-add" data-section="Admin" data-target="운영자" data-change="추가">
+  <td><span class="cell-section admin">Admin</span></td><td><span class="cell-target t-operator">운영자</span></td>
+  <td></td><td></td><td></td><td class="depth4">현업 적용자 체크</td>
+  <td class="login-o">O</td><td></td><td><span class="badge b-add">추가</span></td><td></td>
+</tr>
+
+<tr class="row-add" data-section="Admin" data-target="운영자" data-change="추가">
+  <td><span class="cell-section admin">Admin</span></td><td><span class="cell-target t-operator">운영자</span></td>
+  <td></td><td></td><td class="depth3">리포트 관리</td><td></td>
+  <td class="login-o">O</td><td class="note">심사 완료 후 활성화</td>
+  <td><span class="badge b-add">추가</span></td><td></td>
+</tr>
+
+<tr class="row-add" data-section="Admin" data-target="운영자" data-change="추가">
+  <td><span class="cell-section admin">Admin</span></td><td><span class="cell-target t-operator">운영자</span></td>
+  <td></td><td></td><td></td><td class="depth4">심사위원용 리포트 생성 / 확인</td>
+  <td class="login-o">O</td><td class="note">생성 Only (잠금)</td>
+  <td><span class="badge b-add">추가</span></td><td></td>
+</tr>
+
+<tr class="row-add" data-section="Admin" data-target="운영자" data-change="추가">
+  <td><span class="cell-section admin">Admin</span></td><td><span class="cell-target t-operator">운영자</span></td>
+  <td></td><td></td><td></td><td class="depth4">개인 리포트 생성 / 확인 / 다운로드</td>
+  <td class="login-o">O</td><td class="note">생성 Only (잠금) 개별·일괄 다운로드</td>
+  <td><span class="badge b-add">추가</span></td>
+  <td class="feedback-cell">5/12: 일부 문구 추가</td>
+</tr>
+
+<tr class="row-unresolved" data-section="Admin" data-target="운영자" data-change="⚠️미결">
+  <td><span class="cell-section admin">Admin</span></td><td><span class="cell-target t-operator">운영자</span></td>
+  <td class="depth1">갤러리 목록</td><td></td><td></td><td></td>
+  <td class="login-o">O</td><td class="note">등록된 결과물 순위 확인</td>
+  <td><span class="badge b-unresolved">⚠️미결</span></td>
+  <td class="feedback-cell">5/12: 갤러리는 참가자/운영자가 공통 뷰인지 아니면 운영자는 다른 뷰인지 궁금합니다.</td>
+</tr>
+
+<tr class="row-unresolved" data-section="Admin" data-target="운영자" data-change="⚠️미결">
+  <td><span class="cell-section admin">Admin</span></td><td><span class="cell-target t-operator">운영자</span></td>
+  <td></td><td class="depth2">상세</td><td></td><td></td>
+  <td class="login-o">O</td><td class="note">노출여부 / 다운로드 파일 확인</td>
+  <td><span class="badge b-unresolved">⚠️미결</span></td>
+  <td class="feedback-cell">5/12: 갤러리는 참가자/운영자가 공통 뷰인지 아니면 운영자는 다른 뷰인지 궁금합니다.</td>
+</tr>
+
+<tr class="row-add" data-section="Admin" data-target="운영자" data-change="추가">
+  <td><span class="cell-section admin">Admin</span></td><td><span class="cell-target t-operator">운영자</span></td>
+  <td class="depth1">조회</td><td></td><td></td><td></td>
+  <td class="login-o">O</td><td></td><td><span class="badge b-add">추가</span></td><td></td>
+</tr>
+
+<tr class="row-add" data-section="Admin" data-target="운영자" data-change="추가">
+  <td><span class="cell-section admin">Admin</span></td><td><span class="cell-target t-operator">운영자</span></td>
+  <td></td><td class="depth2">리더보드</td><td></td><td></td>
+  <td class="login-o">O</td><td class="note">본선+수상자 or 전체 점수 / 후속 메일 회신여부 반영</td>
+  <td><span class="badge b-add">추가</span></td><td></td>
+</tr>
+
+<tr class="row-add" data-section="Admin" data-target="운영자" data-change="추가">
+  <td><span class="cell-section admin">Admin</span></td><td><span class="cell-target t-operator">운영자</span></td>
+  <td></td><td class="depth2">교육 수요조사</td><td></td><td></td>
+  <td class="login-o">O</td><td class="note">user ID / 수요 YN / 입력 텍스트</td>
+  <td><span class="badge b-add">추가</span></td><td></td>
+</tr>
+
+<tr class="row-add" data-section="Admin" data-target="운영자" data-change="추가">
+  <td><span class="cell-section admin">Admin</span></td><td><span class="cell-target t-operator">운영자</span></td>
+  <td></td><td class="depth2">해커톤 산출물</td><td></td><td></td>
+  <td class="login-o">O</td><td class="note">제출물·심사결과·개인리포트 개별·일괄 다운로드</td>
+  <td><span class="badge b-add">추가</span></td><td></td>
+</tr>
+
+<tr data-section="Admin" data-target="운영자" data-change="">
+  <td><span class="cell-section admin">Admin</span></td><td><span class="cell-target t-operator">운영자</span></td>
+  <td class="depth1">사용자관리</td><td class="depth2">참가자(팀)</td><td></td><td></td>
+  <td class="login-o">O</td><td></td><td></td><td></td>
+</tr>
+
+<tr data-section="Admin" data-target="운영자" data-change="">
+  <td><span class="cell-section admin">Admin</span></td><td><span class="cell-target t-operator">운영자</span></td>
+  <td></td><td></td><td class="depth3">상세</td><td></td>
+  <td class="login-o">O</td><td class="note">참가자(팀) 정보 확인</td><td></td><td></td>
+</tr>
+
+<tr data-section="Admin" data-target="운영자" data-change="">
+  <td><span class="cell-section admin">Admin</span></td><td><span class="cell-target t-operator">운영자</span></td>
+  <td></td><td class="depth2">심사위원</td><td></td><td></td>
+  <td class="login-o">O</td><td></td><td></td><td></td>
+</tr>
+
+<tr data-section="Admin" data-target="운영자" data-change="">
+  <td><span class="cell-section admin">Admin</span></td><td><span class="cell-target t-operator">운영자</span></td>
+  <td></td><td></td><td class="depth3">등록</td><td></td>
+  <td class="login-o">O</td><td></td><td></td><td></td>
+</tr>
+
+<tr data-section="Admin" data-target="운영자" data-change="">
+  <td><span class="cell-section admin">Admin</span></td><td><span class="cell-target t-operator">운영자</span></td>
+  <td></td><td></td><td class="depth3">상세</td><td></td>
+  <td class="login-o">O</td><td></td><td></td><td></td>
+</tr>
+
+<tr data-section="Admin" data-target="운영자" data-change="">
+  <td><span class="cell-section admin">Admin</span></td><td><span class="cell-target t-operator">운영자</span></td>
+  <td class="depth1">이의신청 로그 조회</td><td></td><td></td><td></td>
+  <td class="login-o">O</td><td></td><td></td><td></td>
+</tr>
+
+<tr data-section="Admin" data-target="운영자" data-change="">
+  <td><span class="cell-section admin">Admin</span></td><td><span class="cell-target t-operator">운영자</span></td>
+  <td></td><td class="depth2">상세</td><td></td><td></td>
+  <td class="login-o">O</td><td></td><td></td><td></td>
+</tr>
+
+<tr data-section="Admin" data-target="운영자" data-change="">
+  <td><span class="cell-section admin">Admin</span></td><td><span class="cell-target t-operator">운영자</span></td>
+  <td class="depth1">심사기준 DB 관리</td><td></td><td></td><td></td>
+  <td class="login-o">O</td><td></td><td></td><td></td>
+</tr>
+
+<tr data-section="Admin" data-target="운영자" data-change="">
+  <td><span class="cell-section admin">Admin</span></td><td><span class="cell-target t-operator">운영자</span></td>
+  <td></td><td class="depth2">평가 가중치 이력</td><td></td><td></td>
+  <td class="login-o">O</td><td></td><td></td><td></td>
+</tr>
+
+<!-- ────────── ADMIN / 시스템관리자 ────────── -->
+<tr class="section-divider"><td colspan="10">▸ ADMIN — 시스템관리자</td></tr>
+
+<tr data-section="Admin" data-target="시스템관리자" data-change="">
+  <td><span class="cell-section sysadmin">Admin</span></td><td><span class="cell-target t-sysadmin">시스템관리자</span></td>
+  <td class="depth1">대회목록</td><td></td><td></td><td></td>
+  <td class="login-o">O</td><td></td><td></td><td></td>
+</tr>
+
+<tr class="row-mod" data-section="Admin" data-target="시스템관리자" data-change="수정">
+  <td><span class="cell-section sysadmin">Admin</span></td><td><span class="cell-target t-sysadmin">시스템관리자</span></td>
+  <td></td><td class="depth2">상세</td><td></td><td></td>
+  <td class="login-o">O</td><td class="note">해커톤 정보·참여자 목록·관리 전반 이력</td>
+  <td><span class="badge b-mod">수정</span></td><td></td>
+</tr>
+
+<tr class="row-mod" data-section="Admin" data-target="시스템관리자" data-change="수정">
+  <td><span class="cell-section sysadmin">Admin</span></td><td><span class="cell-target t-sysadmin">시스템관리자</span></td>
+  <td class="depth1">사용자 권한관리</td><td></td><td></td><td></td>
+  <td class="login-o">O</td><td class="note">MLP / Expert Hub 설정 데이터 연동 구조</td>
+  <td><span class="badge b-mod">수정</span></td>
+  <td class="feedback-cell feedback-confirmed">🔵 회의록 확정: MLP SSO + Expert Hub 두 방식 모두 지원</td>
+</tr>
+
+<tr class="row-mod" data-section="Admin" data-target="시스템관리자" data-change="수정">
+  <td><span class="cell-section sysadmin">Admin</span></td><td><span class="cell-target t-sysadmin">시스템관리자</span></td>
+  <td></td><td class="depth2">운영자 등록</td><td></td><td></td>
+  <td class="login-o">O</td><td></td><td><span class="badge b-mod">수정</span></td><td></td>
+</tr>
+
+<tr class="row-mod" data-section="Admin" data-target="시스템관리자" data-change="수정">
+  <td><span class="cell-section sysadmin">Admin</span></td><td><span class="cell-target t-sysadmin">시스템관리자</span></td>
+  <td></td><td class="depth2">상세</td><td></td><td></td>
+  <td class="login-o">O</td><td></td><td><span class="badge b-mod">수정</span></td><td></td>
+</tr>
+
+<tr class="row-add" data-section="Admin" data-target="시스템관리자" data-change="추가">
+  <td><span class="cell-section sysadmin">Admin</span></td><td><span class="cell-target t-sysadmin">시스템관리자</span></td>
+  <td class="depth1">AI 엔진 통신 성공 여부</td><td></td><td></td><td></td>
+  <td class="login-o">O</td><td class="note">요청 성공률 트래킹 (N개 요청 중 N개 성공)</td>
+  <td><span class="badge b-add">추가</span></td><td></td>
+</tr>
+
+</tbody>
+</table>
+</div>
+
+<script>
+const filters = { section: 'all', target: 'all', change: null };
+
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    const f = this.dataset.filter;
+    const v = this.dataset.val;
+    if (f === 'change') {
+      if (filters.change === v) { filters.change = null; this.classList.remove('active'); }
+      else {
+        document.querySelectorAll('[data-filter="change"]').forEach(b => b.classList.remove('active'));
+        filters.change = v; this.classList.add('active');
+      }
+    } else {
+      document.querySelectorAll(`[data-filter="${f}"]`).forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      filters[f] = v;
+    }
+    applyFilters();
+  });
+});
+
+function applyFilters() {
+  document.querySelectorAll('#iaTable tbody tr:not(.section-divider)').forEach(row => {
+    const s = row.dataset.section || '';
+    const t = row.dataset.target || '';
+    const c = row.dataset.change || '';
+    const okSection = filters.section === 'all' || s === filters.section;
+    const okTarget = filters.target === 'all' || t === filters.target;
+    const okChange = !filters.change || c === filters.change;
+    row.classList.toggle('hidden', !(okSection && okTarget && okChange));
+  });
+}
+
+function downloadCSV() {
+  const rows = [['구분','Target','1Depth','2Depth','3Depth','4Depth','로그인','비고','변경사항','피드백']];
+  document.querySelectorAll('#iaTable tbody tr:not(.section-divider):not(.hidden)').forEach(row => {
+    const cells = row.querySelectorAll('td');
+    rows.push([
+      cells[0]?.innerText?.trim(),
+      cells[1]?.innerText?.trim(),
+      cells[2]?.innerText?.trim(),
+      cells[3]?.innerText?.trim(),
+      cells[4]?.innerText?.trim(),
+      cells[5]?.innerText?.trim(),
+      cells[6]?.innerText?.trim(),
+      cells[7]?.innerText?.trim(),
+      cells[8]?.innerText?.trim(),
+      cells[9]?.innerText?.trim(),
+    ]);
+  });
+  const csv = rows.map(r => r.map(c => `"${(c||'').replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob(['\uFEFF'+csv], {type:'text/csv;charset=utf-8'}));
+  a.download = 'hackathon_ia_v4.csv';
+  a.click();
+}
+</script>
+</body>
+</html>
