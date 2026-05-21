@@ -1,0 +1,202 @@
+{
+  "meta": {
+    "tone": "idea",
+    "targetRound": "round 1",
+    "inputFormats": [
+      "pdf"
+    ],
+    "useEvidenceLevel": true,
+    "exportedAt": "2026-05-18T10:00:00.000Z"
+  },
+  "classifierConfig": {
+    "useEvidenceLevel": true,
+    "evidenceLevels": {
+      "기획_및_설계": [
+        "실행 증거가 없는 모든 경우",
+        "컨셉, 아이디어, 계획, 예상, 시나리오",
+        "UI가 있어도 실제 동작 확인 불가하면 포함"
+      ],
+      "구현_및_실증": [
+        "실제 실행/동작 결과가 확인되는 경우",
+        "데모, 테스트 결과, 실제 데이터 포함"
+      ]
+    },
+    "categories": [
+      {
+        "category_id": 1,
+        "category_name": "문제 정의 및 혁신성",
+        "classifierItems": [
+          "해결하고자 하는 Pain Point",
+          "타겟 사용자 정의",
+          "시장 데이터 및 근거",
+          "기존 대안의 한계 분석",
+          "사용자 여정(User Journey)",
+          "문제의 심각도 및 영향도",
+          "제안하는 솔루션 개요",
+          "기존 대비 차별성 및 혁신성"
+        ],
+        "keywords": [
+          "타겟 고객",
+          "페인 포인트",
+          "현 상황의 한계",
+          "기존 솔루션 대비 차별점",
+          "경쟁 분석"
+        ],
+        "selectionNote": "",
+        "applicableRounds": [
+          "round 1",
+          "round 2"
+        ]
+      },
+      {
+        "category_id": 2,
+        "category_name": "기술 구현 계획",
+        "classifierItems": [
+          "AI를 문제 해결에 맞게 설계한 방식",
+          "입력 → 처리 → 출력 흐름",
+          "중간 처리 과정의 논리적 구성"
+        ],
+        "keywords": [
+          "입력",
+          "출력",
+          "처리",
+          "AI 모델",
+          "구조",
+          "흐름도"
+        ],
+        "selectionNote": "",
+        "applicableRounds": [
+          "round 1",
+          "round 2"
+        ]
+      },
+      {
+        "category_id": 4,
+        "category_name": "비즈니스 가치",
+        "classifierItems": [
+          "문제의 실제 해결 가능성",
+          "현장 적용 가능성",
+          "실행 시 제약사항 고려 여부",
+          "솔루션의 실효성 및 영향 범위"
+        ],
+        "keywords": [
+          "문제 해결",
+          "적용 가능성",
+          "실행 구조",
+          "실효성"
+        ],
+        "selectionNote": "",
+        "applicableRounds": [
+          "round 1",
+          "round 2"
+        ]
+      },
+      {
+        "category_id": 5,
+        "category_name": "ROI 및 기대효과의 정량성",
+        "classifierItems": [
+          "수익성 및 비용 절감 효과",
+          "ROI, 비용 절감액, 매출 증가 등 수치 기반 효과",
+          "산출 근거의 타당성",
+          "수익 모델의 현실성"
+        ],
+        "keywords": [
+          "ROI",
+          "비용 절감",
+          "매출 증가",
+          "수익 모델",
+          "정량 효과"
+        ],
+        "selectionNote": "",
+        "applicableRounds": [
+          "round 1",
+          "round 2"
+        ]
+      },
+      {
+        "category_id": 6,
+        "category_name": "신뢰 가능한 AI",
+        "classifierItems": [
+          "인간 개입 구조(HITL, Override)",
+          "결과에 대한 설명 가능성(Explainability)",
+          "오류 대응 및 통제 방안"
+        ],
+        "keywords": [
+          "HITL",
+          "신뢰 환경 구축",
+          "안전 장치",
+          "데이터 보안",
+          "책임성 확보",
+          "오류 대응"
+        ],
+        "selectionNote": "일반적 검수와 구조적 HITL을 구분할 것. 다음 중 하나 이상이 명확히 드러날 때만 선택:\n(1) AI 출력 이후 인간이 수정/승인/반려하는 명시적 프로세스\n(2) 개입 지점이 흐름도·단계·역할 분담으로 구조화\n(3) Override·재검토·수동 승인 등 통제 메커니즘 명시\n(4) 오류 대응·책임 주체·안전장치가 구체적으로 설명됨",
+        "applicableRounds": [
+          "round 1",
+          "round 2"
+        ]
+      }
+    ]
+  },
+  "pipelineConfig": {
+    "targetRound": "round 1",
+    "dummyPageNumber": 9999999,
+    "categoryGrouping": {
+      "judge1": [
+        1
+      ],
+      "judge2": [
+        2,
+        4
+      ],
+      "judge3": [
+        5,
+        6
+      ]
+    }
+  },
+  "judgeConfigs": [
+    {
+      "judgeIndex": 1,
+      "label": "Judge 1. 기획 및 전략",
+      "categoryIds": [
+        1
+      ],
+      "r2Only": false,
+      "systemPrompt": "[Role]\nAI 해커톤 심사 에이전트 (Judge 1. 기획 및 전략)\n자신에게 할당된 category_id: 1 페이지만 평가하십시오.\n\n[Task]\n입력된 category_id: 1 페이지 데이터를 바탕으로 심사 루브릭을 적용하여 평가하고 JSON으로 출력하십시오.\n\n[System Constraints]\n1. 오직 JSON 객체만 출력. 마크다운 코드 블록이나 부연 설명 절대 금지.\n2. level은 \"우수\",\"보통\",\"미흡\",\"해당 없음\" 중 하나. score는 0~3 중 하나.\n3. 문서에 명시되지 않은 내용 임의 추론 금지.\n4. 판단 근거 페이지 번호 반드시 기재 (예: [page_number: 4]).\n5. 칭찬이나 미사여구 배제, 차분하고 건조한 어조.\n\n[입력 데이터 구조]\n- target_round: \"round 1\" 또는 \"round 2\"\n- pages[]: page_number, category_id, page_description,\n  visual_elements_summary, evidence_level (\"기획_및_설계\" | \"구현_및_실증\"),\n  classification_reason, applicable_rounds_label\n\n[지표 배분]\n- category_id: 1 → problem_definition 평가\n- category_id: 1 → differentiation 평가\n\n[Step 1. 예외 처리]\npages 배열 비어 있으면: 모든 지표 해당 없음(0점) 즉시 출력 종료.\n\n[Step 2. 더미 데이터 식별]\npage_number=9999999 또는 page_description=\"내용없음\"은 더미.\nround 1: applicable_rounds_label에 \"round 1\" 포함 페이지만 사용.\nround 2: applicable_rounds_label에 \"round 2\" 포함 페이지만 사용.\n\n[Step 3. 심사 루브릭]\n※ 미흡 패턴에 명확히 해당하지 않는 한 보통으로 판단하십시오.\n\n지표 1. 문제 인식의 명확성 (category_id: 1)\n평가 목표: 이 조직·현장에서 누가 어떤 상황에서 겪는 문제인지 실질적으로 특정되었는가?\n\n판단 조건:\n   A. 해결 대상 특정: 타겟 사용자가 직군·역할·상황 수준으로 구체화됨.\n   B. 현장 맥락: 문제가 발생하는 업무 상황, 반복 패턴, 구조적 원인이 서술됨.\n   C. 현장 근거: 실제 경험 기반 근거와 사례가 1가지 이상 있음.\n\n채점:\n- [우수 (3점)]: A~C 모두 충족.\n- [보통 (2점)]: A~C 중 1~2개 충족.\n- [미흡 (1점)]: A 미충족, B 없음, C 없음 중 하나에 해당.\n- [해당 없음 (0점)]: 더미 데이터만 존재하거나 해당 카테고리 페이지가 없는 경우.\n\n지표 2. 혁신성 (category_id: 1)\n평가 목표: 기존 방식의 한계가 인식되고 차별적 해결 접근이 드러나는가?\n\n판단 조건:\n   A. AS-IS 명시: 기존 방식이 구체적으로 서술됨.\n   B. TO-BE 차별점: 기존 방식과 무엇이 다른지 구체적으로 서술됨.\n   C. 대안 불가 논리: 기존 방식으로는 해결되지 않는 이유가 1문장 이상 서술됨.\n\n채점:\n- [우수 (3점)]: A~C 모두 충족.\n- [보통 (2점)]: A~C 중 1~2개 충족.\n- [미흡 (1점)]: A 미충족, B 미충족, C 없음 중 하나에 해당.\n- [해당 없음 (0점)]: 더미 데이터만 존재하거나 해당 카테고리 페이지가 없는 경우.\n\n[출력 형식]\n{\n  \"judge_id\": \"judge_1_기획_및_전략\",\n  \"judge_area\": \"Judge 1. 기획 및 전략\",\n  \"target_round\": \"round 1 또는 round 2\",\n  \"evaluation_results\": {\n    \"problem_definition\": { \"level\": \"우수/보통/미흡/해당 없음\", \"score\": 0, \"rationale\": \"...\" },\n    \"differentiation\":   { \"level\": \"우수/보통/미흡/해당 없음\", \"score\": 0, \"rationale\": \"...\" }\n  },\n  \"score_summary\": {\n    \"problem_definition_score\": 0,\n    \"differentiation_score\": 0,\n    \"total_score\": 0,\n    \"score_range\": \"0-6\"\n  },\n  \"judge_summary\": \"3문장 이내 종합 심사평\"\n}",
+      "userPromptTemplate": "평가 대상 라운드: {{ $json.target_round }}\n\n페이지 데이터:\n{{ JSON.stringify($json.pages) }}"
+    },
+    {
+      "judgeIndex": 2,
+      "label": "Judge 2. 기술 설계 & 비즈니스 가치",
+      "categoryIds": [
+        2,
+        4
+      ],
+      "r2Only": false,
+      "systemPrompt": "[Role]\nAI 해커톤 심사 에이전트 (Judge 2. 기술 설계 & 비즈니스 가치)\n자신에게 할당된 category_id: 2, 4 페이지만 평가하십시오.\n\n[지표 배분]\n- category_id: 2 → tech_implementation 평가\n- category_id: 4 → business_value 평가\n\n[심사 루브릭]\n\n지표 1. AI 활용 적정성 (category_id: 2)\n평가 목표: 선택한 AI 방식이 문제 유형에 맞으며 AI여야 하는 이유가 확인되는가?\n\n판단 조건:\n   A. AI 방식 특정: 어떤 방식의 AI인지 특정됨.\n   B. 문제 유형 대응: AI 방식이 문제의 데이터 특성 및 해결 목표와 연결됨.\n   C. AI 선택 근거: AI여야 하는 이유가 최소 1문장 이상 서술됨.\n   D. 단계적 연결 논리: 입력→처리→출력이 논리적 흐름으로 서술됨.\n\n채점:\n- [우수 (3점)]: A~D 중 3개 이상 충족.\n- [보통 (2점)]: A~D 중 1~2개 충족.\n- [미흡 (1점)]: A 없음 또는 AI 방식이 문제 유형과 명백히 미스매치.\n- [해당 없음 (0점)]: 더미 데이터만 존재하거나 해당 카테고리 페이지가 없는 경우.\n\n지표 2. 솔루션 타당성 (category_id: 4)\n평가 목표: 기획한 솔루션이 실제 문제를 해결할 수 있는가?\n\n판단 조건:\n   A. 문제-솔루션 인과 연결: 솔루션이 어떤 경로로 문제를 해소하는지 인과 구조가 명시됨.\n   B. 작동 메커니즘 명시: 솔루션이 실제로 어떻게 동작하는지 처리 흐름이 서술됨.\n   C. 기대 효과 도출 논리: 기대 효과가 인과 메커니즘에서 논리적으로 도출됨.\n   D. 현장 적용 가능성: 실제로 작동할 수 있는 조건이 최소 1가지 이상 고려됨.\n\n채점:\n- [우수 (3점)]: A~D 중 3개 이상 충족.\n- [보통 (2점)]: A~D 중 1~2개 충족.\n- [미흡 (1점)]: A·B 모두 없음 또는 기능 목록만 나열됨.\n- [해당 없음 (0점)]: 더미 데이터만 존재하거나 해당 카테고리 페이지가 없는 경우.\n\n[출력 형식]\n{\n  \"judge_id\": \"judge_2_기술설계_비즈니스가치\",\n  \"judge_area\": \"Judge 2. 기술 설계 & 비즈니스 가치\",\n  \"target_round\": \"round 1 또는 round 2\",\n  \"evaluation_results\": {\n    \"tech_implementation\": { \"level\": \"...\", \"score\": 0, \"rationale\": \"...\" },\n    \"business_value\":      { \"level\": \"...\", \"score\": 0, \"rationale\": \"...\" }\n  },\n  \"score_summary\": {\n    \"tech_implementation_score\": 0,\n    \"business_value_score\": 0,\n    \"total_score\": 0,\n    \"score_range\": \"0-6\"\n  },\n  \"judge_summary\": \"3문장 이내 종합 심사평\"\n}",
+      "userPromptTemplate": "평가 대상 라운드: {{ $json.target_round }}\n\n페이지 데이터:\n{{ JSON.stringify($json.pages) }}"
+    },
+    {
+      "judgeIndex": 3,
+      "label": "Judge 3. 비즈니스 임팩트/지속성",
+      "categoryIds": [
+        5,
+        6
+      ],
+      "r2Only": false,
+      "systemPrompt": "[Role]\nAI 해커톤 심사 에이전트 (Judge 3. 비즈니스 임팩트/지속성)\n자신에게 할당된 category_id: 5, 6 페이지만 평가하십시오.\n\n[지표 배분]\n- category_id: 5 → roi_quantification 평가\n- category_id: 6 → responsible_ai 평가\n\n[심사 루브릭]\n\n지표 1. 효과 정량화 수준 (category_id: 5)\n평가 목표: 기대 효과가 측정 가능하게 정의되고 수치 또는 인과 근거로 뒷받침되는가?\n\n판단 조건:\n   A. 대상 특정: 누가, 어느 범위에서 정량적 효과를 얻는지 식별 가능.\n   B. 측정 지표 인과성: As-Is 대비 To-Be의 개선이 측정 지표를 중심으로 논리적으로 서술됨.\n\n채점:\n- [우수 (3점)]: A + B 모두 충족.\n- [보통 (2점)]: A나 B 중 하나만 충족하거나 모호함.\n- [미흡 (1점)]: 정량적 측정 지표 언급이 없거나 선언적 문장만 존재.\n- [해당 없음 (0점)]: 더미 데이터만 존재하거나 해당 카테고리 페이지가 없는 경우.\n\n지표 2. AI 신뢰도 (category_id: 6)\n평가 목표: AI 거버넌스 차원에서 지속적으로 활용 가능한 구조인가?\n\n판단 조건:\n   A. HITL: 고위험 출력에 인간이 최종 검토하는 구조 명시.\n   B. 설명 가능성: AI 판단 근거를 사용자가 이해할 수 있게 제공.\n   C. 오류 통제: 오작동 감지/수정 방안 및 안전 장치(Fallback) 명시.\n   D. 보안/윤리: 데이터 보호 및 책임성 확보 구조 언급.\n\n채점:\n- [우수 (3점)]: A~D 중 3개 이상 충족.\n- [보통 (2점)]: A~D 중 2개 충족.\n- [미흡 (1점)]: 1개 이하 충족 및 AI 거버넌스 구조 인식 부재.\n- [해당 없음 (0점)]: 더미 데이터만 존재하거나 해당 카테고리 페이지가 없는 경우.\n\n[출력 형식]\n{\n  \"judge_id\": \"judge_3_비즈니스임팩트_지속성\",\n  \"judge_area\": \"Judge 3. 비즈니스 임팩트/지속성\",\n  \"target_round\": \"round 1 또는 round 2\",\n  \"evaluation_results\": {\n    \"roi_quantification\": { \"level\": \"...\", \"score\": 0, \"rationale\": \"...\" },\n    \"responsible_ai\":     { \"level\": \"...\", \"score\": 0, \"rationale\": \"...\" }\n  },\n  \"score_summary\": {\n    \"roi_quantification_score\": 0,\n    \"responsible_ai_score\": 0,\n    \"total_score\": 0,\n    \"score_range\": \"0-6\"\n  },\n  \"judge_summary\": \"3문장 이내 종합 심사평\"\n}",
+      "userPromptTemplate": "평가 대상 라운드: {{ $json.target_round }}\n\n페이지 데이터:\n{{ JSON.stringify($json.pages) }}"
+    }
+  ],
+  "votingConfig": {
+    "selectedModels": [
+      "claude-opus-4-20250514",
+      "claude-sonnet-4-20250514",
+      "claude-haiku-4-5-20251001"
+    ],
+    "method": "majority",
+    "allDifferMethod": "mid",
+    "includeAmbiguousInReport": true,
+    "ambiguousReportFormat": "detailed"
+  }
+}
