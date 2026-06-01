@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 해커톤 플랫폼 — 주요 기능 정의</title>
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
+<style>
+  :root {
+    --primary:   #4F6BF8;
+    --primary-lt:#EEF1FE;
+    --text-base: #131416;
+    --text-sub:  #58616A;
+    --text-muted:#9CA3AF;
+    --border:    #E5E7EB;
+    --bg:        #F8F9FA;
+    --white:     #FFFFFF;
+    --success:   #39C89A;
+    --warning:   #F59E0B;
+    --error:     #E95151;
+    --tag-ai:    #EDE9FE;
+    --tag-ai-t:  #6D28D9;
+    --tag-op:    #DCFCE7;
+    --tag-op-t:  #15803D;
+    --tag-sys:   #FEF3C7;
+    --tag-sys-t: #B45309;
+    --tag-ux:    #DBEAFE;
+    --tag-ux-t:  #1D4ED8;
+  }
+
+  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    font-family: 'Pretendard', sans-serif;
+    background: var(--bg);
+    color: var(--text-base);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── Layout ── */
+  .page-wrap { max-width: 1080px; margin: 0 auto; padding: 64px 40px 120px; }
+
+  /* ── Doc Header ── */
+  .doc-header {
+    border-bottom: 2px solid var(--text-base);
+    padding-bottom: 28px;
+    margin-bottom: 56px;
+  }
+  .doc-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--primary);
+    margin-bottom: 12px;
+  }
+  .doc-title {
+    font-size: 32px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: var(--text-base);
+    margin-bottom: 8px;
+  }
+  .doc-meta {
+    display: flex;
+    gap: 24px;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 16px;
+  }
+  .doc-meta span { display: flex; align-items: center; gap: 5px; }
+
+  /* ── TOC ── */
+  .toc {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 64px;
+  }
+  .toc-item {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 18px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    display: block;
+  }
+  .toc-item:hover {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(79,107,248,0.1);
+  }
+  .toc-num {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: var(--primary);
+    margin-bottom: 6px;
+  }
+  .toc-name {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-base);
+    line-height: 1.4;
+  }
+
+  /* ── Section ── */
+  .section { margin-bottom: 72px; }
+
+  .section-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    margin-bottom: 32px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-num {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: var(--primary);
+    color: var(--white);
+    font-size: 14px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .section-title-wrap {}
+  .section-title {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--text-base);
+    margin-bottom: 4px;
+  }
+  .section-desc {
+    font-size: 13px;
+    color: var(--text-sub);
+    line-height: 1.6;
+  }
+
+  /* ── Tag ── */
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    padding: 2px 8px;
+    border-radius: 5px;
+    text-transform: uppercase;
+    margin-right: 4px;
+  }
+  .tag-ai  { background: var(--tag-ai);  color: var(--tag-ai-t); }
+  .tag-op  { background: var(--tag-op);  color: var(--tag-op-t); }
+  .tag-sys { background: var(--tag-sys); color: var(--tag-sys-t); }
+  .tag-ux  { background: var(--tag-ux);  color: var(--tag-ux-t); }
+
+  /* ── Flow diagram ── */
+  .flow-wrap {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px 32px;
+    margin-bottom: 24px;
+    overflow-x: auto;
+  }
+  .flow-title {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 20px;
+  }
+  .flow-steps {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    flex-wrap: nowrap;
+    min-width: max-content;
+  }
+  .flow-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    min-width: 110px;
+  }
+  .flow-box {
+    width: 100px;
+    padding: 10px 8px;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.4;
+    border: 1.5px solid var(--border);
+    background: var(--white);
+    color: var(--text-base);
+    position: relative;
+  }
+  .flow-box.primary {
+    background: var(--primary);
+    color: var(--white);
+    border-color: var(--primary);
+  }
+  .flow-box.success {
+    background: #F0FDF8;
+    color: #065F46;
+    border-color: var(--success);
+  }
+  .flow-box.warn {
+    background: #FFFBEB;
+    color: #92400E;
+    border-color: var(--warning);
+  }
+  .flow-box.auto {
+    background: var(--primary-lt);
+    color: var(--primary);
+    border-color: var(--primary);
+  }
+  .flow-badge {
+    font-size: 9px;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 4px;
+    background: var(--tag-ai);
+    color: var(--tag-ai-t);
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+  }
+  .flow-badge.op {
+    background: var(--tag-op);
+    color: var(--tag-op-t);
+  }
+  .flow-arrow {
+    font-size: 16px;
+    color: var(--border);
+    padding: 0 4px;
+    flex-shrink: 0;
+    align-self: center;
+    margin-bottom: 22px;
+  }
+  .flow-note {
+    font-size: 10px;
+    color: var(--text-muted);
+    text-align: center;
+    line-height: 1.4;
+  }
+
+  /* ── Feature cards ── */
+  .feature-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .feature-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 22px 24px;
+  }
+  .feature-card-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-base);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .feature-card-title .icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    background: var(--primary-lt);
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    flex-shrink: 0;
+  }
+  .feature-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+  }
+  .feature-list li {
+    font-size: 12px;
+    color: var(--text-sub);
+    display: flex;
+    align-items: flex-start;
+    gap: 7px;
+    line-height: 1.5;
+  }
+  .feature-list li::before {
+    content: '';
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--primary);
+    flex-shrink: 0;
+    margin-top: 6px;
+  }
+
+  /* ── Policy table ── */
+  .policy-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    margin-bottom: 24px;
+    background: var(--white);
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  .policy-table th {
+    background: #F3F4F6;
+    color: var(--text-sub);
+    font-weight: 700;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 10px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  .policy-table td {
+    padding: 11px 16px;
+    color: var(--text-base);
+    border-bottom: 1px solid #F3F4F6;
+    vertical-align: top;
+    line-height: 1.5;
+  }
+  .policy-table tr:last-child td { border-bottom: none; }
+  .policy-table td:first-child {
+    font-weight: 600;
+    color: var(--text-sub);
+    white-space: nowrap;
+    width: 180px;
+  }
+  .policy-table .highlight { color: var(--primary); font-weight: 600; }
+  .policy-table .warn-text { color: var(--warning); font-weight: 600; }
+
+  /* ── Note box ── */
+  .note-box {
+    background: #FFFBEB;
+    border: 1px solid #FDE68A;
+    border-radius: 10px;
+    padding: 14px 18px;
+    font-size: 12px;
+    color: #78350F;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    margin-bottom: 16px;
+  }
+  .note-box .note-icon { flex-shrink: 0; margin-top: 1px; }
+  .note-box.info {
+    background: var(--primary-lt);
+    border-color: #C7D2FE;
+    color: #1E3A8A;
+  }
+  .note-box.success-box {
+    background: #F0FDF8;
+    border-color: #A7F3D0;
+    color: #065F46;
+  }
+
+  /* ── Step block ── */
+  .step-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; }
+  .step-item {
+    display: flex;
+    gap: 16px;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 20px;
+    align-items: flex-start;
+  }
+  .step-badge {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: var(--white);
+    font-size: 11px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .step-content {}
+  .step-name {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-base);
+    margin-bottom: 4px;
+  }
+  .step-detail {
+    font-size: 12px;
+    color: var(--text-sub);
+    line-height: 1.6;
+  }
+  .step-detail strong { color: var(--text-base); }
+
+  /* ── Sub section ── */
+  .sub-section { margin-bottom: 32px; }
+  .sub-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-base);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .sub-title::before {
+    content: '';
+    display: block;
+    width: 3px;
+    height: 14px;
+    background: var(--primary);
+    border-radius: 2px;
+  }
+
+  /* ── Divider ── */
+  .divider { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
+
+  /* ── Print ── */
+  @media print {
+    body { background: white; }
+    .page-wrap { padding: 32px; }
+    .toc-item:hover { border-color: var(--border); box-shadow: none; }
+  }
+</style>
+</head>
+<body>
+<div class="page-wrap">
+
+  <!-- Doc Header -->
+  <div class="doc-header">
+    <div class="doc-label">AI Hackathon Platform · Feature Definition</div>
+    <div class="doc-title">주요 기능 정의서</div>
+    <div style="font-size:13px; color:var(--text-sub); margin-top:6px;">
+      Samsung SDS Multicampus AI 해커톤 플랫폼 — 킥오프 공유용
+    </div>
+    <div class="doc-meta">
+      <span>📅 2026-06-01</span>
+      <span>🔖 v1.0</span>
+      <span>👤 기획: Jink</span>
+      <span>🏗 개발: NexGen</span>
+    </div>
+  </div>
+
+  <!-- TOC -->
+  <div class="toc">
+    <a class="toc-item" href="#section1">
+      <div class="toc-num">01</div>
+      <div class="toc-name">심사 프로세스</div>
+    </a>
+    <a class="toc-item" href="#section2">
+      <div class="toc-num">02</div>
+      <div class="toc-name">해커톤 대회설정</div>
+    </a>
+    <a class="toc-item" href="#section3">
+      <div class="toc-num">03</div>
+      <div class="toc-name">팀빌딩</div>
+    </a>
+    <a class="toc-item" href="#section4">
+      <div class="toc-num">04</div>
+      <div class="toc-name">루브릭 테스트</div>
+    </a>
+  </div>
+
+  <!-- ════════════════════════════════
+       01. 심사 프로세스
+  ════════════════════════════════ -->
+  <div class="section" id="section1">
+    <div class="section-header">
+      <div class="section-num">01</div>
+      <div class="section-title-wrap">
+        <div class="section-title">심사 프로세스</div>
+        <div class="section-desc">
+          AI 심사(루브릭 기반) + 심사위원 점수 + 선택적 운영자 임의평가(동료평가 포함) 3단계 구조로 최종 점수를 산출한다.
+        </div>
+      </div>
+    </div>
+
+    <!-- Flow -->
+    <div class="flow-wrap">
+      <div class="flow-title">전체 심사 흐름</div>
+      <div class="flow-steps">
+
+        <div class="flow-step">
+          <div class="flow-box">학습자<br>파일 등록</div>
+          <div class="flow-note">PDF / MD / URL</div>
+        </div>
+        <div class="flow-arrow">→</div>
+
+        <div class="flow-step">
+          <div class="flow-box auto" style="position:relative;">
+            <span class="flow-badge">자동</span>
+            전처리 엔진<br>가동
+          </div>
+          <div class="flow-note">등록 즉시</div>
+        </div>
+        <div class="flow-arrow">→</div>
+
+        <div class="flow-step">
+          <div class="flow-box warn" style="position:relative;">
+            <span class="flow-badge op">운영자</span>
+            심사 실시<br>버튼 클릭
+          </div>
+          <div class="flow-note">수동 기본<br>(일배치 옵션)</div>
+        </div>
+        <div class="flow-arrow">→</div>
+
+        <div class="flow-step">
+          <div class="flow-box auto" style="position:relative;">
+            <span class="flow-badge">AI</span>
+            Stage 1<br>전처리
+          </div>
+          <div class="flow-note">페이지 분류<br>증거수준 판단</div>
+        </div>
+        <div class="flow-arrow">→</div>
+
+        <div class="flow-step">
+          <div class="flow-box auto" style="position:relative;">
+            <span class="flow-badge">AI</span>
+            Stage 2<br>루브릭 심사
+          </div>
+          <div class="flow-note">멀티LLM<br>지표별 스코어링</div>
+        </div>
+        <div class="flow-arrow">→</div>
+
+        <div class="flow-step">
+          <div class="flow-box warn" style="position:relative;">
+            <span class="flow-badge op">운영자</span>
+            결과 확인<br>및 확정
+          </div>
+          <div class="flow-note">루브릭 수정 시<br>재심사 (최대 10회)</div>
+        </div>
+        <div class="flow-arrow">→</div>
+
+        <div class="flow-step">
+          <div class="flow-box success" style="position:relative;">
+            <span class="flow-badge">자동</span>
+            리포트<br>자동 생성
+          </div>
+          <div class="flow-note">본선 확정 시<br>즉시 배포</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 배점 구조 -->
+    <div class="sub-section">
+      <div class="sub-title">배점 구조</div>
+      <table class="policy-table">
+        <thead>
+          <tr>
+            <th>구분</th>
+            <th>반영 방식</th>
+            <th>담당</th>
+            <th>비고</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>AI 심사 점수</td>
+            <td>루브릭 기반 GPT-4o / Claude / Gemini 다수결</td>
+            <td><span class="tag tag-ai">AI</span></td>
+            <td>3개 LLM 고정, 전원 다른 점수 시 관대/중립/엄격 선택</td>
+          </tr>
+          <tr>
+            <td>심사위원 점수</td>
+            <td>배정된 팀 목록 기준 총점 1개 + 코멘트 입력</td>
+            <td><span class="tag tag-ux">심사위원</span></td>
+            <td>Expert Hub / MLP 강사 자동 표시, 엑셀 업로드 병행</td>
+          </tr>
+          <tr>
+            <td>임의평가 <span style="color:var(--text-muted);font-weight:400;">(옵션)</span></td>
+            <td>운영자가 항목명 직접 설정, 결과 확정 화면에서 점수 입력</td>
+            <td><span class="tag tag-op">운영자</span></td>
+            <td>동료평가 배틀 결과를 임의평가로 활용 가능</td>
+          </tr>
+          <tr>
+            <td>동료평가 (HACK ARENA)</td>
+            <td class="warn-text">배점 구조 제외 — 임의평가 항목으로만 활용</td>
+            <td><span class="tag tag-ux">참가자</span></td>
+            <td>블라인드 1:1 배틀 방식, 승/패/비김 집계</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- AI 심사 상세 -->
+    <div class="sub-section">
+      <div class="sub-title">AI 심사 상세 정책</div>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="feature-card-title">
+            <div class="icon">🤖</div>
+            LLM 다수결 방식
+          </div>
+          <ul class="feature-list">
+            <li>GPT-4o / Claude / Gemini 3개 모델 고정 운영</li>
+            <li>3개 모델의 점수를 다수결로 최종 점수 산출</li>
+            <li>전원 다른 점수일 경우 운영자가 관대/중립(기본)/엄격 선택</li>
+            <li>LLM별 점수 + 근거 어드민에서 상세 확인 가능</li>
+          </ul>
+        </div>
+        <div class="feature-card">
+          <div class="feature-card-title">
+            <div class="icon">⚙️</div>
+            심사 실행 방식
+          </div>
+          <ul class="feature-list">
+            <li>수동 실시 기본 — 운영자가 심사 실시 버튼 클릭</li>
+            <li>일배치 자동 실행 옵션 선택 가능 (어드민 설정)</li>
+            <li>전처리는 파일 등록 즉시 자동 가동 (별도 트리거 불필요)</li>
+            <li>AI 심사 결과는 운영자 승인 후 리더보드 반영</li>
+          </ul>
+        </div>
+        <div class="feature-card">
+          <div class="feature-card-title">
+            <div class="icon">📊</div>
+            심사 결과 관리
+          </div>
+          <ul class="feature-list">
+            <li>루브릭 버전별 심사 결과 누적 이력 관리 (v1.0 / v2.0 등)</li>
+            <li>LLM 심사결과 탭 + 전처리 데이터 탭 분리 제공</li>
+            <li>카테고리별 등급 + 점수 테이블, CSV 다운로드</li>
+            <li>리더보드 UX: "점수는 기준 변경에 따라 전일 대비 달라질 수 있습니다"</li>
+          </ul>
+        </div>
+        <div class="feature-card">
+          <div class="feature-card-title">
+            <div class="icon">📄</div>
+            리포트 자동 생성
+          </div>
+          <ul class="feature-list">
+            <li>본선 진출자 확정 클릭 시 즉시 자동 생성 (수동 트리거 없음)</li>
+            <li>심사위원용 리포트 / 참가자 개인 리포트 분리</li>
+            <li>참가자는 결과 확인 화면에서 조회 및 다운로드/인쇄</li>
+            <li>확정 알럿: "루브릭 수정 불가, 리포트 자동 생성 진행"</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="note-box">
+      <span class="note-icon">⚠️</span>
+      <div>루브릭 수정 시 전체 재심사가 진행되며 리더보드 점수가 변동될 수 있습니다. 수정 가능 횟수는 루브릭 수정 + 테스트 합산 <strong>최대 10회</strong>로 제한됩니다.</div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ════════════════════════════════
+       02. 해커톤 대회설정
+  ════════════════════════════════ -->
+  <div class="section" id="section2">
+    <div class="section-header">
+      <div class="section-num">02</div>
+      <div class="section-title-wrap">
+        <div class="section-title">해커톤 대회설정</div>
+        <div class="section-desc">
+          운영자가 대회 전 설정해야 하는 전체 항목. 기본 정보 · 트랙 설정 · 심사 설정 · 공개/알림 4개 탭으로 구성.
+        </div>
+      </div>
+    </div>
+
+    <!-- 탭 구조 -->
+    <div class="sub-section">
+      <div class="sub-title">대회설정 탭 구성</div>
+      <div class="step-list">
+        <div class="step-item">
+          <div class="step-badge">1</div>
+          <div class="step-content">
+            <div class="step-name">기본 정보</div>
+            <div class="step-detail">
+              배너/썸네일 업로드, 대회소개 (HTML 에디터), 보상/혜택 내용, 일정 설정 (각 단계별 시작~종료일)<br>
+              <strong>대회 시작 후 일부 항목 수정 제한</strong>
+            </div>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-badge">2</div>
+          <div class="step-content">
+            <div class="step-name">트랙 설정</div>
+            <div class="step-detail">
+              참가 유형: <strong>Basic(MVP톤) / Custom</strong> 라디오 선택 (아이디어톤/MVP톤 chip 표기 전체 삭제)<br>
+              트랙별 제출 항목 관리 — 항목 추가 모달로 구성 (PDF / MD / URL 파일 타입 설정)
+            </div>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-badge">3</div>
+          <div class="step-content">
+            <div class="step-name">심사 설정</div>
+            <div class="step-detail">
+              <strong>탭 3개 구성:</strong> 심사단계 설정 / 심사기준·루브릭(Step1~3-3) / 심사기준 다운로드<br>
+              AI 심사 LLM 다수결 예외처리, 배점 구조 설정 (AI심사 + 임의평가), 동료투표 활성화 여부<br>
+              <strong>대회 시작 후 프리징</strong> (본선 확정 전까지 루브릭 수정 가능, 최대 10회)
+            </div>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-badge">4</div>
+          <div class="step-content">
+            <div class="step-name">공개/알림</div>
+            <div class="step-detail">
+              갤러리 노출 시점: <strong>본선 진행 중 / 최종 수상자 발표 후</strong> 선택<br>
+              AI 심사 결과 노출 방식 설정, 갤러리 미리보기 버튼<br>
+              메일링 설정: 발송 이메일 내용 설정 + 발송 이력 탭
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 주요 정책 -->
+    <div class="sub-section">
+      <div class="sub-title">주요 정책</div>
+      <table class="policy-table">
+        <thead>
+          <tr><th>항목</th><th>내용</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>대회 유형</td><td>Basic(MVP톤) / Custom 2가지 유지. 아이디어톤/MVP톤 chip 표기 어드민·프론트 전체 삭제</td></tr>
+          <tr><td>프리징 기준</td><td>대회 시작 후 심사 설정 전체 수정 불가. 루브릭만 본선 확정 전까지 최대 10회 허용</td></tr>
+          <tr><td>갤러리 노출</td><td>하트(동료평가) 기능 삭제. 아카이빙 개념. 노출 시점 운영자 설정 (본선 중 / 수상 후)</td></tr>
+          <tr><td>데이터 보관</td><td>운영 종료 후 +1개월 유지, 이후 파기</td></tr>
+          <tr><td>임의평가</td><td>운영자가 항목명 직접 설정. 동료평가 배틀 결과를 임의평가로 활용 가능</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="note-box info">
+      <span class="note-icon">ℹ️</span>
+      <div>대회설정은 킥오프 전 운영자가 사전에 완료해야 합니다. 대회 시작 이후 심사단계 설정과 배점 구조는 수정이 불가합니다.</div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ════════════════════════════════
+       03. 팀빌딩
+  ════════════════════════════════ -->
+  <div class="section" id="section3">
+    <div class="section-header">
+      <div class="section-num">03</div>
+      <div class="section-title-wrap">
+        <div class="section-title">팀빌딩</div>
+        <div class="section-desc">
+          참가자가 직접 팀을 구성하는 방식. 동일 과정(course_id) 수강생 내에서 아이디 검색 후 즉시 추가. 수락/거절 없음.
+        </div>
+      </div>
+    </div>
+
+    <!-- 흐름 -->
+    <div class="flow-wrap">
+      <div class="flow-title">팀빌딩 흐름</div>
+      <div class="flow-steps">
+        <div class="flow-step">
+          <div class="flow-box primary">참가 신청</div>
+          <div class="flow-note">팀명 / 유형 / 주제</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">
+          <div class="flow-box">팀원 검색</div>
+          <div class="flow-note">동일 course_id<br>수강생 내 검색</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">
+          <div class="flow-box auto">즉시 추가</div>
+          <div class="flow-note">수락/거절 없음<br>(MVP 기준)</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">
+          <div class="flow-box">팀 구성 완료</div>
+          <div class="flow-note">최소 1인<br>최대 4인</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">
+          <div class="flow-box success">과제물 제출</div>
+          <div class="flow-note">팀장만 가능<br>재제출 무제한</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 팀장 vs 팀원 -->
+    <div class="sub-section">
+      <div class="sub-title">역할별 권한 — 마이페이지</div>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="feature-card-title">
+            <div class="icon">👑</div>
+            팀장 (신청자)
+          </div>
+          <ul class="feature-list">
+            <li>팀 정보 수정 (팀명 · 유형 · 주제)</li>
+            <li>팀 멤버 추가 / 삭제</li>
+            <li>과제물 제출 및 수정 (재제출 무제한)</li>
+            <li>현재 순위 · 동료평가 점수 · 제출 횟수 확인</li>
+            <li>자동 설정, 변경 불가</li>
+          </ul>
+        </div>
+        <div class="feature-card">
+          <div class="feature-card-title">
+            <div class="icon">👤</div>
+            팀원
+          </div>
+          <ul class="feature-list">
+            <li>팀 정보 · 멤버 구성 조회 (읽기 전용)</li>
+            <li>현재 순위 · 동료평가 점수 · 제출 횟수 확인</li>
+            <li>수정 · 제출 버튼 비활성 (팀장만 가능)</li>
+            <li>팀 탈퇴 가능 (본인만)</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- 정책 테이블 -->
+    <div class="sub-section">
+      <div class="sub-title">팀빌딩 정책</div>
+      <table class="policy-table">
+        <thead>
+          <tr><th>항목</th><th>내용</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>팀원 검색 범위</td><td>동일 <strong>course_id</strong> 수강생 목록 내. 외부 조직도 연동 없음</td></tr>
+          <tr><td>팀 구성 인원</td><td>최소 1인 (개인 참가) ~ 최대 4인</td></tr>
+          <tr><td>팀장 설정</td><td>신청자 자동 설정, 변경 불가</td></tr>
+          <tr><td>팀원 추가 방식</td><td>아이디 검색 후 즉시 추가 (수락/거절 없음, MVP 기준)</td></tr>
+          <tr><td>과제물 제출</td><td>팀장만 가능. 제출 기간 내 재제출 횟수 무제한</td></tr>
+          <tr><td>파일 타입</td><td>PDF / MD / URL — 어드민 트랙 설정에 따라 활성화</td></tr>
+          <tr><td>이메일 마스킹</td><td class="warn-text">마스킹 정책 개발팀 확인 필요</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="note-box success-box">
+      <span class="note-icon">✅</span>
+      <div>팀원 추가 즉시 해당 수강생은 팀 소속으로 처리됩니다. 팀 구성 안내 문구는 참여신청 화면 내 노출 예정입니다.</div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ════════════════════════════════
+       04. 루브릭 테스트
+  ════════════════════════════════ -->
+  <div class="section" id="section4">
+    <div class="section-header">
+      <div class="section-num">04</div>
+      <div class="section-title-wrap">
+        <div class="section-title">루브릭 테스트</div>
+        <div class="section-desc">
+          AI 심사 전 루브릭의 품질을 사전 검증하는 기능. 점검(포지큐브 AI) → 테스트 심사 → 확정 3단계로 구성.
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 흐름 -->
+    <div class="flow-wrap">
+      <div class="flow-title">루브릭 설정 흐름 (심사 설정 > Step 3)</div>
+      <div class="flow-steps">
+        <div class="flow-step">
+          <div class="flow-box">Step 1<br>지표 선택</div>
+          <div class="flow-note">비즈니스가치<br>기술완성도</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">
+          <div class="flow-box">Step 2<br>세부 설정</div>
+          <div class="flow-note">지표별 가중치<br>판단조건 입력</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">
+          <div class="flow-box auto" style="position:relative;">
+            <span class="flow-badge">AI</span>
+            Step 3-1<br>루브릭 점검
+          </div>
+          <div class="flow-note">포지큐브 API<br>명확성 분석</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">
+          <div class="flow-box warn" style="position:relative;">
+            <span class="flow-badge op">운영자</span>
+            Step 3-2<br>심사 테스트
+          </div>
+          <div class="flow-note">가상팀+파일<br>미리 심사</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">
+          <div class="flow-box success">Step 3-3<br>루브릭 확정</div>
+          <div class="flow-note">버전 이력 관리<br>확정 후 잠금</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 단계별 상세 -->
+    <div class="sub-section">
+      <div class="sub-title">단계별 상세</div>
+      <div class="step-list">
+        <div class="step-item">
+          <div class="step-badge" style="background:#6D28D9;">AI</div>
+          <div class="step-content">
+            <div class="step-name">Step 3-1 — 루브릭 점검 <span class="tag tag-ai">AI 자동</span></div>
+            <div class="step-detail">
+              포지큐브 API를 호출해 루브릭의 명확성·일관성을 자동 분석한다.<br>
+              지표별 <strong>수정 필요 / 검토 권장 / 참고</strong> 3단계로 분류.<br>
+              현재 문구 vs AI 제안 문구 나란히 비교, 운영자가 <strong>무시 / 직접 수정 / 제안대로 수정</strong> 중 선택.<br>
+              선택 사항 — 점검 여부는 운영자가 결정.
+            </div>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-badge" style="background:var(--warning);">OP</div>
+          <div class="step-content">
+            <div class="step-name">Step 3-2 — 심사 테스트 <span class="tag tag-op">운영자</span></div>
+            <div class="step-detail">
+              가상 팀이름 + 가상 제출 파일로 AI 심사를 미리 실행해 루브릭 품질을 확인한다.<br>
+              테스트 케이스 복수 추가 가능. 테스트 실행 시 즉시 심사 진행.<br>
+              <strong>잔여 횟수 표시 (최대 10회) — 루브릭 수정 + 테스트 합산 카운트.</strong>
+            </div>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-badge" style="background:var(--success);">✓</div>
+          <div class="step-content">
+            <div class="step-name">Step 3-3 — 루브릭 확정 <span class="tag tag-op">운영자</span></div>
+            <div class="step-detail">
+              점검 + 테스트 완료 후 최종 확정. 버전 이력 표시 (v1.0 적용 중 → v1.1 변경 예정).<br>
+              AI 심사 전: <strong>[이대로 확정하기]</strong> 버튼 활성.<br>
+              AI 심사 후 수정 시: 알럿 — <em>"전체 재심사 진행, 리더보드 점수 변동 가능"</em><br>
+              본선 확정 후: 확정 버튼 비활성 (수정 불가).
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 제약 조건 -->
+    <div class="sub-section">
+      <div class="sub-title">제약 조건 및 정책</div>
+      <table class="policy-table">
+        <thead>
+          <tr><th>항목</th><th>내용</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>수정 가능 기간</td><td>본선 진출자 확정 전까지 허용</td></tr>
+          <tr><td>최대 횟수</td><td class="highlight">루브릭 수정 + 테스트 실행 합산 최대 10회</td></tr>
+          <tr><td>재심사 트리거</td><td>루브릭 수정 시 전체 재심사 자동 진행, 리더보드 점수 변동 가능</td></tr>
+          <tr><td>버전 관리</td><td>변경 이력 누적 저장 (v1.0 → v1.1). 심사 결과 관리 화면에서 버전별 조회 가능</td></tr>
+          <tr><td>MD/URL 제출 시</td><td>루브릭 8번 항목 자동 추가 (어드민 연동)</td></tr>
+          <tr><td>포지큐브 연동</td><td class="warn-text">파라미터 스펙 확정 필요 (개발팀 신동진 확인 대기)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="note-box">
+      <span class="note-icon">⚠️</span>
+      <div>루브릭 점검(Step 3-1)은 선택 사항이지만, 심사 테스트(Step 3-2)는 잔여 횟수를 소진합니다. 본선 확정 후에는 루브릭 수정이 불가하므로 대회 시작 전 충분히 검증해야 합니다.</div>
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <div style="margin-top:80px; padding-top:24px; border-top:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
+    <div style="font-size:11px; color:var(--text-muted);">
+      AI Hackathon Platform · Feature Definition v1.0 · 2026-06-01
+    </div>
+    <div style="font-size:11px; color:var(--text-muted);">
+      Samsung SDS Multicampus × NexGen
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

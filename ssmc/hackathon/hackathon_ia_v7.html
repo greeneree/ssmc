@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AI 해커톤 IA v7</title>
+<link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --primary: #7F5DD5;
+    --grad: linear-gradient(139deg, #B06CFF 8.74%, #4E70FF 62.41%, #1772FF 92.67%);
+    --text: #131416; --subtle: #58616A; --border: #E8EAED; --bg: #F7F8FA;
+    --add: #E8F5E9; --add-b: #43A047;
+    --mod: #FFF8E1; --mod-b: #FB8C00;
+    --del: #FFEBEE; --del-b: #E53935;
+    --exist: #E3F2FD; --exist-b: #1976D2;
+    --cond: #FFF3CD; --cond-b: #FFC107;
+    --unresolved: #FFE0E0; --unresolved-b: #E53935;
+    --confirmed: #F3E5F5; --confirmed-b: #7B1FA2;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Pretendard', sans-serif; }
+  body { background: var(--bg); color: var(--text); }
+  header { background: var(--grad); color: white; padding: 28px 40px 24px; }
+  header h1 { font-size: 23px; font-weight: 800; margin-bottom: 6px; }
+  header p { font-size: 14px; opacity: .75; }
+  .version-badge { display: inline-block; background: rgba(255,255,255,.2); border: 1px solid rgba(255,255,255,.35); padding: 3px 12px; border-radius: 20px; font-size: 13px; font-weight: 700; margin-right: 8px; }
+  .toolbar { background: white; border-bottom: 1px solid var(--border); padding: 14px 40px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; position: sticky; top: 0; z-index: 50; }
+  .filter-group { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .filter-label { font-size: 13px; font-weight: 700; color: var(--subtle); }
+  .filter-btn { font-size: 13px; font-weight: 600; padding: 5px 12px; border-radius: 20px; border: 1.5px solid var(--border); background: white; color: var(--subtle); cursor: pointer; transition: all .15s; }
+  .filter-btn.active { border-color: var(--primary); color: var(--primary); background: #F5F2FF; }
+  .filter-btn[data-label="추가"].active { border-color: var(--add-b); color: var(--add-b); background: var(--add); }
+  .filter-btn[data-label="수정"].active { border-color: var(--mod-b); color: var(--mod-b); background: var(--mod); }
+  .filter-btn[data-label="기존활용"].active { border-color: var(--exist-b); color: var(--exist-b); background: var(--exist); }
+  .dl-btn { margin-left: auto; font-size: 13px; font-weight: 700; padding: 7px 16px; border-radius: 8px; border: none; background: var(--grad); color: white; cursor: pointer; }
+  .legend { padding: 10px 40px; display: flex; gap: 16px; flex-wrap: wrap; background: white; border-bottom: 1px solid var(--border); }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--subtle); }
+  .legend-dot { width: 10px; height: 10px; border-radius: 2px; }
+  .summary-bar { background: white; border-bottom: 2px solid var(--border); padding: 12px 40px; display: flex; gap: 24px; align-items: center; }
+  .summary-item { font-size: 13px; color: var(--subtle); }
+  .summary-item strong { color: var(--primary); font-size: 18px; font-weight: 800; margin-right: 4px; }
+  .table-wrap { overflow-x: auto; padding: 20px 40px 60px; }
+  table { border-collapse: collapse; width: 100%; min-width: 1300px; background: white; border-radius: 14px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,.06); font-size: 14px; }
+  thead tr { background: #1a1040; }
+  th { color: white; font-size: 12px; font-weight: 700; letter-spacing: .05em; padding: 13px 14px; text-align: left; white-space: nowrap; }
+  td { padding: 10px 14px; border-bottom: 1px solid var(--border); vertical-align: top; line-height: 1.5; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #FAFAFA; }
+  .cell-section { font-weight: 800; font-size: 13px; padding: 4px 10px; border-radius: 4px; display: inline-block; }
+  .front { background: #E8F4FD; color: #1565C0; }
+  .admin { background: #F3E5F5; color: #6A1B9A; }
+  .sysadmin { background: #E8F5E9; color: #2E7D32; }
+  .judge { background: #FFF8E1; color: #E65100; }
+  .cell-target { font-size: 13px; font-weight: 600; padding: 3px 9px; border-radius: 20px; display: inline-block; white-space: nowrap; }
+  .t-participant { background: #E3F2FD; color: #1565C0; }
+  .t-peer { background: #E8F5E9; color: #2E7D32; }
+  .t-judge { background: #FFF8E1; color: #E65100; }
+  .t-operator { background: #F3E5F5; color: #6A1B9A; }
+  .t-sysadmin { background: #ECEFF1; color: #37474F; }
+  .depth1 { font-weight: 700; color: var(--text); }
+  .depth2 { padding-left: 12px; color: var(--subtle); }
+  .depth3 { padding-left: 24px; color: #8FA0B0; font-size: 13px; }
+  .depth4 { padding-left: 36px; color: #AAB5C0; font-size: 13px; }
+  .badge { font-size: 12px; font-weight: 700; padding: 2px 8px; border-radius: 4px; display: inline-block; }
+  .b-add { background: var(--add); color: var(--add-b); border: 1px solid #A5D6A7; }
+  .b-mod { background: var(--mod); color: var(--mod-b); border: 1px solid #FFE082; }
+  .b-exist { background: var(--exist); color: var(--exist-b); border: 1px solid #90CAF9; }
+  .b-del { background: var(--del); color: var(--del-b); border: 1px solid #FFCDD2; }
+  .feedback-cell { font-size: 12px; color: #5D4037; line-height: 1.6; }
+  .feedback-confirmed { color: #4A148C; font-weight: 600; }
+  .login-o { color: var(--primary); font-weight: 700; }
+  .note { font-size: 12px; color: var(--subtle); line-height: 1.6; }
+  .screen-count { font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 10px; background: #EEF2FF; color: #4F6BF8; margin-left: 6px; }
+  tr.row-add td { background: #FAFFF9; }
+  tr.row-mod td { background: #FFFDF5; }
+  tr.row-exist td { background: #F9FDFF; }
+  tr.row-del td { background: #FFF8F8; }
+  tr.row-confirmed td { background: #FCF9FF; }
+  .section-divider td { background: linear-gradient(90deg, #F0EFF8 0%, #F7F8FA 100%); font-weight: 800; font-size: 13px; color: var(--primary); padding: 8px 14px; letter-spacing: .06em; border-bottom: 2px solid #E0D8FF; }
+  tr.hidden { display: none; }
+</style>
+</head>
+<body>
+<header>
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+    <span class="version-badge">v7</span>
+    <span style="font-size:14px;opacity:.7;">최종 수정: 2026-05-29 | 05-29 회의 반영 — 동료평가 배틀방식·루브릭Step3·시스템관리자 신규·유형구분 삭제·배점구조 변경</span>
+  </div>
+  <h1>AI 해커톤 플랫폼 — IA (Information Architecture)</h1>
+  <p>Samsung SDS Multicampus · Front / Admin / SystemAdmin · 5개 역할</p>
+</header>
+
+<div class="toolbar">
+  <div class="filter-group">
+    <span class="filter-label">구분</span>
+    <button class="filter-btn active" data-filter="section" data-val="all">전체</button>
+    <button class="filter-btn" data-filter="section" data-val="Front">Front</button>
+    <button class="filter-btn" data-filter="section" data-val="Admin">Admin</button>
+    <button class="filter-btn" data-filter="section" data-val="SysAdmin">시스템관리자</button>
+  </div>
+  <div class="filter-group">
+    <span class="filter-label">역할</span>
+    <button class="filter-btn active" data-filter="target" data-val="all">전체</button>
+    <button class="filter-btn" data-filter="target" data-val="참가자">참가자</button>
+    <button class="filter-btn" data-filter="target" data-val="심사위원">심사위원</button>
+    <button class="filter-btn" data-filter="target" data-val="운영자">운영자</button>
+    <button class="filter-btn" data-filter="target" data-val="시스템관리자">시스템관리자</button>
+  </div>
+  <div class="filter-group">
+    <span class="filter-label">변경</span>
+    <button class="filter-btn" data-filter="change" data-val="추가" data-label="추가">추가</button>
+    <button class="filter-btn" data-filter="change" data-val="수정" data-label="수정">수정</button>
+    <button class="filter-btn" data-filter="change" data-val="기존활용" data-label="기존활용">기존활용</button>
+  </div>
+  <button class="dl-btn" onclick="downloadCSV()">⬇ CSV 다운로드</button>
+</div>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:var(--add-b)"></div> 추가</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--mod-b)"></div> 수정</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--exist-b)"></div> 기존활용</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--del-b)"></div> 삭제</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--confirmed-b)"></div> 🔵확정</div>
+</div>
+
+<div class="summary-bar">
+  <div class="summary-item"><strong id="cnt-front">-</strong>Front 화면</div>
+  <div class="summary-item"><strong id="cnt-judge">-</strong>심사위원 화면</div>
+  <div class="summary-item"><strong id="cnt-admin">-</strong>Admin 화면</div>
+  <div class="summary-item"><strong id="cnt-sysadmin">-</strong>시스템관리자 화면</div>
+  <div class="summary-item" style="margin-left:auto;"><strong id="cnt-total">-</strong>총 화면수</div>
+</div>
+
+<div class="table-wrap">
+<table id="iaTable">
+<thead>
+<tr>
+  <th>구분</th><th>Target</th><th>1Depth</th><th>2Depth</th><th>3Depth</th><th>4Depth</th>
+  <th>화면수</th><th>로그인</th><th>비고</th><th>변경사항</th><th>회의록 / 피드백</th>
+</tr>
+</thead>
+<tbody>
+
+<!-- ────────── FRONT / 참가자 ────────── -->
+<tr class="section-divider"><td colspan="11">▸ FRONT — 참가자</td></tr>
+
+<tr class="row-mod" data-section="Front" data-target="참가자" data-change="수정" data-screen="1">
+  <td><span class="cell-section front">Front</span></td><td><span class="cell-target t-participant">참가자</span></td>
+  <td class="depth1">랜딩 (홈)</td><td></td><td></td><td></td>
+  <td><span class="screen-count">4variant</span></td>
+  <td class="login-o">O</td>
+  <td class="note">진행 단계별 4가지 화면 변형<br/>①모집단계: 배너+대회안내+일정+보상+참가신청버튼<br/>②진행단계: 팀룸 개념 (내 팀 현황 중심)<br/>③동료평가단계: 배틀 게임 유도 배너<br/>④결과공개: 갤러리+리더보드 전환<br/>리더보드는 참가신청 종료 후 노출</td>
+  <td><span class="badge b-mod">수정</span></td>
+  <td class="feedback-cell feedback-confirmed">🔵 05-29: 진행단계 팀룸 개념, 동료평가 게임 유도, 결과공개 갤러리전환</td>
+</tr>
+
+<tr class="row-add" data-section="Front" data-target="참가자" data-change="추가" data-screen="1">
+  <td><span class="cell-section front">Front</span></td><td><span class="cell-target t-participant">참가자</span></td>
+  <td class="depth1">심사기준</td><td></td><td></td><td></td>
+  <td><span class="screen-count">1</span></td>
+  <td class="login-o">O</td>
+  <td class="note">심사기준 안내, 작성 예시, 제출 파일 정보<br/>템플릿 다운로드 (PDF/PPT)</td>
+  <td><span class="badge b-add">추가</span></td>
+  <td class="feedback-cell feedback-confirmed">🔵 05-29 신규</td>
+</tr>
+
+<tr class="row-mod" data-section="Front" data-target="참가자" data-change="수정" data-screen="1">
+  <td><span class="cell-section front">Front</span></td><td><span class="cell-target t-participant">참가자</span></td>
+  <td class="depth1">참여신청 / 제출</td><td></td><td></td><td></td>
+  <td><span class="screen-count">1</span></td>
+  <td class="login-o">O</td>
+  <td class="note">개인 및 팀 구성·주제 등록, 정보 수정, 산출물 제출<br/>진행단계에 따라 탭 추가<br/>재제출 가능 (제출 기간 내 횟수 무제한)<br/>Admin 설정에 따라 파일 업로드 필드 활성화 (PDF/MD/URL)</td>
+  <td><span class="badge b-mod">수정</span></td>
+  <td class="feedback-cell feedback-confirmed">🔵 05-29: 재제출 무제한, 파일 타입 어드민 연동</td>
+</tr>
+
+<tr class="row-add" data-section="Front" data-target="참가자" data-change="추가" data-screen="1">
+  <td><span class="cell-section front">Front</span></td><td><span class="cell-target t-participant">참가자</span></td>
+  <td></td><td class="depth2">팀 구성</td><td></td><td></td>
+  <td><span class="screen-count">1</span></td>
+  <td class="login-o">O</td>
+  <td class="note">아이디 검색 후 직접 추가하는 방식<br/>이메일 마스킹 정책 확인 필요</td>
+  <td><span class="badge b-add">추가</span></td>
+  <td class="feedback-cell feedback-confirmed">🔵 05-29 신규</td>
+</tr>
+
+<tr class="row-mod" data-section="Front" data-target="참가자" data-change="수정" data-screen="1">
+  <td><span class="cell-section front">Front</span></td><td><span class="cell-target t-participant">참가자</span></td>
+  <td class="depth1">동료평가 (HACK ARENA)</td><td></td><td></td><td></td>
+  <td><span class="screen-count">3variant</span></td>
+  <td class="login-o">O</td>
+  <td class="note">기존 좋아요 방식 → 블라인드 1:1 배틀 게임 방식으로 전면 변경<br/>①게임 전: 참여 유도형 배너 + 게임시작 버튼<br/>②게임 중: 카드 섹션 (문제/해결/AI기술/기대효과) 2팀 비교, 왼쪽선택/비김/오른쪽선택<br/>③게임 후: Top3 시상대 + 스토리형 뱃지 + 그리드 스크롤<br/>블라인드로 팀명 숨기고 내용만 노출 → 결과 공개 시 팀명 공개<br/>승패에 따른 점수 가감</td>
+  <td><span class="badge b-mod">수정</span></td>
+  <td class="feedback-cell feedback-confirmed">🔵 05-29: 이상형월드컵 방식 전면 변경, 하트 삭제</td>
+</tr>
+
+<tr class="row-add" data-section="Front" data-target="참가자" data-change="추가" data-screen="1">
+  <td><span class="cell-section front">Front</span></td><td><span class="cell-target t-participant">참가자</span></td>
+  <td class="depth1">결과 확인</td><td></td><td></td><td></td>
+  <td><span class="screen-count">1</span></td>
+  <td class="login-o">O</td>
+  <td class="note">본선 확정 이후 노출<br/>본인 제출물에 대한 AI 피드백 확인<br/>개인 리포트 조회 및 다운로드/인쇄 가능</td>
+  <td><span class="badge b-add">추가</span></td>
+  <td class="feedback-cell feedback-confirmed">🔵 05-29 신규</td>
+</tr>
+
+<tr class="row-mod" data-section="Front" data-target="참가자" data-change="수정" data-screen="1">
+  <td><span class="cell-section front">Front</span></td><td><span class="cell-target t-participant">참가자</span></td>
+  <td class="depth1">갤러리</td><td></td><td></td><td></td>
+  <td><span class="screen-count">1</span></td>
+  <td class="login-o">O</td>
+  <td class="note">전체 산출물 갤러리 + 뱃지 노출<br/>아카이빙 개념, 하트 기능 삭제<br/>본선 진출 확정 후 노출 (어드민 설정)<br/>종료 후 1개월간 유지</td>
+  <td><span class="badge b-mod">수정</span></td>
+  <td class="feedback-cell feedback-confirmed">🔵 05-29: 하트 삭제, 아카이빙 개념, 노출시점 어드민 연동</td>
+</tr>
+
+<tr class="row-mod" data-section="Front" data-target="참가자" data-change="수정" data-screen="1">
+  <td><span class="cell-section front">Front</span></td><td><span class="cell-target t-participant">참가자</span></td>
+  <td class="depth1">랭킹 / 리더보드</td><td></td><td></td><td></td>
+  <td><span class="screen-count">1</span></td>
+  <td class="login-o">O</td>
+  <td class="note">공통 렌더링 / 권한에 따라 노출 컴포넌트 조건부<br/>상단 문구: "AI 심사 점수는 평가 기준 및 가중치 변경에 따라 전일 대비 일부 달라질 수 있습니다."</td>
+  <td><span class="badge b-mod">수정</span></td>
+  <td class="feedback-cell feedback-confirmed">🔵 05-29: 리더보드 UX Writing 추가</td>
+</tr>
+
+<!-- ────────── FRONT / 심사위원 ────────── -->
+<tr class="section-divider"><td colspan="11">▸ FRONT — 심사위원</td></tr>
+
+<tr class="row-add" data-section="Front" data-target="심사위원" data-change="추가" data-screen="1">
+  <td><span class="cell-section judge">Front</span></td><td><span class="cell-target t-judge">심사위원</span></td>
+  <td class="depth1">심사 목록</td><td></td><td></td><td></td>
+  <td><span class="screen-count">1</span></td>
+  <td class="login-o">O</td>
+  <td class="note">배정된 제출물 목록, 심사 상태 (완료/미완료), 진척률<br/>LNB: 심사 목록 단 하나만 노출</td>
+  <td><span class="badge b-add">추가</span></td>
+  <td class="feedback-cell feedback-confirmed">🔵 05-26 피드백 반영</td>
+</tr>
+
+<tr class="row-add" data-section="Front" data-target="심사위원" data-change="추가" data-screen="1">
+  <td><span class="cell-section judge">Front</span></td><td><span class="cell-target t-judge">심사위원</span></td>
+  <td class="depth1">심사 상세</td><td></td><td></td><td></td>
+  <td><span class="screen-count">1</span></td>
+  <td class="login-o">O</td>
+  <td class="note">AI 심사 참고자료 (프로젝트 개요/AI 평가/검토 포인트)<br/>결과물 수준 (미흡/보통/우수) 라디오 → 허용 점수 구간 제어<br/>총점 1개 + 코멘트 입력<br/>임시저장 / 심사 완료 제출</td>
+  <td><span class="badge b-add">추가</span></td>
+  <td class="feedback-cell feedback-confirmed">🔵 05-26 피드백 반영</td>
+</tr>
+
+<!-- ────────── ADMIN / 운영자 ────────── -->
+<tr class="section-divider"><td colspan="11">▸ ADMIN — 운영자</td></tr>
+
+<tr class="row-mod" data-section="Admin" data-target="운영자" data-change="수정" data-screen="1">
+  <td><span class="cell-section admin">Admin</span></td><td><span class="cell-target t-operator">운영자</span></td>
+  <td class="depth1">대시보드</td><td></td><td></td><td></td>
+  <td><span class="screen-count">1</span></td>
+  <td class="login-o">O</td>
+  <td class="note">KPI 카드, 진행 단계 타임라인, 리더보드 요약, 최근 상태 알림<br/>AI 심사와 동료평가 동시 진행 시 "3-1 AI심사 / 3-2 동료투표" 병기</td>
+  <td><span class="badge b-mod">수정</span></td>
+  <td class="feedback-cell feedback-confirmed">🔵 05-29: 동시진행 단계 병기 방식</td>
+</tr>
+
+<tr data-section="Admin" data-target="운영자" data-change="" data-screen="0">
+  <td><span class="cell-section admin">Admin</span></td><td><span class="cell-target t-operator">운영자</span></td>
+  <td class="depth1">대회설정</td><td></td><td></td><td></td>
+  <td></td><td class="login-o">O</td><td class="note">메뉴 그룹</td><td></td><td></td>
+</tr>
+
+<tr class="row-mod" data-section="Admin" data-target="운영자" data-change="수정" data-screen="1">
+  <td><span class="cell-section admin">Admin</span></td><td><span class="cell-target t-operator">운영자</span></td>
+  <td></td><td class="depth2">기본 정보</td><td></td><td></td>
+  <td><span class="screen-count">1</span></td>
+  <td class="login-o">O</td>
+  <td class="note">배너/썸네일, 대회소개(HTML), 보상/혜택, 일정설정 탭 분리</td>
+  <td><span class="badge b-mod">수정</span></td><td></td>
+</tr>
+
+<tr class="row-mod" data-section="Admin" data-target="운영자" data-change="수정" data-screen="1">
+  <td><span class="cell-section admin">Admin</span></td><td><span class="cell-target t-operator">운영자</span></td>
+  <td></td><td class="depth2">트랙 설정</td><td></td><td></td>
+  <td><span class="screen-count">1</span></td>
+  <td class="login-o">O</td>
+  <td class="note">참가유형: 기본(MVP톤) / 커스텀 라디오 선택<br/>트랙 제출항목 관리 (항목추가 모달)<br/>유형 구분(아이디어톤/MVP톤 chip) 전체 삭제</td>
+  <td><span class="badge b-mod">수정</span></td>
+  <td class="feedback-cell feedback-confirmed">🔵 05-29: 유형구분 삭제 확정, Basic/Custom 유지</td>
+</tr>
+
+<tr data-section="Admin" data-target="운영자" data-change="" data-screen="0">
+  <td><span class="cell-section admin">Admin</span></td><td><span class="cell-target t-operator">운영자</span></td>
+  <td></td><td class="depth2">심사 설정</td><td></td><td></td>
+  <td></td><td class="login-o">O</td><td class="note">탭: 심사단계 설정 / 심사기준·루브릭 / 심사기준 다운로드</td><td></td><td></td>
+</tr>
+
+<tr class="row-mod" data-section="Admin" data-target="운영자" data-change="수정" data-screen="1">
+  <td><span class="cell-section admin">Admin</span></td><td><span class="cell-target t-operator">운영자</span></td>
+  <td></td><td></td><td class="depth3">심사단계 설정</td><td></td>
+  <td><span class="screen-count">1</span></td>
+  <td class="login-o">O</td>
+  <td class="note">AI 심사 LLM 다수결 예외처리 (최고/중간DEFAULT/최저)<br/>AI 심사 실행 방식: 수동 실시(기본) / 일배치 자동 실행<br/>동료투표: 활성화 여부만 설정<br/>배점구조: AI심사 + 임의평가 (동료평가 배점 제외)<br/>본선 심사용 점수 설정<br/>대회 시작 후 프리징</td>
+  <td><span class="badge b-mod">수정</span></td>
+  <td class="feedback-cell feedback-confirmed">🔵 05-29: 수동배치 기본, 동료평가 배점 제외, 임의평가 항목 추가</td>
+</tr>
+
+<tr class="row-mod" data-section="Admin" data-target="운영자" data-change="수정" data-screen="1">
+  <td><span class="cell-section admin">Admin</span></td><td><span class="cell-target t-operator">운영자</span></td>
+  <td></td><td></td><td class="depth3">심사기준 / 루브릭 Step1</td><td></td>
+  <td><span class="screen-count">1</span></td>
+  <td class="login-o">O</td>
+  <td class="note">평가 지표 선택 (비즈니스가치 / 기술완성도)<br/>MD/URL 제출 시 루브릭 8번 자동 추가</td>
+  <td><span class="badge b-mod">수정</span></td>
+  <td class="feedback-cell feedback-confirmed">🔵 05-29: MD/URL 루브릭 자동추가</td>
+</tr>
+
+<tr class="row-mod" data-section="Admin" data-target="운영자" data-change="수정" data-screen="1">
+  <td><span class="cell-section admin">Admin</span></td><td><span class="cell-target t-operator">운영자</span></td>
+  <td></td><td></td><td class="depth3">심사기준 / 루브릭 Step2</td><td></td>
+  <td><span class="screen-count">1</span></td>
+  <td class="login-o">O</td>
+  <td class="note">지표별 세부 설정 (지표명/평가항목/평가목표/판단조건A~C/채점기준1~3점)<br/>가중치 설정 테이블 (합계 100% 자동검증)<br/>지표 확정 버튼 / 대회 시작 후 프리징<br/>본선 확정 후 확정 버튼 비활성</td>
+  <td><span class="badge b-mod">수정</span></td><td></td>
+</tr>
+
+<tr class="row-add" data-section="Admin" data-target="운영자" data-change="추가" data-screen="1">
+  <td><span class="cell-section admin">Admin</span></td><td><span class="cell-target t-operator">운영자</span></td>
+  <td></td><td></td><td class="depth3">루브릭 점검 Step3-1</td><td></td>
+  <td><span class="screen-count">1</span></td>
+  <td class="login-o">O</td>
+  <td class="note">포지큐브 API 호출 → 루브릭 명확성/일관성 분석<br/>지표별 수정 필요/검토권장/참고 분류<br/>현재 문구 vs AI 제안 문구 비교<br/>무시 / 직접 수정 / 제안대로 수정 액션<br/>선택 사항 (점검 여부 선택)</td>
+  <td><span class="badge b-add">추가</span></td>
+  <td class="feedback-cell feedback-confirmed">🔵 05-29 신규</td>
+</tr>
+
+<tr class="row-add" data-section="Admin" data-target="운영자" data-change="추가" data-screen="1">
+  <td><span class="cell-section admin">Admin</span></td><td><span class="cell-target t-operator">운영자</span></td>
+  <td></td><td></td><td class="depth3">심사 테스트 Step3-2</td><td></td>
+  <td><span class="screen-count">1</span></td>
+  <td class="login-o">O</td>
+  <td class="note">가상 팀이름 + 가상 제출 파일로 AI 심사 미리 확인<br/>테스트 케이스 복수 추가 가능<br/>잔여 횟수 표시 (최대 10회, 루브릭 수정+테스트 합산)<br/>테스트 실행 시 즉시 심사 진행</td>
+  <td><span class="badge b-add">추가</span></td>
+  <td class="feedback-cell feedback-confirmed">🔵 05-29 신규</td>
+</tr>
+
+<tr class="row-add" data-section="Admin" data-target="운영자" data-change="추가" data-screen="1">
+  <td><span class="cell-section admin">Admin</span></td><td><span class="cell-target t-operator">운영자</span></td>
+  <td></td><td></td><td class="depth3">심사기준/루브릭 확정 Step3-3</td><td></td>
+  <td><span class="screen-count">1</span></td>
+  <td class="login-o">O</td>
+  <td class="note">점검+테스트 완료 후 루브릭 확정<br/>버전 이력 표시 (v1.0 적용중 → v1.1 변경예정)<br/>AI 심사 전: 이대로 확정하기 버튼 활성<br/>AI 심사 후 수정 시: 재심사 알럿 ("전체 재심사 진행, 리더보드 변동 가능")<br/>본선 확정 후: 확정 버튼 비활성</td>
+  <td><span class="badge b-add">추가</span></td>
+  <td class="feedback-cell feedback-confirmed">🔵 05-29 신규, 최대 10회 제한</td>
+</tr>
+
+<tr class="row-mod" data-section="Admin" data-target="운영자" data-change="수정" data-screen="1">
+  <td><span class="cell-section admin">Admin</span></td><td><span class="cell-target t-operator">운영자</span></td>
+  <td></td><td></td><td class="depth3">심사기준 다운로드</td><td></td>
+  <td><span class="screen-count">1</span></td>
+  <td class="login-o">O</td>
+  <td class="note">루브릭 버전별 누적 저장 이력<br/>버전 chip (v1.0.0, v2.0.0 등), 최신버전 잠금<br/>Excel 다운로드</td>
+  <td><span class="badge b-mod">수정</span></td><td></td>
+</tr>
+
+<tr class="row-mod" data-section="Admin" data-target="운영자" data-change="수정" data-screen="1">
+  <td><span class="cell-section admin">Admin</span></td><td><span class="cell-target t-operator">운영자</span></td>
+  <td></td><td class="depth2">공개/알림</td><td></td><td></td>
+  <td><span class="screen-count">1</span></td>
+  <td class="login-o">O</td>
+  <td class="note">탭: 노출정책 / 메일링 설정<br/>갤러리 노출 시점: 본선 진행 중 / 최종 수상자 발표 후<br/>갤러리 하트 기능 삭제<br/>AI 심사결과 노출 방식 설정<br/>갤러리 미리보기 버튼</td>
+  <td><span class="badge b-mod">수정</span></td>
+  <td class="feedback-cell feedback-confirmed">🔵 05-29: 하트 삭제, 갤러리 노출 시점 2가지</td>
+</tr>
+
+<tr class="row-mod" data-section="Admin" data-target="운영자" data-change="수정" data-screen="1">
+  <td><span class="cell-section admin">Admin</span></td><td><span class="cell-target t-operator">운영자</span></td>
+  <td class="depth1">참가신청관리</td><td></td><td></td><td></td>
+  <td><span class="screen-count">1</span></td>
+  <td class="login-o">O</td>
+  <td class="note">참가자(팀) 목록 / 상세<br/>교육수요조사 엑셀 다운로드 포함</td>
+  <td><span class="badge b-mod">수정</span></td><td></td>
+</tr>
+
+<tr class="row-exist" data-section="Admin" data-target="운영자" data-change="기존활용" data-screen="1">
+  <td><span class="cell-section admin">Admin</span></td><td><span class="cell-target t-operator">운영자</span></td>
+  <td class="depth1">공지관리</td><td></td><td></td><td></td>
+  <td><span class="screen-count">2</span></td>
+  <td class="login-o">O</td>
+  <td class="note">구: 컨텐츠관리 → 공지관리로 변경<br/>탭: 공지사항 / FAQ<br/>기존 AI Studio 공지사항 기능 활용</td>
+  <td><span class="badge b-exist">기존활용</span></td><td></td>
+</tr>
+
+<tr data-section="Admin" data-target="운영자" data-change="" data-screen="0">
+  <td><span class="cell-section admin">Admin</span></td><td><span class="cell-target t-operator">운영자</span></td>
+  <td class="depth1">심사·평가관리</td><td></td><td></td><td></td>
+  <td></td><td class="login-o">O</td><td class="note">메뉴 그룹</td><td></td><td></td>
+</tr>
+
+<tr class="row-mod" data-section="Admin" data-target="운영자" data-change="수정" data-screen="1">
+  <td><span class="cell-section admin">Admin</span></td><td><span class="cell-target t-operator">운영자</span></td>
+  <td></td><td class="depth2">AI 심사</td><td></td><td></td>
+  <td><span class="screen-count">2</span></td>
+  <td class="login-o">O</td>
+  <td class="note">탭: AI 심사 / AI 피드백 확인<br/>KPI: 전체제출팀/심사완료/심사중/미심사<br/>심사 실시 버튼 (수동 배치)<br/>목록: 팀명/AI점수/승인상태/심사일/관리<br/>상세: LLM 심사결과 탭 + 전처리 데이터 탭<br/>LLM별(GPT-4o/Claude/Gemini) 점수+근거 노출</td>
+  <td><span class="badge b-mod">수정</span></td>
+  <td class="feedback-cell feedback-confirmed">🔵 05-29: 수동배치 버튼, LLM 상세+전처리 탭</td>
+</tr>
+
+<tr class="row-mod" data-section="Admin" data-target="운영자" data-change="수정" data-screen="1">
+  <td><span class="cell-section admin">Admin</span></td><td><span class="cell-target t-operator">운영자</span></td>
+  <td></td><td class="depth2">심사위원</td><td></td><td></td>
+  <td><span class="screen-count">1</span></td>
+  <td class="login-o">O</td>
+  <td class="note">Expert Hub/MLP 강사 자동 표시 (View 전용)<br/>엑셀 일괄 업로드 지원 (오프라인 점수 입력 대비)<br/>운영자가 대신 점수 입력/수정 가능</td>
+  <td><span class="badge b-mod">수정</span></td>
+  <td class="feedback-cell feedback-confirmed">🔵 05-29: 엑셀 업로드, 운영자 대리 입력</td>
+</tr>
+
+<tr class="row-mod" data-section="Admin" data-target="운영자" data-change="수정" data-screen="1">
+  <td><span class="cell-section admin">Admin</span></td><td><span class="cell-target t-operator">운영자</span></td>
+  <td></td><td class="depth2">동료투표</td><td></td><td></td>
+  <td><span class="screen-count">1</span></td>
+  <td class="login-o">O</td>
+  <td class="note">배틀 게임 방식 설정/관리 화면<br/>게임 시작 버튼 / 결과 노출 버튼<br/>보팅 DB 확인 (배틀 ID, 투표자/승리팀/패배팀 고유값, 투표일시)<br/>배점 구조에서 제외 → 운영자 임의평가 항목으로 활용</td>
+  <td><span class="badge b-mod">수정</span></td>
+  <td class="feedback-cell feedback-confirmed">🔵 05-29: 배틀 게임 방식, 배점 제외</td>
+</tr>
+
+<tr class="row-mod" data-section="Admin" data-target="운영자" data-change="수정" data-screen="1">
+  <td><span class="cell-section admin">Admin</span></td><td><span class="cell-target t-operator">운영자</span></td>
+  <td></td><td class="depth2">결과 확정</td><td></td><td></td>
+  <td><span class="screen-count">1</span></td>
+  <td class="login-o">O</td>
+  <td class="note">탭: 결과 집계 / 결과 공개<br/>본선 진출자 / 최종 수상자 개별 설정<br/>임의평가 항목 입력란 (활성화 시): 운영자가 점수 직접 입력<br/>임의평가 이름: 운영자가 원하는 대로 설정 가능<br/>본선 진출자 확정 클릭 시 알럿: "루브릭 수정 불가, 심사위원 리포트 및 AI 개인 리포트 자동 생성"<br/>리포트 생성: 확정 즉시 자동 (수동 아님)</td>
+  <td><span class="badge b-mod">수정</span></td>
+  <td class="feedback-cell feedback-confirmed">🔵 05-29: 임의평가 추가, 리포트 자동생성</td>
+</tr>
+
+<tr class="row-add" data-section="Admin" data-target="운영자" data-change="추가" data-screen="1">
+  <td><span class="cell-section admin">Admin</span></td><td><span class="cell-target t-operator">운영자</span></td>
+  <td class="depth1">심사 결과 관리</td><td></td><td></td><td></td>
+  <td><span class="screen-count">2</span></td>
+  <td class="login-o">O</td>
+  <td class="note">루브릭 기반 평가 결과 이력·LLM 보팅 및 전처리 데이터 조회<br/>루브릭 버전별 심사 결과 누적 (v1.0/v2.0 등)<br/>카테고리별 등급+점수 테이블<br/>CSV 다운로드<br/>상세 클릭: LLM 심사결과 탭 + 전처리 데이터 탭</td>
+  <td><span class="badge b-add">추가</span></td>
+  <td class="feedback-cell feedback-confirmed">🔵 05-29 신규</td>
+</tr>
+
+<tr class="row-mod" data-section="Admin" data-target="운영자" data-change="수정" data-screen="1">
+  <td><span class="cell-section admin">Admin</span></td><td><span class="cell-target t-operator">운영자</span></td>
+  <td class="depth1">결과관리</td><td class="depth2">리더보드</td><td></td><td></td>
+  <td><span class="screen-count">1</span></td>
+  <td class="login-o">O</td>
+  <td class="note">풀 셋팅 화면 (노출설정 최대값 기준)<br/>상시 접근 가능</td>
+  <td><span class="badge b-mod">수정</span></td><td></td>
+</tr>
+
+<!-- ────────── SYSTEM ADMIN ────────── -->
+<tr class="section-divider"><td colspan="11">▸ 시스템 관리자 콘솔 (신규)</td></tr>
+
+<tr class="row-add" data-section="SysAdmin" data-target="시스템관리자" data-change="추가" data-screen="1">
+  <td><span class="cell-section sysadmin">SysAdmin</span></td><td><span class="cell-target t-sysadmin">시스템관리자</span></td>
+  <td class="depth1">과정 관리</td><td></td><td></td><td></td>
+  <td><span class="screen-count">1</span></td>
+  <td class="login-o">O</td>
+  <td class="note">해커톤과 매핑된 과정 정보<br/>과정코드/과정명/시작일/종료일/입과인원(MLP)/해커톤 참여인원<br/>Excel 다운로드</td>
+  <td><span class="badge b-add">추가</span></td>
+  <td class="feedback-cell feedback-confirmed">🔵 05-29 신규</td>
+</tr>
+
+<tr class="row-add" data-section="SysAdmin" data-target="시스템관리자" data-change="추가" data-screen="1">
+  <td><span class="cell-section sysadmin">SysAdmin</span></td><td><span class="cell-target t-sysadmin">시스템관리자</span></td>
+  <td class="depth1">루브릭 프롬프트</td><td></td><td></td><td></td>
+  <td><span class="screen-count">1</span></td>
+  <td class="login-o">O</td>
+  <td class="note">프롬프트 유형별 관리 (전처리/분류/기본셋팅루브릭/CONTEXT생성/심사위원용리포트/개인용리포트)<br/>버전 관리 (적용 중 / 이전 버전 적용하기)<br/>Prompt Message / User Message / Schema 탭<br/>고객별 가변 X 표시</td>
+  <td><span class="badge b-add">추가</span></td>
+  <td class="feedback-cell feedback-confirmed">🔵 05-29 신규</td>
+</tr>
+
+<tr class="row-add" data-section="SysAdmin" data-target="시스템관리자" data-change="추가" data-screen="1">
+  <td><span class="cell-section sysadmin">SysAdmin</span></td><td><span class="cell-target t-sysadmin">시스템관리자</span></td>
+  <td class="depth1">LLM 엔진 설정</td><td></td><td></td><td></td>
+  <td><span class="screen-count">1</span></td>
+  <td class="login-o">O</td>
+  <td class="note">프롬프트 유형별 엔진 선택 (claude-sonnet/claude-opus/gpt-4o/gpt-4-turbo)<br/>파라미터: Temperature / Top-P / Max Tokens<br/>버전별 이력 관리</td>
+  <td><span class="badge b-add">추가</span></td>
+  <td class="feedback-cell feedback-confirmed">🔵 05-29 신규</td>
+</tr>
+
+<tr class="row-add" data-section="SysAdmin" data-target="시스템관리자" data-change="추가" data-screen="1">
+  <td><span class="cell-section sysadmin">SysAdmin</span></td><td><span class="cell-target t-sysadmin">시스템관리자</span></td>
+  <td class="depth1">토큰 모니터링</td><td></td><td></td><td></td>
+  <td><span class="screen-count">1</span></td>
+  <td class="login-o">O</td>
+  <td class="note">LLM API 총 토큰 사용량 조회<br/>총 입력/출력/사용 토큰<br/>포지큐브 API 연동 필요 (현재는 샘플 데이터)</td>
+  <td><span class="badge b-add">추가</span></td>
+  <td class="feedback-cell feedback-confirmed">🔵 05-29 신규</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+
+<script>
+const filters = { section: 'all', target: 'all', change: null };
+
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    const f = this.dataset.filter, v = this.dataset.val;
+    if (f === 'change') {
+      if (filters.change === v) { filters.change = null; this.classList.remove('active'); }
+      else { document.querySelectorAll('[data-filter="change"]').forEach(b => b.classList.remove('active')); filters.change = v; this.classList.add('active'); }
+    } else {
+      document.querySelectorAll(`[data-filter="${f}"]`).forEach(b => b.classList.remove('active'));
+      this.classList.add('active'); filters[f] = v;
+    }
+    applyFilters(); updateCount();
+  });
+});
+
+function applyFilters() {
+  document.querySelectorAll('#iaTable tbody tr:not(.section-divider)').forEach(row => {
+    const s = row.dataset.section || '', t = row.dataset.target || '', c = row.dataset.change || '';
+    const okS = filters.section === 'all' || s === filters.section;
+    const okT = filters.target === 'all' || t === filters.target;
+    const okC = !filters.change || c === filters.change;
+    row.classList.toggle('hidden', !(okS && okT && okC));
+  });
+}
+
+function updateCount() {
+  let front = 0, judge = 0, admin = 0, sys = 0;
+  document.querySelectorAll('#iaTable tbody tr:not(.section-divider):not(.hidden)').forEach(row => {
+    const sc = parseInt(row.dataset.screen || 0);
+    if (!sc) return;
+    const s = row.dataset.section, t = row.dataset.target;
+    if (s === 'Front' && t === '심사위원') judge += sc;
+    else if (s === 'Front') front += sc;
+    else if (s === 'Admin') admin += sc;
+    else if (s === 'SysAdmin') sys += sc;
+  });
+  document.getElementById('cnt-front').textContent = front;
+  document.getElementById('cnt-judge').textContent = judge;
+  document.getElementById('cnt-admin').textContent = admin;
+  document.getElementById('cnt-sysadmin').textContent = sys;
+  document.getElementById('cnt-total').textContent = front + judge + admin + sys;
+}
+
+function downloadCSV() {
+  const rows = [['구분','Target','1Depth','2Depth','3Depth','4Depth','화면수','로그인','비고','변경사항','피드백']];
+  document.querySelectorAll('#iaTable tbody tr:not(.section-divider):not(.hidden)').forEach(row => {
+    const cells = row.querySelectorAll('td');
+    rows.push([0,1,2,3,4,5,6,7,8,9,10].map(i => cells[i]?.innerText?.trim() || ''));
+  });
+  const csv = rows.map(r => r.map(c => `"${(c||'').replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob(['\uFEFF'+csv], {type:'text/csv;charset=utf-8'}));
+  a.download = 'hackathon_ia_v7.csv'; a.click();
+}
+
+updateCount();
+</script>
+</body>
+</html>
