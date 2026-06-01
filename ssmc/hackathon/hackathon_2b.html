@@ -329,6 +329,134 @@ body { background: var(--bg-base); font-family: var(--font-family); -webkit-font
 .live-rank-change.down { color: var(--error); }
 .live-rank-change.same { color: var(--text-muted); }
 
+/* ── Arena / 동료평가 배틀 ── */
+.arena-section { padding: 0 24px 8px; }
+.arena-mock {
+  background: rgba(6,7,13,0.9);
+  border: 1px solid rgba(255,45,155,0.22); border-radius: 14px;
+  padding: 28px; position: relative; overflow: hidden;
+}
+.arena-mock::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, #FF2D9B, #4E70FF, transparent);
+}
+.arena-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+.arena-label-text {
+  font-size: 11px; font-weight: 700; letter-spacing: 0.25em; color: #FF2D9B;
+  text-transform: uppercase; text-shadow: 0 0 10px rgba(255,45,155,0.6);
+}
+.arena-round { font-size: 11px; color: var(--text-muted); letter-spacing: 0.06em; }
+.battle-layout { display: grid; grid-template-columns: 1fr auto 1fr; gap: 20px; align-items: center; }
+.battle-team-card {
+  background: var(--bg-elevated); border-radius: 12px; padding: 24px;
+  position: relative; overflow: hidden; min-height: 220px; display: flex; flex-direction: column;
+}
+.battle-card-left {
+  border: 1px solid rgba(78,112,255,0.4);
+  box-shadow: 0 0 24px rgba(78,112,255,0.07), inset 0 0 24px rgba(78,112,255,0.04);
+}
+.battle-card-right {
+  border: 1px solid rgba(176,108,255,0.4);
+  box-shadow: 0 0 24px rgba(176,108,255,0.07), inset 0 0 24px rgba(176,108,255,0.04);
+}
+.battle-card-left::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, var(--neon-blue), var(--neon-cyan));
+}
+.battle-card-right::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, var(--text-neon), #FF2D9B);
+}
+.battle-team-num {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.18em; color: var(--text-muted);
+  text-transform: uppercase; margin-bottom: 8px;
+}
+.battle-team-name { font-size: 18px; font-weight: 800; color: var(--text-primary); margin-bottom: 10px; line-height: 1.3; }
+.battle-tag {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 3px 10px; border-radius: 99px; display: inline-block; margin-bottom: 14px; width: fit-content;
+}
+.battle-tag-blue { background: rgba(78,112,255,0.2); color: var(--neon-blue); border: 1px solid rgba(78,112,255,0.3); }
+.battle-tag-purple { background: rgba(176,108,255,0.2); color: var(--text-neon); border: 1px solid rgba(176,108,255,0.3); }
+.battle-team-desc { font-size: 13px; color: var(--text-sub); line-height: 1.7; flex: 1; }
+.battle-effect {
+  margin-top: 14px; padding: 10px 12px;
+  background: rgba(255,255,255,0.03); border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);
+}
+.battle-effect-label { font-size: 9px; font-weight: 700; letter-spacing: 0.18em; color: var(--text-muted); text-transform: uppercase; margin-bottom: 3px; }
+.battle-effect-text { font-size: 12px; color: var(--text-primary); font-weight: 500; }
+.vs-center { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.vs-line { width: 2px; height: 36px; background: linear-gradient(180deg, transparent, #FF2D9B, transparent); box-shadow: 0 0 6px rgba(255,45,155,0.5); }
+.vs-text { font-size: 44px; font-weight: 900; font-style: italic; color: #FF2D9B; text-shadow: 0 0 20px rgba(255,45,155,0.8), 0 0 50px rgba(255,45,155,0.4); line-height: 1; }
+.battle-btns { display: flex; gap: 10px; margin-top: 24px; justify-content: center; }
+.btn-battle-left {
+  flex: 1; padding: 13px 0; background: linear-gradient(135deg, rgba(78,112,255,0.2), rgba(0,212,255,0.1));
+  border: 1px solid rgba(78,112,255,0.5); border-radius: 8px; color: var(--neon-cyan);
+  font-size: 13px; font-weight: 700; letter-spacing: 0.06em; cursor: pointer; text-align: center;
+  font-family: var(--font-family); box-shadow: 0 0 16px rgba(78,112,255,0.1); transition: all .2s;
+}
+.btn-battle-left:hover { background: linear-gradient(135deg, rgba(78,112,255,0.35), rgba(0,212,255,0.2)); box-shadow: 0 0 24px rgba(78,112,255,0.3); }
+.btn-battle-draw {
+  padding: 13px 24px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px; color: var(--text-muted); font-size: 12px; font-weight: 700;
+  letter-spacing: 0.08em; cursor: pointer; white-space: nowrap; font-family: var(--font-family); transition: all .2s;
+}
+.btn-battle-draw:hover { background: rgba(255,255,255,0.08); color: var(--text-sub); }
+.btn-battle-right {
+  flex: 1; padding: 13px 0; background: linear-gradient(135deg, rgba(176,108,255,0.2), rgba(255,45,155,0.1));
+  border: 1px solid rgba(176,108,255,0.5); border-radius: 8px; color: var(--text-neon);
+  font-size: 13px; font-weight: 700; letter-spacing: 0.06em; cursor: pointer; text-align: center;
+  font-family: var(--font-family); box-shadow: 0 0 16px rgba(176,108,255,0.1); transition: all .2s;
+}
+.btn-battle-right:hover { background: linear-gradient(135deg, rgba(176,108,255,0.35), rgba(255,45,155,0.2)); box-shadow: 0 0 24px rgba(176,108,255,0.3); }
+.arena-footer-btn { display: flex; justify-content: center; margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.06); }
+.btn-battle-all {
+  padding: 13px 48px; border-radius: 8px; border: none; cursor: pointer;
+  font-size: 14px; font-weight: 700; letter-spacing: 0.1em; color: #fff; font-family: var(--font-family);
+  background: var(--grad-arena);
+  box-shadow: 0 0 24px rgba(255,45,155,0.35), 0 0 48px rgba(123,47,255,0.15);
+  transition: all .2s; position: relative; overflow: hidden;
+}
+.btn-battle-all::before {
+  content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent); transition: left .4s;
+}
+.btn-battle-all:hover::before { left: 100%; }
+.btn-battle-all:hover { transform: translateY(-1px); box-shadow: 0 0 36px rgba(255,45,155,0.5), 0 0 64px rgba(123,47,255,0.25); }
+
+/* ── Arena Modal ── */
+.arena-modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.75); backdrop-filter:blur(5px); z-index:1000; display:flex; align-items:center; justify-content:center; padding:24px; }
+.arena-modal-inner {
+  background: var(--bg-surface); border: 1px solid rgba(255,45,155,0.25); border-radius: 16px;
+  width: 100%; max-width: 780px; max-height: 90vh; overflow-y: auto;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.7), 0 0 80px rgba(255,45,155,0.08);
+  display: flex; flex-direction: column;
+}
+.arena-modal-inner::before {
+  content: ''; display: block; height: 2px; flex-shrink: 0;
+  background: linear-gradient(90deg, transparent, #FF2D9B, #4E70FF, transparent);
+  border-radius: 16px 16px 0 0;
+}
+.arena-modal-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 20px 24px 16px; border-bottom: 1px solid rgba(255,255,255,0.07); flex-shrink: 0;
+}
+.arena-modal-eyebrow { font-size: 11px; font-weight: 700; color: #FF2D9B; letter-spacing: .12em; text-transform: uppercase; margin-bottom: 4px; }
+.arena-modal-title { font-size: 18px; font-weight: 700; color: var(--text-primary); }
+.arena-modal-close { width: 32px; height: 32px; border: none; background: rgba(255,255,255,0.06); border-radius: 6px; color: var(--text-sub); font-size: 14px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background .15s; }
+.arena-modal-close:hover { background: rgba(255,255,255,0.12); color: var(--text-primary); }
+.arena-modal-body { flex: 1; overflow-y: auto; padding: 20px 24px; }
+.arena-modal-footer { padding: 16px 24px; border-top: 1px solid rgba(255,255,255,0.07); display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+.arena-progress-text { font-size: 13px; color: var(--text-sub); }
+.arena-progress-text strong { color: var(--neon-cyan); font-variant-numeric: tabular-nums; }
+.arena-voted-overlay {
+  text-align: center; padding: 32px 0 8px;
+  display: none;
+}
+.arena-voted-icon { font-size: 40px; margin-bottom: 8px; }
+.arena-voted-text { font-size: 16px; font-weight: 700; color: var(--success); margin-bottom: 4px; }
+.arena-voted-sub { font-size: 13px; color: var(--text-sub); }
+
 /* ── Apply Modal ── */
 .apply-modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.6); backdrop-filter:blur(3px); z-index:1000; display:flex; align-items:center; justify-content:center; padding:24px; }
 .apply-modal { background:#fff; border-radius:16px; width:100%; max-width:640px; max-height:90vh; display:flex; flex-direction:column; box-shadow:0 24px 64px rgba(0,0,0,.18); overflow:hidden; }
@@ -514,7 +642,7 @@ textarea.apply-input { height:auto; padding:10px 12px; resize:none; line-height:
         <canvas id="hero-canvas"></canvas>
         <div class="hero-overlay">
           <div class="hero-left">
-            <div class="hero-badge">2026 AI HACKATHON · SAMSUNG SDS MULTICAMPUS</div>
+            <div class="hero-badge">2026 AI HACKATHON · MULTICAMPUS</div>
             <h1 class="hero-title">2026 AI 해커톤</h1>
             <p id="sub-before" class="hero-sub">AI로 세상을 바꾸는 48시간의 여정. 아이디어에서 실전 AI 솔루션까지, 지금 도전하세요.</p>
             <p id="sub-during" class="hero-sub hidden"><span style="color:var(--neon-cyan);font-weight:600;">현재 62팀 제출 완료</span> · 마감까지 D-14</p>
@@ -613,7 +741,6 @@ textarea.apply-input { height:auto; padding:10px 12px; resize:none; line-height:
                 <th style="width:52px;">순위</th>
                 <th>팀명</th>
                 <th style="width:90px;">점수</th>
-                <th style="width:100px;">좋아요</th>
                 <th style="width:64px;">변동</th>
               </tr>
             </thead>
@@ -622,35 +749,30 @@ textarea.apply-input { height:auto; padding:10px 12px; resize:none; line-height:
                 <td><span class="lb-rank-badge gold">1</span></td>
                 <td>임의 팀이름 A2</td>
                 <td><span class="lb-score">95점</span></td>
-                <td style="color:var(--neon-pink);">♥ 2,134</td>
                 <td><span class="lb-trend up">▲ 2</span></td>
               </tr>
               <tr class="lb-row-2">
                 <td><span class="lb-rank-badge silver">2</span></td>
                 <td>People그룹</td>
                 <td><span class="lb-score">92점</span></td>
-                <td style="color:var(--neon-pink);">♥ 1,748</td>
                 <td><span class="lb-trend up">▲ 1</span></td>
               </tr>
               <tr class="lb-row-3">
                 <td><span class="lb-rank-badge bronze">3</span></td>
                 <td>아이디어톤그룹스</td>
                 <td><span class="lb-score">90점</span></td>
-                <td style="color:var(--neon-pink);">♥ 1,456</td>
                 <td><span class="lb-trend up">▲ 1</span></td>
               </tr>
               <tr class="lb-row-mine">
                 <td><span class="lb-rank-badge" style="background:rgba(123,47,255,0.3);color:var(--text-neon);">4</span></td>
                 <td>주니어벤처스 <span class="badge-neon" style="margin-left:6px;font-size:9px;">MY</span></td>
                 <td><span class="lb-score">88점</span></td>
-                <td style="color:var(--neon-pink);">♥ 1,123</td>
                 <td><span class="lb-trend same">— 0</span></td>
               </tr>
               <tr>
                 <td><span class="lb-rank-badge">5</span></td>
                 <td>AI는혁신이소</td>
                 <td><span class="lb-score" style="color:var(--text-primary);">85점</span></td>
-                <td style="color:var(--neon-pink);">♥ 987</td>
                 <td><span class="lb-trend down">▼ 1</span></td>
               </tr>
             </tbody>
@@ -660,6 +782,52 @@ textarea.apply-input { height:auto; padding:10px 12px; resize:none; line-height:
             <button class="lb-page-btn">2</button>
             <button class="lb-page-btn">3</button>
             <button class="lb-page-btn">›</button>
+          </div>
+        </div>
+
+        <!-- 동료평가 배틀 -->
+        <div class="arena-section">
+          <div class="section-title">동료평가 <span>아이디어 배틀 · 실시간 동료 평가</span></div>
+          <div class="arena-mock">
+            <div class="arena-top">
+              <div class="arena-label-text">⚔ 동료 평가 배틀</div>
+              <div class="arena-round">ROUND 03 / 12 &nbsp;·&nbsp; 남은 시간 04:22</div>
+            </div>
+            <div class="battle-layout">
+              <div class="battle-team-card battle-card-left">
+                <div class="battle-team-num">TEAM A · TM-017</div>
+                <div class="battle-team-name">AI 기반 실시간<br>물류 최적화 시스템</div>
+                <span class="battle-tag battle-tag-blue">Logistics AI</span>
+                <div class="battle-team-desc">머신러닝 기반 배송 경로 자동화로 운송비 23% 절감. 실시간 데이터 스트리밍과 강화학습 적용.</div>
+                <div class="battle-effect">
+                  <div class="battle-effect-label">기대 효과</div>
+                  <div class="battle-effect-text">연간 비용 절감 ₩4.2억 · 배송 정확도 +18%</div>
+                </div>
+              </div>
+              <div class="vs-center">
+                <div class="vs-line"></div>
+                <div class="vs-text">VS</div>
+                <div class="vs-line"></div>
+              </div>
+              <div class="battle-team-card battle-card-right">
+                <div class="battle-team-num">TEAM B · TM-031</div>
+                <div class="battle-team-name">LLM 활용 사내<br>지식 검색 플랫폼</div>
+                <span class="battle-tag battle-tag-purple">Knowledge AI</span>
+                <div class="battle-team-desc">사내 문서 임베딩 기반 RAG 시스템. 업무 온보딩 기간 40% 단축, 정보 탐색 효율 극대화.</div>
+                <div class="battle-effect">
+                  <div class="battle-effect-label">기대 효과</div>
+                  <div class="battle-effect-text">온보딩 기간 -40% · 문서 검색 시간 -65%</div>
+                </div>
+              </div>
+            </div>
+            <div class="battle-btns">
+              <button class="btn-battle-left" onclick="battleVote('a')">◀ A팀 선택</button>
+              <button class="btn-battle-draw" onclick="battleVote('draw')">비김</button>
+              <button class="btn-battle-right" onclick="battleVote('b')">B팀 선택 ▶</button>
+            </div>
+            <div class="arena-footer-btn">
+              <button class="btn-battle-all" onclick="openArenaModal()">전체 동료평가 하기</button>
+            </div>
           </div>
         </div>
 
@@ -683,7 +851,7 @@ textarea.apply-input { height:auto; padding:10px 12px; resize:none; line-height:
                   <div class="proj-badges"><span class="badge-type">아이디어톤</span><span class="badge-submit">제출완료</span></div>
                   <div class="proj-title">AIB 나의 인공 영향력 전략: AI Counseling & AI News Clipping</div>
                   <div class="proj-desc">AI 기반 개인화 뉴스 큐레이션과 상담 서비스를 통해 직원 역량 강화를 지원하는 플랫폼</div>
-                  <div class="proj-footer"><span class="proj-likes">♥ 1,247</span><span class="proj-more">더보기 →</span></div>
+                  <div class="proj-footer" style="justify-content:flex-end;"><span class="proj-more">더보기 →</span></div>
                 </div>
               </div>
 
@@ -693,7 +861,7 @@ textarea.apply-input { height:auto; padding:10px 12px; resize:none; line-height:
                   <div class="proj-badges"><span class="badge-type">아이디어톤</span><span class="badge-submit">제출완료</span></div>
                   <div class="proj-title">AI로 운영하는 AI 해커톤: Work Reboot</div>
                   <div class="proj-desc">업무 효율화 AI 플랫폼으로 반복 업무를 자동화하고 창의적 작업에 집중할 수 있는 환경 구현</div>
-                  <div class="proj-footer"><span class="proj-likes">♥ 1,123</span><span class="proj-more">더보기 →</span></div>
+                  <div class="proj-footer" style="justify-content:flex-end;"><span class="proj-more">더보기 →</span></div>
                 </div>
               </div>
 
@@ -703,7 +871,7 @@ textarea.apply-input { height:auto; padding:10px 12px; resize:none; line-height:
                   <div class="proj-badges"><span class="badge-type">아이디어톤</span><span class="badge-submit">제출완료</span></div>
                   <div class="proj-title">스타트업·차세대 리더를 위한 SERICEO AI 자문·콘텐츠 재생성 서비스</div>
                   <div class="proj-desc">AI 기반 리더십 진단 및 맞춤형 성장 로드맵을 제공하는 통합 플랫폼</div>
-                  <div class="proj-footer"><span class="proj-likes">♥ 987</span><span class="proj-more">더보기 →</span></div>
+                  <div class="proj-footer" style="justify-content:flex-end;"><span class="proj-more">더보기 →</span></div>
                 </div>
               </div>
 
@@ -713,7 +881,7 @@ textarea.apply-input { height:auto; padding:10px 12px; resize:none; line-height:
                   <div class="proj-badges"><span class="badge-type">아이디어톤</span><span class="badge-submit">제출완료</span></div>
                   <div class="proj-title">AIB 나의 인공 영향력 전략: AI Counseling & AI News Clipping</div>
                   <div class="proj-desc">임직원 역량 강화를 위한 AI 기반 맞춤형 뉴스레터 및 코칭 서비스</div>
-                  <div class="proj-footer"><span class="proj-likes">♥ 856</span><span class="proj-more">더보기 →</span></div>
+                  <div class="proj-footer" style="justify-content:flex-end;"><span class="proj-more">더보기 →</span></div>
                 </div>
               </div>
 
@@ -723,7 +891,7 @@ textarea.apply-input { height:auto; padding:10px 12px; resize:none; line-height:
                   <div class="proj-badges"><span class="badge-type">아이디어톤</span><span class="badge-submit">제출완료</span></div>
                   <div class="proj-title">AI로 운영하는 AI 해커톤: Work Reboot</div>
                   <div class="proj-desc">업무 프로세스 혁신을 위한 AI 에이전트 도입 전략 및 시범 적용 방안 제시</div>
-                  <div class="proj-footer"><span class="proj-likes">♥ 744</span><span class="proj-more">더보기 →</span></div>
+                  <div class="proj-footer" style="justify-content:flex-end;"><span class="proj-more">더보기 →</span></div>
                 </div>
               </div>
 
@@ -733,7 +901,7 @@ textarea.apply-input { height:auto; padding:10px 12px; resize:none; line-height:
                   <div class="proj-badges"><span class="badge-type">아이디어톤</span><span class="badge-submit">제출완료</span></div>
                   <div class="proj-title">AI 기반 재무업무 자동화로 반복업무 효율 극대화 솔루션</div>
                   <div class="proj-desc">재무팀 반복 업무를 AI로 자동화해 월 80시간 절감을 목표로 하는 RPA+AI 통합 솔루션</div>
-                  <div class="proj-footer"><span class="proj-likes">♥ 612</span><span class="proj-more">더보기 →</span></div>
+                  <div class="proj-footer" style="justify-content:flex-end;"><span class="proj-more">더보기 →</span></div>
                 </div>
               </div>
 
@@ -822,7 +990,6 @@ textarea.apply-input { height:auto; padding:10px 12px; resize:none; line-height:
           <div class="live-rank-num n1">1</div>
           <div class="live-rank-info">
             <div class="live-rank-team">임의 팀이름 A2</div>
-            <div class="live-rank-likes">♥ 2,134</div>
           </div>
           <div class="live-rank-right">
             <div class="live-rank-score">95<span>점</span></div>
@@ -834,7 +1001,6 @@ textarea.apply-input { height:auto; padding:10px 12px; resize:none; line-height:
           <div class="live-rank-num n2">2</div>
           <div class="live-rank-info">
             <div class="live-rank-team">People그룹</div>
-            <div class="live-rank-likes">♥ 1,748</div>
           </div>
           <div class="live-rank-right">
             <div class="live-rank-score">92<span>점</span></div>
@@ -846,7 +1012,6 @@ textarea.apply-input { height:auto; padding:10px 12px; resize:none; line-height:
           <div class="live-rank-num n3">3</div>
           <div class="live-rank-info">
             <div class="live-rank-team">아이디어톤그룹스</div>
-            <div class="live-rank-likes">♥ 1,456</div>
           </div>
           <div class="live-rank-right">
             <div class="live-rank-score">90<span>점</span></div>
@@ -858,7 +1023,6 @@ textarea.apply-input { height:auto; padding:10px 12px; resize:none; line-height:
           <div class="live-rank-num">4</div>
           <div class="live-rank-info">
             <div class="live-rank-team">Work Reboot팀</div>
-            <div class="live-rank-likes">♥ 1,123</div>
           </div>
           <div class="live-rank-right">
             <div class="live-rank-score">88<span>점</span></div>
@@ -870,7 +1034,6 @@ textarea.apply-input { height:auto; padding:10px 12px; resize:none; line-height:
           <div class="live-rank-num">5</div>
           <div class="live-rank-info">
             <div class="live-rank-team">AI는혁신이소</div>
-            <div class="live-rank-likes">♥ 987</div>
           </div>
           <div class="live-rank-right">
             <div class="live-rank-score">85<span>점</span></div>
@@ -1061,6 +1224,70 @@ textarea.apply-input { height:auto; padding:10px 12px; resize:none; line-height:
     <div class="apply-modal-footer" style="justify-content:center;gap:10px;">
       <button class="btn btn-secondary" style="flex:1;" onclick="document.getElementById('am-cancel-dialog').classList.add('hidden')">아니요, 유지</button>
       <button class="btn btn-primary" style="flex:1;background:var(--color-error);" onclick="amConfirmCancel()">네, 취소합니다</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     동료평가 모달
+══════════════════════════════════════ -->
+<div id="arena-modal" class="arena-modal-overlay hidden" onclick="if(event.target===this)closeArenaModal()">
+  <div class="arena-modal-inner" onclick="event.stopPropagation()">
+    <div class="arena-modal-header">
+      <div>
+        <div class="arena-modal-eyebrow">⚔ PEER EVALUATION</div>
+        <div class="arena-modal-title">전체 동료평가</div>
+      </div>
+      <button class="arena-modal-close" onclick="closeArenaModal()">✕</button>
+    </div>
+    <div class="arena-modal-body">
+      <div class="arena-top">
+        <div class="arena-label-text">⚔ 동료 평가 배틀</div>
+        <div class="arena-round">ROUND <span id="am-round-num">01</span> / 12 &nbsp;·&nbsp; 남은 시간 05:00</div>
+      </div>
+      <div id="am-vote-area">
+        <div class="battle-layout">
+          <div class="battle-team-card battle-card-left">
+            <div class="battle-team-num">TEAM A · TM-017</div>
+            <div class="battle-team-name">AI 기반 실시간<br>물류 최적화 시스템</div>
+            <span class="battle-tag battle-tag-blue">Logistics AI</span>
+            <div class="battle-team-desc">머신러닝 기반 배송 경로 자동화로 운송비 23% 절감. 실시간 데이터 스트리밍과 강화학습 적용.</div>
+            <div class="battle-effect">
+              <div class="battle-effect-label">기대 효과</div>
+              <div class="battle-effect-text">연간 비용 절감 ₩4.2억 · 배송 정확도 +18%</div>
+            </div>
+          </div>
+          <div class="vs-center">
+            <div class="vs-line"></div>
+            <div class="vs-text">VS</div>
+            <div class="vs-line"></div>
+          </div>
+          <div class="battle-team-card battle-card-right">
+            <div class="battle-team-num">TEAM B · TM-031</div>
+            <div class="battle-team-name">LLM 활용 사내<br>지식 검색 플랫폼</div>
+            <span class="battle-tag battle-tag-purple">Knowledge AI</span>
+            <div class="battle-team-desc">사내 문서 임베딩 기반 RAG 시스템. 업무 온보딩 기간 40% 단축, 정보 탐색 효율 극대화.</div>
+            <div class="battle-effect">
+              <div class="battle-effect-label">기대 효과</div>
+              <div class="battle-effect-text">온보딩 기간 -40% · 문서 검색 시간 -65%</div>
+            </div>
+          </div>
+        </div>
+        <div class="battle-btns" style="margin-top:20px;">
+          <button class="btn-battle-left" onclick="modalVote('a')">◀ A팀 선택</button>
+          <button class="btn-battle-draw" onclick="modalVote('draw')">비김</button>
+          <button class="btn-battle-right" onclick="modalVote('b')">B팀 선택 ▶</button>
+        </div>
+      </div>
+      <div id="am-voted-overlay" class="arena-voted-overlay">
+        <div class="arena-voted-icon">✅</div>
+        <div class="arena-voted-text" id="am-voted-text">A팀을 선택했습니다!</div>
+        <div class="arena-voted-sub">다음 라운드로 이동합니다...</div>
+      </div>
+    </div>
+    <div class="arena-modal-footer">
+      <span class="arena-progress-text">진행: <strong id="am-progress-num">0</strong> / 12 라운드 완료</span>
+      <button class="btn-battle-all" style="padding:10px 28px;font-size:13px;" onclick="closeArenaModal()">닫기</button>
     </div>
   </div>
 </div>
@@ -1324,6 +1551,50 @@ function switchTab(el, targetId) {
   el.classList.add('active');
   DURING_TABS.forEach(id => document.getElementById(id)?.classList.add('hidden'));
   document.getElementById(targetId)?.classList.remove('hidden');
+}
+
+/* ── Arena / 동료평가 ── */
+function battleVote(choice) {
+  const msg = choice === 'a' ? '◀ A팀을 선택했습니다!' : choice === 'b' ? 'B팀을 선택했습니다! ▶' : '비겼습니다!';
+  amToast(msg);
+}
+
+let arenaProgress = 0;
+
+function openArenaModal() {
+  arenaProgress = 0;
+  document.getElementById('am-progress-num').textContent = '0';
+  document.getElementById('am-round-num').textContent = '01';
+  document.getElementById('am-vote-area').style.display = '';
+  document.getElementById('am-voted-overlay').style.display = 'none';
+  document.getElementById('arena-modal').classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeArenaModal() {
+  document.getElementById('arena-modal').classList.add('hidden');
+  document.body.style.overflow = '';
+}
+
+function modalVote(choice) {
+  const voteMsg = choice === 'a' ? 'A팀을 선택했습니다!' : choice === 'b' ? 'B팀을 선택했습니다!' : '비겼습니다!';
+  const overlay = document.getElementById('am-voted-overlay');
+  const voteArea = document.getElementById('am-vote-area');
+  document.getElementById('am-voted-text').textContent = voteMsg;
+  voteArea.style.display = 'none';
+  overlay.style.display = 'block';
+  arenaProgress = Math.min(arenaProgress + 1, 12);
+  document.getElementById('am-progress-num').textContent = arenaProgress;
+  if (arenaProgress >= 12) {
+    document.getElementById('am-voted-text').textContent = '🎉 모든 평가가 완료되었습니다!';
+    document.getElementById('am-voted-overlay').querySelector('.arena-voted-sub').textContent = '소중한 평가에 감사드립니다.';
+    return;
+  }
+  setTimeout(() => {
+    document.getElementById('am-round-num').textContent = String(arenaProgress + 1).padStart(2, '0');
+    overlay.style.display = 'none';
+    voteArea.style.display = '';
+  }, 900);
 }
 
 /* ── Hero Canvas — KV-C Data·Tech style ── */
