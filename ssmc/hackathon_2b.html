@@ -1,0 +1,1309 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>해커톤 2b — 다크 네온 테마</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="./assets/css/tokens.css"/>
+<link rel="stylesheet" href="./assets/css/components.css"/>
+<link rel="stylesheet" href="./assets/css/layout.css"/>
+<style>
+/* ── Dark Neon Design Tokens ── */
+:root {
+  --bg-base:      #06070D;
+  --bg-surface:   #0D1117;
+  --bg-elevated:  #151C2B;
+  --bg-overlay:   #1E2538;
+
+  --neon-purple:  #7B2FFF;
+  --neon-blue:    #4E70FF;
+  --neon-cyan:    #00D4FF;
+  --neon-pink:    #FF2D9B;
+  --gold:         #FFD700;
+
+  --text-primary:  #FFFFFF;
+  --text-sub:      #A0AEC0;
+  --text-muted:    #4A5568;
+  --text-neon:     #B06CFF;
+
+  --success:  #39C89A;
+  --error:    #FF4D6A;
+
+  --grad-primary: linear-gradient(135deg, #B06CFF 0%, #4E70FF 55%, #00D4FF 100%);
+  --grad-arena:   linear-gradient(135deg, #FF2D9B 0%, #7B2FFF 50%, #4E70FF 100%);
+}
+
+@keyframes neon-pulse {
+  0%, 100% { box-shadow: 0 0 8px rgba(123,47,255,0.4); }
+  50%       { box-shadow: 0 0 20px rgba(123,47,255,0.8); }
+}
+
+.hidden { display: none !important; }
+
+.card-dark {
+  background: var(--bg-surface);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 16px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.card-dark:hover { transform: translateY(-3px); box-shadow: 0 8px 32px rgba(123,47,255,0.2); }
+
+.text-gradient {
+  background: var(--grad-primary);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+
+.badge-neon {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 3px 10px; border-radius: 6px;
+  background: rgba(123,47,255,0.15); border: 1px solid rgba(123,47,255,0.35);
+  color: var(--text-neon);
+}
+
+/* ── State Toggle ── */
+.state-toggle {
+  position: fixed; top: 10px; left: 50%; transform: translateX(-50%);
+  z-index: 9999; display: flex;
+  background: var(--bg-elevated); border-radius: 99px;
+  border: 1px solid rgba(255,255,255,0.12); box-shadow: 0 4px 20px rgba(0,0,0,0.5); overflow: hidden;
+}
+.state-btn {
+  padding: 6px 18px; font-size: 12px; font-weight: 600; cursor: pointer;
+  border: none; background: transparent; color: var(--text-sub);
+  font-family: var(--font-family); transition: all .15s;
+}
+.state-btn.active { background: var(--neon-purple); color: #fff; }
+
+/* ── Global Layout ── */
+html, body { margin: 0; padding: 0; overflow-x: hidden; }
+body { background: var(--bg-base); font-family: var(--font-family); -webkit-font-smoothing: antialiased; }
+.app-frame { display: flex; flex-direction: column; min-height: 100vh; max-width: 100vw; overflow-x: hidden; background: var(--bg-base); }
+
+/* ── Global Header (white preserved) ── */
+.global-header {
+  height: 64px; background: #fff;
+  border-bottom: 1px solid var(--border-default);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 24px; flex-shrink: 0; position: sticky; top: 0; z-index: 100;
+}
+.header-left { display: flex; align-items: center; gap: 16px; height: 32px; flex: 1 0 0; }
+.header-logo { display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 700; color: var(--text-basic); letter-spacing: -0.3px; white-space: nowrap; }
+.header-logo-icon { width: 28px; height: 28px; border-radius: 8px; background: var(--color-primary-gradient); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 13px; font-weight: 700; }
+.breadcrumb-sep { color: var(--text-subtle); font-size: 14px; }
+.breadcrumb-current { font-size: 14px; color: var(--text-subtle); }
+.header-right { display: flex; align-items: center; gap: 8px; }
+.header-icon-btn { width: 32px; height: 32px; border-radius: 50%; background: transparent; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; position: relative; transition: background .15s; flex-shrink: 0; }
+.header-icon-btn:hover { background: var(--bg-hover); }
+.notif-dot { position: absolute; top: 5px; right: 5px; width: 7px; height: 7px; border-radius: 50%; background: var(--color-error); border: 1.5px solid #fff; }
+.header-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--color-primary); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; letter-spacing: -0.3px; flex-shrink: 0; }
+
+/* ── Page Body ── */
+.page-body { display: flex; gap: 8px; padding: 8px; flex: 1; align-items: flex-start; overflow: visible; background: var(--bg-base); }
+
+/* ── LNB (unchanged) ── */
+.lnb { width: 220px; min-width: 220px; flex-shrink: 0; flex: none; background: #fff; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 4px; align-self: flex-start; position: sticky; top: 72px; max-height: calc(100vh - 80px); overflow-y: auto; }
+.lnb-section-label { font-size: 11px; font-weight: 600; color: var(--text-subtle); letter-spacing: .08em; text-transform: uppercase; padding: 4px 10px 8px; }
+.lnb-menu { display: flex; flex-direction: column; gap: 2px; width: 100%; }
+.lnb-item { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 8px; font-size: 14px; font-weight: 500; line-height: 20px; letter-spacing: -0.3px; color: var(--text-subtle); cursor: pointer; transition: background .15s; }
+.lnb-item:hover { background: var(--bg-hover); }
+.lnb-item.active { background: var(--bg-hover); color: var(--text-basic); font-weight: 600; }
+.lnb-icon { width: 16px; height: 16px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+
+/* ── Body Area ── */
+.body-area { flex: 1; min-width: 0; background: var(--bg-surface); border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; position: relative; }
+
+/* ── Hero Banner (dark CSS) ── */
+.hero-banner-wrap {
+  width: 100%; flex-shrink: 0; position: relative; overflow: hidden;
+  min-height: 260px; background: var(--bg-base);
+  display: flex; align-items: flex-end;
+}
+.hero-ambient-1 {
+  position: absolute; width: 560px; height: 560px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(123,47,255,0.22) 0%, transparent 70%);
+  top: -200px; left: -120px; pointer-events: none;
+}
+.hero-ambient-2 {
+  position: absolute; width: 440px; height: 440px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(0,212,255,0.13) 0%, transparent 70%);
+  bottom: -120px; right: -60px; pointer-events: none;
+}
+.hero-content { position: relative; z-index: 1; padding: 44px 40px 36px; width: 100%; box-sizing: border-box; }
+.hero-title {
+  font-size: 34px; font-weight: 800; line-height: 1.2; margin: 0 0 10px;
+  background: var(--grad-primary);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.hero-sub { font-size: 15px; color: var(--text-sub); margin: 0 0 24px; line-height: 1.6; }
+.hero-cta {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 12px 28px; border-radius: 99px; border: none; cursor: pointer;
+  font-size: 15px; font-weight: 700; color: #fff; font-family: var(--font-family);
+  background: var(--grad-primary); box-shadow: 0 4px 20px rgba(123,47,255,0.4);
+  transition: transform .15s, box-shadow .15s;
+}
+.hero-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(123,47,255,0.55); }
+
+/* ── Stat Wrap ── */
+.stat-wrap { padding: 20px 24px 16px; }
+.stat-row { display: flex; gap: 10px; flex-wrap: nowrap; overflow-x: auto; }
+.stat-c {
+  flex: 1 1 120px; min-width: 110px;
+  background: var(--bg-surface); border: 1px solid rgba(255,255,255,0.07); border-radius: 16px;
+  padding: 16px 18px; display: flex; flex-direction: column; gap: 6px;
+  transition: box-shadow 0.2s ease;
+}
+.stat-c:hover { box-shadow: 0 0 20px rgba(123,47,255,0.2); }
+.stat-label { font-size: 12px; color: var(--text-sub); white-space: nowrap; }
+.stat-val { font-size: 22px; font-weight: 800; color: var(--neon-cyan); line-height: 1.2; white-space: nowrap; }
+.stat-val em { font-size: 11px; font-weight: 400; margin-left: 2px; color: var(--text-sub); }
+
+/* ── Schedule Steps (dark) ── */
+.section-title { font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+.section-title span { font-size: 12px; font-weight: 400; color: var(--text-sub); }
+.schedule-section { padding: 8px 24px 28px; }
+.steps { display: flex; gap: 12px; }
+.step {
+  flex: 1; display: flex; flex-direction: column;
+  background: var(--bg-surface); border: 1px solid rgba(255,255,255,0.07);
+  border-top: 3px solid rgba(255,255,255,0.05);
+  border-radius: 16px; padding: 20px 16px;
+}
+.step.done { border-top-color: var(--success); }
+.step.active { border-top-color: var(--neon-purple); box-shadow: -3px 0 20px rgba(123,47,255,0.15); }
+.step-icon-wrap { width: 40px; height: 40px; border-radius: 50%; background: rgba(123,47,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 18px; margin-bottom: 12px; }
+.step-num { font-size: 11px; font-weight: 700; color: var(--neon-cyan); letter-spacing: .06em; margin-bottom: 4px; }
+.step-label { font-size: 14px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; }
+.step-period { font-size: 12px; color: var(--text-sub); line-height: 1.5; }
+.step-note { font-size: 11px; color: var(--text-muted); margin-top: 6px; }
+
+/* ── Before Content ── */
+.before-content { display: flex; flex-direction: column; gap: 0; position: relative; z-index: 1; }
+
+/* ── My Team Card (dark) ── */
+.myteam-bar {
+  margin: 16px 24px 0; box-sizing: border-box;
+  background: var(--bg-surface); border: 1px solid rgba(123,47,255,0.3); border-radius: 16px;
+  padding: 20px 24px; display: flex; align-items: center; gap: 24px;
+}
+.myteam-left { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 8px; }
+.myteam-top-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.myteam-tags { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.myteam-tag-gray { font-size: 12px; color: var(--text-sub); padding: 3px 10px; border-radius: 6px; background: var(--bg-elevated); }
+.myteam-link { flex-shrink: 0; font-size: 13px; font-weight: 700; color: #fff; cursor: pointer; white-space: nowrap; padding: 8px 18px; border-radius: 99px; background: var(--grad-primary); box-shadow: 0 4px 14px rgba(123,47,255,0.35); border: none; font-family: var(--font-family); }
+.myteam-members { font-size: 13px; color: var(--text-sub); line-height: 1.4; }
+.myteam-title { font-size: 14px; font-weight: 700; color: var(--text-primary); line-height: 1.4; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.myteam-right { flex-shrink: 0; display: flex; gap: 32px; align-items: center; }
+.myteam-stat { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.myteam-stat-label { font-size: 12px; color: var(--text-sub); white-space: nowrap; }
+.myteam-stat-rank { font-size: 28px; font-weight: 800; color: var(--gold); font-variant-numeric: tabular-nums; line-height: 1; }
+.myteam-stat-score { font-size: 22px; font-weight: 800; color: var(--neon-cyan); font-variant-numeric: tabular-nums; line-height: 1; }
+.myteam-stat-count { font-size: 20px; font-weight: 700; color: var(--text-sub); line-height: 1; }
+
+/* ── Leaderboard ── */
+.leaderboard-section { padding: 20px 24px 8px; }
+.leaderboard-table { width: 100%; border-collapse: collapse; }
+.leaderboard-table thead tr { background: var(--bg-elevated); }
+.leaderboard-table thead th { padding: 10px 14px; text-align: left; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: .08em; }
+.leaderboard-table thead th:first-child { border-radius: 8px 0 0 8px; }
+.leaderboard-table thead th:last-child { border-radius: 0 8px 8px 0; }
+.leaderboard-table tbody tr { background: var(--bg-surface); border-bottom: 1px solid rgba(255,255,255,0.04); transition: background 0.15s; }
+.leaderboard-table tbody tr:hover { background: rgba(123,47,255,0.08); }
+.leaderboard-table tbody td { padding: 12px 14px; font-size: 14px; color: var(--text-primary); }
+.lb-row-1 { background: rgba(255,215,0,0.06) !important; border-left: 3px solid var(--gold) !important; }
+.lb-row-1 .lb-score { color: var(--gold); }
+.lb-row-2 { background: rgba(78,112,255,0.06) !important; }
+.lb-row-2 .lb-score { color: var(--neon-blue); }
+.lb-row-3 { background: rgba(0,212,255,0.04) !important; }
+.lb-row-3 .lb-score { color: var(--neon-cyan); }
+.lb-row-mine { background: rgba(123,47,255,0.1) !important; outline: 1px solid rgba(123,47,255,0.4); }
+.lb-row-mine td { color: var(--text-neon) !important; font-weight: 700; }
+.lb-rank-badge { width: 28px; height: 28px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; background: var(--bg-elevated); color: var(--text-sub); }
+.lb-rank-badge.gold { background: var(--gold); color: #000; }
+.lb-rank-badge.silver { background: #B0BEC5; color: #000; }
+.lb-rank-badge.bronze { background: #CD7F32; color: #fff; }
+.lb-score { font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.lb-trend { font-size: 11px; font-weight: 700; }
+.lb-trend.up { color: var(--success); }
+.lb-trend.down { color: var(--error); }
+.lb-trend.same { color: var(--text-muted); }
+.lb-pagination { display: flex; justify-content: center; align-items: center; gap: 6px; margin: 16px 0 8px; }
+.lb-page-btn { width: 32px; height: 32px; border-radius: 8px; border: none; cursor: pointer; background: var(--bg-elevated); color: var(--text-sub); font-size: 13px; font-weight: 600; display: flex; align-items: center; justify-content: center; transition: all .15s; font-family: var(--font-family); }
+.lb-page-btn:hover { background: var(--bg-overlay); color: var(--text-primary); }
+.lb-page-btn.active { background: var(--neon-purple); color: #fff; }
+
+/* ── Tabs (during - dark) ── */
+.tabs { display: flex; padding: 0 24px; background: var(--bg-surface); position: relative; z-index: 1; border-bottom: 1px solid rgba(255,255,255,0.07); }
+.tab { display: inline-flex; height: 48px; min-width: 80px; padding: 6px 16px; justify-content: center; align-items: center; gap: 4px; font-size: 14px; font-weight: 400; color: var(--text-muted); cursor: pointer; transition: all .15s; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+.tab:hover { color: var(--text-primary); }
+.tab.active { color: var(--neon-cyan); font-weight: 600; border-bottom: 2px solid var(--neon-cyan); }
+
+/* ── Body Scroll ── */
+.body-scroll { flex: 1; overflow-y: auto; padding: 20px 24px 24px; }
+
+/* ── Project Card Grid (dark) ── */
+.proj-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.proj-card { background: var(--bg-surface); border: 1px solid rgba(255,255,255,0.07); border-radius: 16px; overflow: hidden; cursor: pointer; transition: transform .2s ease, box-shadow .2s ease; }
+.proj-card:hover { transform: translateY(-4px); box-shadow: 0 8px 32px rgba(123,47,255,0.2); }
+.proj-thumb { height: 130px; position: relative; overflow: hidden; }
+.proj-thumb-bg { width: 100%; height: 100%; }
+.proj-thumb-bg.g1 { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+.proj-thumb-bg.g2 { background: linear-gradient(135deg, #4facfe 0%, #7B2FFF 100%); }
+.proj-thumb-bg.g3 { background: linear-gradient(135deg, #43e97b 0%, #2196F3 100%); }
+.proj-thumb-bg.g4 { background: linear-gradient(135deg, #B06CFF 8%, #4E70FF 62%, #1772FF 93%); }
+.proj-thumb-bg.g5 { background: linear-gradient(135deg, #f093fb 0%, #6B2FFF 100%); }
+.proj-thumb-bg.g6 { background: linear-gradient(135deg, #00b4d8 0%, #7B2FFF 100%); }
+.proj-thumb-icon { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 40px; height: 40px; background: rgba(255,255,255,.18); border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+.proj-body { padding: 14px 16px 16px; }
+.proj-badges { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+.badge-type { font-size: 10px; font-weight: 700; letter-spacing: .06em; padding: 3px 10px; border-radius: 6px; background: rgba(123,47,255,0.15); border: 1px solid rgba(123,47,255,0.35); color: var(--text-neon); }
+.badge-submit { font-size: 10px; font-weight: 700; padding: 3px 10px; border-radius: 6px; background: rgba(57,200,154,0.15); border: 1px solid rgba(57,200,154,0.35); color: var(--success); }
+.proj-title { font-size: 14px; font-weight: 700; line-height: 1.45; color: var(--text-primary); margin-bottom: 6px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.proj-desc { font-size: 12px; color: var(--text-sub); line-height: 1.55; margin-bottom: 10px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.proj-footer { display: flex; align-items: center; justify-content: space-between; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.07); margin-top: 4px; }
+.proj-likes { font-size: 13px; color: var(--neon-pink); display: flex; align-items: center; gap: 4px; font-weight: 600; }
+.proj-more { font-size: 12px; color: var(--neon-cyan); cursor: pointer; }
+
+/* ── Right Panel (dark) ── */
+.right-panel { width: 360px; flex-shrink: 0; display: flex; flex-direction: column; gap: 10px; align-self: flex-start; position: sticky; top: 72px; max-height: calc(100vh - 80px); overflow-y: auto; background: var(--bg-base); border-radius: 12px; padding: 8px; }
+.panel-box { background: var(--bg-surface); border: 1px solid rgba(255,255,255,0.07); border-radius: 16px; padding: 20px; }
+.panel-title { font-size: 15px; font-weight: 700; color: var(--text-primary); margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; }
+.panel-title-link { font-size: 13px; font-weight: 400; color: var(--neon-cyan); cursor: pointer; }
+
+/* ── Schedule Items (dark) ── */
+.sch-item { padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+.sch-item:last-child { border-bottom: none; }
+.sch-row { display: flex; align-items: center; gap: 10px; }
+.sch-num { width: 22px; height: 22px; border-radius: 50%; background: var(--neon-purple); color: #fff; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.sch-num.done { background: var(--success); }
+.sch-num.pending { background: var(--bg-elevated); color: var(--text-muted); }
+.sch-num.active { background: var(--neon-purple); animation: neon-pulse 2s infinite; }
+.sch-title-row { display: flex; align-items: center; gap: 8px; flex: 1; }
+.sch-title { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+.sch-date { font-size: 11px; color: var(--text-sub); margin-left: auto; white-space: nowrap; }
+.sch-action { margin-top: 8px; padding-left: 32px; }
+.sch-badge-done { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px; background: rgba(57,200,154,0.15); color: var(--success); }
+.sch-badge-dday { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px; background: rgba(123,47,255,0.15); color: var(--text-neon); }
+.sch-badge-tbd { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px; background: var(--bg-elevated); color: var(--text-muted); }
+.sch-submit-btn { height: 30px; font-size: 12px; padding: 0 14px; border-radius: 8px; border: none; cursor: pointer; font-family: var(--font-family); font-weight: 700; color: #fff; background: var(--grad-primary); box-shadow: 0 2px 10px rgba(123,47,255,0.3); }
+
+/* ── Live Ranking (dark) ── */
+.live-rank-item { display: flex; align-items: center; gap: 10px; padding: 10px 8px; border-radius: 8px; transition: background 0.15s; }
+.live-rank-item:hover { background: rgba(123,47,255,0.08); }
+.live-rank-num { width: 24px; height: 24px; border-radius: 50%; background: var(--bg-elevated); color: var(--text-sub); font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.live-rank-num.n1 { background: var(--gold); color: #000; }
+.live-rank-num.n2 { background: #B0BEC5; color: #000; }
+.live-rank-num.n3 { background: #CD7F32; color: #fff; }
+.live-rank-info { flex: 1; min-width: 0; }
+.live-rank-team { font-size: 13px; font-weight: 600; color: var(--text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.live-rank-likes { font-size: 11px; color: var(--neon-pink); }
+.live-rank-right { text-align: right; flex-shrink: 0; }
+.live-rank-score { font-size: 16px; font-weight: 700; color: var(--neon-cyan); font-variant-numeric: tabular-nums; }
+.live-rank-score span { font-size: 11px; font-weight: 400; color: var(--text-sub); }
+.live-rank-change { font-size: 10px; font-weight: 700; }
+.live-rank-change.up { color: var(--success); }
+.live-rank-change.down { color: var(--error); }
+.live-rank-change.same { color: var(--text-muted); }
+
+/* ── Apply Modal ── */
+.apply-modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.6); backdrop-filter:blur(3px); z-index:1000; display:flex; align-items:center; justify-content:center; padding:24px; }
+.apply-modal { background:#fff; border-radius:16px; width:100%; max-width:640px; max-height:90vh; display:flex; flex-direction:column; box-shadow:0 24px 64px rgba(0,0,0,.18); overflow:hidden; }
+.apply-modal-header { display:flex; align-items:center; justify-content:space-between; padding:20px 24px; border-bottom:1px solid var(--border-default); flex-shrink:0; }
+.apply-modal-step-label { font-size:11px; font-weight:600; color:var(--color-primary); letter-spacing:.06em; margin-bottom:2px; }
+.apply-modal-title { font-size:18px; font-weight:700; color:var(--text-basic); }
+.apply-modal-close { width:32px; height:32px; border:none; background:none; cursor:pointer; color:var(--text-subtle); border-radius:6px; display:flex; align-items:center; justify-content:center; }
+.apply-modal-close:hover { background:var(--bg-hover); }
+.apply-step-indicator { display:flex; align-items:center; padding:16px 24px 4px; flex-shrink:0; }
+.apply-step-ind { display:flex; flex-direction:column; align-items:center; gap:4px; }
+.apply-step-ind-dot { width:28px; height:28px; border-radius:50%; border:2px solid var(--border-default); background:#fff; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:var(--text-subtle); transition:all .2s; }
+.apply-step-ind.active .apply-step-ind-dot,.apply-step-ind.done .apply-step-ind-dot { border-color:var(--color-primary); background:var(--color-primary); color:#fff; }
+.apply-step-ind-label { font-size:11px; font-weight:600; color:var(--text-subtle); }
+.apply-step-ind.active .apply-step-ind-label,.apply-step-ind.done .apply-step-ind-label { color:var(--color-primary); }
+.apply-step-line { flex:1; height:2px; background:var(--border-default); margin:0 8px; margin-bottom:18px; transition:background .2s; }
+.apply-step-line.done { background:var(--color-primary); }
+.apply-modal-body { flex:1; overflow-y:auto; padding:20px 24px; }
+.apply-modal-footer { padding:16px 24px; border-top:1px solid var(--border-default); display:flex; justify-content:space-between; align-items:center; gap:8px; flex-shrink:0; }
+.apply-section { margin-bottom:20px; }
+.apply-section-title { font-size:12px; font-weight:700; color:var(--text-subtle); margin-bottom:10px; text-transform:uppercase; letter-spacing:.06em; display:flex; justify-content:space-between; align-items:center; }
+.apply-form-group { margin-bottom:20px; }
+.apply-form-label { display:block; font-size:14px; font-weight:600; color:var(--text-basic); margin-bottom:8px; }
+.apply-form-label .req { color:var(--color-error); margin-left:2px; }
+.apply-form-hint { font-size:12px; color:var(--text-subtle); margin-top:4px; min-height:16px; }
+.apply-form-hint.success { color:var(--color-success); }
+.apply-form-hint.error { color:var(--color-error); }
+.apply-input { width:100%; height:40px; border:1px solid var(--border-default); border-radius:8px; padding:0 40px 0 12px; font-family:var(--font-family); font-size:14px; color:var(--text-basic); background:#fff; outline:none; transition:border-color .15s; box-sizing:border-box; }
+.apply-input:focus { border-color:var(--color-primary); }
+.apply-input::placeholder { color:var(--text-subtle); }
+.apply-input.success { border-color:var(--color-success); }
+.apply-input.error { border-color:var(--color-error); }
+textarea.apply-input { height:auto; padding:10px 12px; resize:none; line-height:1.6; }
+.apply-char-count { font-size:12px; color:var(--text-subtle); text-align:right; margin-top:4px; }
+.radio-group { display:flex; gap:10px; }
+.radio-opt { flex:1; display:flex; align-items:flex-start; gap:10px; padding:14px 16px; border:1.5px solid var(--border-default); border-radius:10px; cursor:pointer; transition:all .15s; }
+.radio-opt:hover { border-color:var(--color-primary); background:rgba(127,93,213,.04); }
+.radio-opt.selected { border-color:var(--color-primary); background:rgba(127,93,213,.06); }
+.radio-opt input[type=radio] { accent-color:var(--color-primary); margin-top:2px; flex-shrink:0; }
+.radio-opt-label { font-size:14px; font-weight:600; }
+.radio-opt-desc { font-size:12px; color:var(--text-subtle); margin-top:2px; }
+.toggle-row { display:flex; align-items:center; justify-content:space-between; }
+.toggle-sw { width:40px; height:22px; border-radius:11px; background:#D0D5DD; cursor:pointer; position:relative; transition:background .2s; flex-shrink:0; }
+.toggle-sw.on { background:var(--color-primary); }
+.toggle-sw::after { content:''; position:absolute; width:16px; height:16px; border-radius:50%; background:#fff; top:3px; left:3px; transition:left .2s; box-shadow:0 1px 3px rgba(0,0,0,.2); }
+.toggle-sw.on::after { left:21px; }
+.toggle-extra { display:none; margin-top:10px; }
+.toggle-extra.show { display:block; }
+.msearch-wrap { position:relative; }
+.msearch-dropdown { position:absolute; top:100%; left:0; right:0; background:#fff; border:1px solid var(--border-default); border-radius:8px; box-shadow:var(--shadow-md); z-index:20; max-height:200px; overflow-y:auto; margin-top:4px; display:none; }
+.msearch-dropdown.show { display:block; }
+.msearch-item { display:flex; align-items:center; justify-content:space-between; padding:10px 14px; cursor:pointer; transition:background .1s; }
+.msearch-item:hover:not(.disabled) { background:var(--bg-hover); }
+.msearch-item.disabled { opacity:.5; cursor:not-allowed; pointer-events:none; }
+.msearch-name { font-size:14px; font-weight:600; }
+.msearch-dept { font-size:12px; color:var(--text-subtle); }
+.msearch-badge { font-size:11px; background:var(--bg-hover); color:var(--text-subtle); padding:2px 8px; border-radius:99px; font-weight:600; flex-shrink:0; }
+.team-cards-wrap { display:flex; flex-wrap:wrap; gap:8px; }
+.tc { display:flex; align-items:center; gap:10px; padding:10px 14px; background:#fff; border:1px solid var(--border-default); border-radius:10px; }
+.tc-avatar { width:32px; height:32px; border-radius:50%; background:var(--color-primary); color:#fff; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:600; flex-shrink:0; }
+.tc.leader .tc-avatar { background:var(--color-primary-gradient); }
+.tc-name { font-size:13px; font-weight:600; }
+.tc-role { font-size:11px; color:var(--text-subtle); margin-top:1px; }
+.tc-remove { width:20px; height:20px; border-radius:50%; background:none; border:none; cursor:pointer; color:var(--text-subtle); font-size:12px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
+.tc-remove:hover { background:rgba(233,81,90,.1); color:var(--color-error); }
+.apply-info-box { background:var(--bg-hover); border-radius:10px; padding:14px; }
+.apply-info-box ul { font-size:12px; color:var(--text-subtle); line-height:1.9; padding-left:16px; margin:0; }
+.apply-warn-box { background:rgba(233,81,122,.06); border:1px solid rgba(233,81,122,.2); border-radius:10px; padding:12px; }
+.apply-complete-header { text-align:center; padding:20px 0 16px; }
+.apply-complete-icon { font-size:48px; margin-bottom:12px; }
+.apply-complete-title { font-size:20px; font-weight:700; margin-bottom:6px; color:var(--text-basic); }
+.apply-complete-sub { font-size:14px; color:var(--text-subtle); }
+.apply-team-summary { background:var(--bg-hover); border-radius:12px; padding:16px; margin-bottom:20px; }
+.apply-team-summary-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+.apply-team-summary-name { font-size:15px; font-weight:700; }
+.apply-team-summary-topic { font-size:13px; color:var(--text-subtle); line-height:1.6; }
+</style>
+</head>
+<body>
+
+<!-- 상태 토글 -->
+<div class="state-toggle">
+  <button class="state-btn active" onclick="setState('before',this)">진행 전</button>
+  <button class="state-btn" onclick="setState('during',this)">진행 중</button>
+</div>
+
+<div class="app-frame">
+
+  <!-- ── HEADER ── -->
+  <header class="global-header">
+    <div class="header-left">
+      <div class="header-logo">
+        <div class="header-logo-icon">M</div>
+        2026 멀티캠퍼스 해커톤
+      </div>
+      <span class="breadcrumb-sep">›</span>
+      <span class="breadcrumb-current">산학</span>
+    </div>
+    <div class="header-right">
+      <button class="header-icon-btn">
+        <div class="notif-dot"></div>
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M8 1.5a4.5 4.5 0 0 0-4.5 4.5v2.25L2 10h12l-1.5-1.75V6A4.5 4.5 0 0 0 8 1.5zM6.5 12a1.5 1.5 0 0 0 3 0H6.5z" fill="#131416"/>
+        </svg>
+      </button>
+      <button class="header-icon-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M8 2a6 6 0 1 0 6 6A6 6 0 0 0 8 2zm0 10.5A4.5 4.5 0 1 1 12.5 8 4.5 4.5 0 0 1 8 12.5z" fill="#131416"/>
+        </svg>
+      </button>
+      <div class="header-avatar">김</div>
+    </div>
+  </header>
+
+  <!-- ── PAGE BODY ── -->
+  <div class="page-body">
+
+    <!-- ── LNB ── -->
+    <nav class="lnb">
+      <div class="lnb-section-label">MENU</div>
+      <div class="lnb-menu">
+
+        <div class="lnb-item active" id="lnb-home">
+          <span class="lnb-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M2 6.5L8 2l6 4.5V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V6.5z" stroke="#7F5DD5" stroke-width="1.3" fill="none" stroke-linejoin="round"/>
+              <rect x="5.5" y="9" width="5" height="6" rx="1" fill="#7F5DD5" opacity=".4"/>
+            </svg>
+          </span>
+          홈
+        </div>
+
+        <div class="lnb-item">
+          <span class="lnb-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <circle cx="8" cy="8" r="5.5" stroke="#58616A" stroke-width="1.2"/>
+              <line x1="8" y1="7.5" x2="8" y2="11" stroke="#58616A" stroke-width="1.4" stroke-linecap="round"/>
+              <circle cx="8" cy="5.5" r=".8" fill="#58616A"/>
+            </svg>
+          </span>
+          대회소개
+        </div>
+
+        <div class="lnb-item">
+          <span class="lnb-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <rect x="2" y="3" width="12" height="10" rx="1.5" stroke="#58616A" stroke-width="1.2" fill="none"/>
+              <line x1="2" y1="6" x2="14" y2="6" stroke="#58616A" stroke-width="1.2"/>
+              <line x1="5.5" y1="1.5" x2="5.5" y2="4.5" stroke="#58616A" stroke-width="1.2" stroke-linecap="round"/>
+              <line x1="10.5" y1="1.5" x2="10.5" y2="4.5" stroke="#58616A" stroke-width="1.2" stroke-linecap="round"/>
+            </svg>
+          </span>
+          일정·규칙
+        </div>
+
+        <div class="lnb-item" id="lnb-rank">
+          <span class="lnb-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M8 2l1.8 3.6L14 6.4l-3 2.9.7 4.1L8 11.4l-3.7 1.9.7-4.1L2 6.4l4.2-.8L8 2z" stroke="#58616A" stroke-width="1.2" fill="none" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          랭킹·제출
+        </div>
+
+        <div class="lnb-item">
+          <span class="lnb-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <circle cx="8" cy="8" r="5.5" stroke="#58616A" stroke-width="1.2"/>
+              <path d="M6.5 6.5C6.5 5.67 7.17 5 8 5s1.5.67 1.5 1.5c0 .83-.67 1.5-1.5 1.5V9.5" stroke="#58616A" stroke-width="1.2" stroke-linecap="round"/>
+              <circle cx="8" cy="11" r=".7" fill="#58616A"/>
+            </svg>
+          </span>
+          FAQ
+        </div>
+
+      </div>
+    </nav>
+
+    <!-- ── BODY ── -->
+    <div class="body-area">
+
+      <!-- 히어로 배너 (dark CSS, 이미지 없음) -->
+      <div class="hero-banner-wrap">
+        <div class="hero-ambient-1"></div>
+        <div class="hero-ambient-2"></div>
+        <div class="hero-content">
+          <h1 class="hero-title">2026 AI 해커톤</h1>
+          <p id="sub-before" class="hero-sub">AI로 세상을 바꾸는 48시간의 여정. 아이디어에서 실전 AI 솔루션까지, 지금 도전하세요.</p>
+          <p id="sub-during" class="hero-sub hidden">2026.05.22(금) 18:00까지 결과물 제출 · 현재 62팀 제출 완료</p>
+          <button class="hero-cta" id="hero-cta-btn" onclick="openApplyModal()">참가 신청하기</button>
+        </div>
+      </div>
+
+      <!-- 내 팀 카드 (진행 중) -->
+      <div id="myteam-bar" class="myteam-bar hidden">
+        <div class="myteam-left">
+          <div class="myteam-top-row">
+            <div class="myteam-tags">
+              <span class="badge-neon">아이디어톤</span>
+              <span class="myteam-tag-gray">주니어벤처스</span>
+              <span class="myteam-tag-gray">기업사업교육2그룹</span>
+            </div>
+            <button class="myteam-link" onclick="">과제물 제출 →</button>
+          </div>
+          <div class="myteam-members">김민준 · 이사연 · 박지호 · 최유나</div>
+          <div class="myteam-title">전통 AI + 생성형 AI 활용 역량을 통합 평가하는 인증·교육 플랫폼 구축</div>
+        </div>
+        <div class="myteam-right">
+          <div class="myteam-stat">
+            <div class="myteam-stat-label">현재순위</div>
+            <div class="myteam-stat-rank">3위</div>
+          </div>
+          <div class="myteam-stat">
+            <div class="myteam-stat-label">동료평가</div>
+            <div class="myteam-stat-score">89.5</div>
+          </div>
+          <div class="myteam-stat">
+            <div class="myteam-stat-label">제출횟수</div>
+            <div class="myteam-stat-count">2회</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─────────────── 진행 전 콘텐츠 ─────────────── -->
+      <div id="content-before" class="before-content">
+
+        <!-- 스탯 카드 -->
+        <div class="stat-wrap">
+          <div class="stat-row">
+            <div class="stat-c"><div class="stat-label">총상금</div><div class="stat-val">1,000<em>만원</em></div></div>
+            <div class="stat-c"><div class="stat-label">최대 참가팀</div><div class="stat-val">100<em>팀</em></div></div>
+            <div class="stat-c"><div class="stat-label">전문 심사위원</div><div class="stat-val">10<em>명</em></div></div>
+            <div class="stat-c"><div class="stat-label">진행 기간</div><div class="stat-val">30<em>일</em></div></div>
+            <div class="stat-c"><div class="stat-label">현재 참가팀</div><div class="stat-val">23<em>팀</em></div></div>
+          </div>
+        </div>
+
+        <!-- 대회 일정 스텝 -->
+        <div class="schedule-section">
+          <div class="section-title">대회 일정 <span>2026년 5월 1일 접수 시작 · 전 과정 온라인 진행</span></div>
+          <div class="steps">
+            <div class="step done">
+              <div class="step-icon-wrap">🎨</div>
+              <div class="step-num">STEP 01</div>
+              <div class="step-label">참가 접수</div>
+              <div class="step-period">2026.05.01(금)<br/>~ 2026.05.15(금)</div>
+              <div class="step-note">팀 구성 후 신청 · 최대 4인</div>
+            </div>
+            <div class="step active">
+              <div class="step-icon-wrap">💡</div>
+              <div class="step-num">STEP 02</div>
+              <div class="step-label">본선 제출</div>
+              <div class="step-period">2026.05.20(수)<br/>~ 2026.05.22(수) 18:00</div>
+              <div class="step-note">결과물 + 발표자료 제출</div>
+            </div>
+            <div class="step">
+              <div class="step-icon-wrap">🔍</div>
+              <div class="step-num">STEP 03</div>
+              <div class="step-label">심사 · 평가</div>
+              <div class="step-period">2026.05.25(월)<br/>~ 2026.05.27(수)</div>
+              <div class="step-note">전문 심사위원 정량·정성 평가</div>
+            </div>
+            <div class="step">
+              <div class="step-icon-wrap">🎉</div>
+              <div class="step-num">STEP 04</div>
+              <div class="step-label">결과 발표 · 시상</div>
+              <div class="step-period">2026.05.30(토)<br/>오후 2:00</div>
+              <div class="step-note">온라인 시상식 · 수상작 공개</div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /content-before -->
+
+      <!-- ─────────────── 진행 중 콘텐츠 ─────────────── -->
+      <div id="content-during" class="hidden">
+
+        <!-- 리더보드 -->
+        <div class="leaderboard-section">
+          <div class="section-title">리더보드 <span>실시간 업데이트</span></div>
+          <table class="leaderboard-table">
+            <thead>
+              <tr>
+                <th style="width:52px;">순위</th>
+                <th>팀명</th>
+                <th style="width:90px;">점수</th>
+                <th style="width:100px;">좋아요</th>
+                <th style="width:64px;">변동</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="lb-row-1">
+                <td><span class="lb-rank-badge gold">1</span></td>
+                <td>임의 팀이름 A2</td>
+                <td><span class="lb-score">95점</span></td>
+                <td style="color:var(--neon-pink);">♥ 2,134</td>
+                <td><span class="lb-trend up">▲ 2</span></td>
+              </tr>
+              <tr class="lb-row-2">
+                <td><span class="lb-rank-badge silver">2</span></td>
+                <td>People그룹</td>
+                <td><span class="lb-score">92점</span></td>
+                <td style="color:var(--neon-pink);">♥ 1,748</td>
+                <td><span class="lb-trend up">▲ 1</span></td>
+              </tr>
+              <tr class="lb-row-3">
+                <td><span class="lb-rank-badge bronze">3</span></td>
+                <td>아이디어톤그룹스</td>
+                <td><span class="lb-score">90점</span></td>
+                <td style="color:var(--neon-pink);">♥ 1,456</td>
+                <td><span class="lb-trend up">▲ 1</span></td>
+              </tr>
+              <tr class="lb-row-mine">
+                <td><span class="lb-rank-badge" style="background:rgba(123,47,255,0.3);color:var(--text-neon);">4</span></td>
+                <td>주니어벤처스 <span class="badge-neon" style="margin-left:6px;font-size:9px;">MY</span></td>
+                <td><span class="lb-score">88점</span></td>
+                <td style="color:var(--neon-pink);">♥ 1,123</td>
+                <td><span class="lb-trend same">— 0</span></td>
+              </tr>
+              <tr>
+                <td><span class="lb-rank-badge">5</span></td>
+                <td>AI는혁신이소</td>
+                <td><span class="lb-score" style="color:var(--text-primary);">85점</span></td>
+                <td style="color:var(--neon-pink);">♥ 987</td>
+                <td><span class="lb-trend down">▼ 1</span></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="lb-pagination">
+            <button class="lb-page-btn active">1</button>
+            <button class="lb-page-btn">2</button>
+            <button class="lb-page-btn">3</button>
+            <button class="lb-page-btn">›</button>
+          </div>
+        </div>
+
+        <!-- 탭 -->
+        <div class="tabs">
+          <div class="tab active" onclick="switchTab(this,'tab-submissions')">제출 현황</div>
+          <div class="tab" onclick="switchTab(this,'tab-presentations')">발표 자료</div>
+          <div class="tab" onclick="switchTab(this,'tab-notice')">공지</div>
+        </div>
+
+        <!-- 탭 컨텐츠 -->
+        <div class="body-scroll">
+
+          <!-- 제출 현황 -->
+          <div id="tab-submissions">
+            <div class="proj-grid">
+
+              <div class="proj-card">
+                <div class="proj-thumb"><div class="proj-thumb-bg g1"></div><div class="proj-thumb-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="white" stroke-width="1.5"/><path d="M9 12l2 2 4-4" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg></div></div>
+                <div class="proj-body">
+                  <div class="proj-badges"><span class="badge-type">아이디어톤</span><span class="badge-submit">제출완료</span></div>
+                  <div class="proj-title">AIB 나의 인공 영향력 전략: AI Counseling & AI News Clipping</div>
+                  <div class="proj-desc">AI 기반 개인화 뉴스 큐레이션과 상담 서비스를 통해 직원 역량 강화를 지원하는 플랫폼</div>
+                  <div class="proj-footer"><span class="proj-likes">♥ 1,247</span><span class="proj-more">더보기 →</span></div>
+                </div>
+              </div>
+
+              <div class="proj-card">
+                <div class="proj-thumb"><div class="proj-thumb-bg g2"></div><div class="proj-thumb-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7l10 5 10-5-10-5z" stroke="white" stroke-width="1.5" stroke-linejoin="round"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5" stroke="white" stroke-width="1.5" stroke-linejoin="round"/></svg></div></div>
+                <div class="proj-body">
+                  <div class="proj-badges"><span class="badge-type">아이디어톤</span><span class="badge-submit">제출완료</span></div>
+                  <div class="proj-title">AI로 운영하는 AI 해커톤: Work Reboot</div>
+                  <div class="proj-desc">업무 효율화 AI 플랫폼으로 반복 업무를 자동화하고 창의적 작업에 집중할 수 있는 환경 구현</div>
+                  <div class="proj-footer"><span class="proj-likes">♥ 1,123</span><span class="proj-more">더보기 →</span></div>
+                </div>
+              </div>
+
+              <div class="proj-card">
+                <div class="proj-thumb"><div class="proj-thumb-bg g3"></div><div class="proj-thumb-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="3" stroke="white" stroke-width="1.5"/><path d="M8 12h8M8 8h5M8 16h6" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg></div></div>
+                <div class="proj-body">
+                  <div class="proj-badges"><span class="badge-type">아이디어톤</span><span class="badge-submit">제출완료</span></div>
+                  <div class="proj-title">스타트업·차세대 리더를 위한 SERICEO AI 자문·콘텐츠 재생성 서비스</div>
+                  <div class="proj-desc">AI 기반 리더십 진단 및 맞춤형 성장 로드맵을 제공하는 통합 플랫폼</div>
+                  <div class="proj-footer"><span class="proj-likes">♥ 987</span><span class="proj-more">더보기 →</span></div>
+                </div>
+              </div>
+
+              <div class="proj-card">
+                <div class="proj-thumb"><div class="proj-thumb-bg g4"></div><div class="proj-thumb-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="white" stroke-width="1.5"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg></div></div>
+                <div class="proj-body">
+                  <div class="proj-badges"><span class="badge-type">아이디어톤</span><span class="badge-submit">제출완료</span></div>
+                  <div class="proj-title">AIB 나의 인공 영향력 전략: AI Counseling & AI News Clipping</div>
+                  <div class="proj-desc">임직원 역량 강화를 위한 AI 기반 맞춤형 뉴스레터 및 코칭 서비스</div>
+                  <div class="proj-footer"><span class="proj-likes">♥ 856</span><span class="proj-more">더보기 →</span></div>
+                </div>
+              </div>
+
+              <div class="proj-card">
+                <div class="proj-thumb"><div class="proj-thumb-bg g5"></div><div class="proj-thumb-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" stroke="white" stroke-width="1.5" stroke-linejoin="round"/></svg></div></div>
+                <div class="proj-body">
+                  <div class="proj-badges"><span class="badge-type">아이디어톤</span><span class="badge-submit">제출완료</span></div>
+                  <div class="proj-title">AI로 운영하는 AI 해커톤: Work Reboot</div>
+                  <div class="proj-desc">업무 프로세스 혁신을 위한 AI 에이전트 도입 전략 및 시범 적용 방안 제시</div>
+                  <div class="proj-footer"><span class="proj-likes">♥ 744</span><span class="proj-more">더보기 →</span></div>
+                </div>
+              </div>
+
+              <div class="proj-card">
+                <div class="proj-thumb"><div class="proj-thumb-bg g6"></div><div class="proj-thumb-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+                <div class="proj-body">
+                  <div class="proj-badges"><span class="badge-type">아이디어톤</span><span class="badge-submit">제출완료</span></div>
+                  <div class="proj-title">AI 기반 재무업무 자동화로 반복업무 효율 극대화 솔루션</div>
+                  <div class="proj-desc">재무팀 반복 업무를 AI로 자동화해 월 80시간 절감을 목표로 하는 RPA+AI 통합 솔루션</div>
+                  <div class="proj-footer"><span class="proj-likes">♥ 612</span><span class="proj-more">더보기 →</span></div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- 발표 자료 -->
+          <div id="tab-presentations" class="hidden">
+            <p style="color:var(--text-sub);text-align:left;padding:48px 0;">발표 자료는 결과 발표 후 공개됩니다.</p>
+          </div>
+
+          <!-- 공지 -->
+          <div id="tab-notice" class="hidden">
+            <p style="color:var(--text-sub);text-align:left;padding:48px 0;">공지사항이 없습니다.</p>
+          </div>
+
+        </div><!-- /body-scroll -->
+      </div><!-- /content-during -->
+
+    </div><!-- /body-area -->
+
+    <!-- ── RIGHT PANEL (진행 중만) ── -->
+    <div id="right-panel" class="right-panel hidden">
+
+      <!-- 해커톤 일정 -->
+      <div class="panel-box">
+        <div class="panel-title">해커톤 일정 <span class="panel-title-link">모두보기 →</span></div>
+        <div class="sch-item">
+          <div class="sch-row">
+            <div class="sch-num done">1</div>
+            <div class="sch-title-row">
+              <span class="sch-title">참가 신청</span>
+              <span class="sch-badge-done">완료</span>
+              <span class="sch-date">2026.05.15 18:00</span>
+            </div>
+          </div>
+        </div>
+        <div class="sch-item">
+          <div class="sch-row">
+            <div class="sch-num active">2</div>
+            <div class="sch-title-row">
+              <span class="sch-title">기획서 제출</span>
+              <span class="sch-badge-dday">D-14</span>
+              <span class="sch-date">2026.06.13 18:00</span>
+            </div>
+          </div>
+          <div class="sch-action"><button class="sch-submit-btn">기획서 제출</button></div>
+        </div>
+        <div class="sch-item">
+          <div class="sch-row">
+            <div class="sch-num pending">3</div>
+            <div class="sch-title-row">
+              <span class="sch-title">개발산출물 제출</span>
+              <span class="sch-badge-dday">D-30</span>
+              <span class="sch-date">2026.06.28 18:00</span>
+            </div>
+          </div>
+        </div>
+        <div class="sch-item">
+          <div class="sch-row">
+            <div class="sch-num pending">4</div>
+            <div class="sch-title-row">
+              <span class="sch-title">심사</span>
+              <span class="sch-badge-tbd">D-37</span>
+              <span class="sch-date">YYYY.MM.DD HH:SS</span>
+            </div>
+          </div>
+        </div>
+        <div class="sch-item">
+          <div class="sch-row">
+            <div class="sch-num pending">5</div>
+            <div class="sch-title-row">
+              <span class="sch-title">결과발표</span>
+              <span class="sch-badge-tbd">D-45</span>
+              <span class="sch-date">YYYY.MM.DD HH:SS</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 실시간 랭킹 TOP 5 -->
+      <div class="panel-box">
+        <div class="panel-title">실시간 랭킹 TOP 5 <span class="panel-title-link">모두보기 →</span></div>
+
+        <div class="live-rank-item">
+          <div class="live-rank-num n1">1</div>
+          <div class="live-rank-info">
+            <div class="live-rank-team">임의 팀이름 A2</div>
+            <div class="live-rank-likes">♥ 2,134</div>
+          </div>
+          <div class="live-rank-right">
+            <div class="live-rank-score">95<span>점</span></div>
+            <div class="live-rank-change up">▲ 2</div>
+          </div>
+        </div>
+
+        <div class="live-rank-item">
+          <div class="live-rank-num n2">2</div>
+          <div class="live-rank-info">
+            <div class="live-rank-team">People그룹</div>
+            <div class="live-rank-likes">♥ 1,748</div>
+          </div>
+          <div class="live-rank-right">
+            <div class="live-rank-score">92<span>점</span></div>
+            <div class="live-rank-change up">▲ 1</div>
+          </div>
+        </div>
+
+        <div class="live-rank-item">
+          <div class="live-rank-num n3">3</div>
+          <div class="live-rank-info">
+            <div class="live-rank-team">아이디어톤그룹스</div>
+            <div class="live-rank-likes">♥ 1,456</div>
+          </div>
+          <div class="live-rank-right">
+            <div class="live-rank-score">90<span>점</span></div>
+            <div class="live-rank-change up">▲ 1</div>
+          </div>
+        </div>
+
+        <div class="live-rank-item">
+          <div class="live-rank-num">4</div>
+          <div class="live-rank-info">
+            <div class="live-rank-team">Work Reboot팀</div>
+            <div class="live-rank-likes">♥ 1,123</div>
+          </div>
+          <div class="live-rank-right">
+            <div class="live-rank-score">88<span>점</span></div>
+            <div class="live-rank-change same">= -</div>
+          </div>
+        </div>
+
+        <div class="live-rank-item">
+          <div class="live-rank-num">5</div>
+          <div class="live-rank-info">
+            <div class="live-rank-team">AI는혁신이소</div>
+            <div class="live-rank-likes">♥ 987</div>
+          </div>
+          <div class="live-rank-right">
+            <div class="live-rank-score">85<span>점</span></div>
+            <div class="live-rank-change down">▼ 1</div>
+          </div>
+        </div>
+
+      </div>
+
+    </div><!-- /right-panel -->
+
+  </div><!-- /page-body -->
+</div><!-- /app-frame -->
+
+<!-- ══════════════════════════════════════
+     참가신청 모달
+══════════════════════════════════════ -->
+<div id="apply-modal" class="apply-modal-overlay hidden" onclick="if(event.target===this)closeApplyModal()">
+  <div class="apply-modal" onclick="event.stopPropagation()">
+
+    <div class="apply-modal-header">
+      <div>
+        <div class="apply-modal-step-label" id="am-step-label">STEP 1 / 2</div>
+        <div class="apply-modal-title" id="am-title">기본 정보 입력</div>
+      </div>
+      <button class="apply-modal-close" onclick="closeApplyModal()">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M12 4L4 12M4 4l8 8" stroke="#58616A" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+
+    <div class="apply-step-indicator" id="am-indicator">
+      <div class="apply-step-ind active" id="am-ind1">
+        <div class="apply-step-ind-dot">1</div>
+        <div class="apply-step-ind-label">기본 정보</div>
+      </div>
+      <div class="apply-step-line" id="am-step-line"></div>
+      <div class="apply-step-ind" id="am-ind2">
+        <div class="apply-step-ind-dot">2</div>
+        <div class="apply-step-ind-label">팀 구성</div>
+      </div>
+    </div>
+
+    <!-- STEP 1 -->
+    <div class="apply-modal-body" id="am-body1">
+      <div class="apply-form-group">
+        <label class="apply-form-label">팀 이름 <span class="req">*</span></label>
+        <div style="position:relative;">
+          <input type="text" class="apply-input" id="am-team-name" maxlength="20" placeholder="최대 20자, 중복 불가" oninput="amNameInput()" onblur="amCheckName()">
+          <span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:11px;color:var(--text-subtle);" id="am-name-len">0/20</span>
+        </div>
+        <div class="apply-form-hint" id="am-name-hint"></div>
+      </div>
+      <div class="apply-form-group">
+        <label class="apply-form-label">해커톤 유형 <span class="req">*</span></label>
+        <div class="radio-group">
+          <div class="radio-opt" id="am-type-idea" onclick="amSelectType('idea')">
+            <input type="radio" name="am-hacktype" value="idea">
+            <div><div class="radio-opt-label">아이디어톤</div><div class="radio-opt-desc">아이디어 기획 · 전략 중심</div></div>
+          </div>
+          <div class="radio-opt" id="am-type-mvp" onclick="amSelectType('mvp')">
+            <input type="radio" name="am-hacktype" value="mvp">
+            <div><div class="radio-opt-label">MVP톤</div><div class="radio-opt-desc">프로토타입 구현 · 기술 중심</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="apply-form-group">
+        <label class="apply-form-label">참가 주제 <span class="req">*</span></label>
+        <textarea class="apply-input" id="am-topic" rows="3" maxlength="200" placeholder="아이디어를 한 줄로 요약해 주세요 (최대 200자)" oninput="amTopicInput()"></textarea>
+        <div class="apply-char-count" id="am-topic-len">0 / 200</div>
+      </div>
+      <div class="apply-form-group">
+        <div class="toggle-row">
+          <div>
+            <div class="apply-form-label" style="margin-bottom:2px;">교육 지원 필요 여부</div>
+            <div style="font-size:12px;color:var(--text-subtle);">추가 교육 지원이 필요한 경우 활성화해 주세요</div>
+          </div>
+          <div class="toggle-sw" id="am-toggle-edu" onclick="amToggle('edu')"></div>
+        </div>
+        <div class="toggle-extra" id="am-toggle-edu-extra">
+          <input type="text" class="apply-input" style="padding-right:12px;" placeholder="필요한 교육 지원 내용을 입력해 주세요">
+        </div>
+      </div>
+      <div class="apply-form-group" style="margin-bottom:0;">
+        <div class="toggle-row">
+          <div>
+            <div class="apply-form-label" style="margin-bottom:2px;">기술 멘토링 필요 여부</div>
+            <div style="font-size:12px;color:var(--text-subtle);">기술 멘토링이 필요한 경우 활성화해 주세요</div>
+          </div>
+          <div class="toggle-sw" id="am-toggle-mentor" onclick="amToggle('mentor')"></div>
+        </div>
+        <div class="toggle-extra" id="am-toggle-mentor-extra">
+          <input type="text" class="apply-input" style="padding-right:12px;" placeholder="필요한 기술 멘토링 영역을 입력해 주세요">
+        </div>
+      </div>
+    </div>
+    <div class="apply-modal-footer" id="am-footer1">
+      <button class="btn btn-secondary" onclick="closeApplyModal()">취소</button>
+      <button class="btn btn-primary btn-lg" id="am-btn-next" onclick="amGoStep2()" disabled>다음</button>
+    </div>
+
+    <!-- STEP 2 -->
+    <div class="apply-modal-body hidden" id="am-body2">
+      <div class="apply-section">
+        <div class="apply-section-title">팀원 검색</div>
+        <p style="font-size:13px;color:var(--text-subtle);margin-bottom:10px;">같은 과정(course_id) 수강생 중에서만 검색됩니다</p>
+        <div class="msearch-wrap">
+          <div style="display:flex;gap:8px;">
+            <input type="text" class="apply-input" id="am-search" style="padding-right:12px;" placeholder="이름으로 검색..." oninput="amSearch()" onfocus="amSearch()">
+            <button class="btn btn-outline" style="flex-shrink:0;" onclick="amAddMember()">+ 추가</button>
+          </div>
+          <div class="msearch-dropdown" id="am-dropdown"></div>
+        </div>
+      </div>
+      <div class="apply-section">
+        <div class="apply-section-title">
+          <span>현재 팀 구성</span>
+          <span id="am-count-label" style="font-weight:700;color:var(--color-primary);font-size:13px;">1 / 4명</span>
+        </div>
+        <div class="team-cards-wrap" id="am-team-cards">
+          <div class="tc leader">
+            <div class="tc-avatar">김</div>
+            <div><div class="tc-name">김학습</div><div class="tc-role">팀장 · 기업사업교육2그룹</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="apply-info-box">
+        <div style="font-size:13px;font-weight:600;margin-bottom:4px;">팀 구성 안내</div>
+        <ul>
+          <li>팀장(신청자 본인)은 자동 설정되며 변경할 수 없습니다</li>
+          <li>최소 1인(개인 참가)부터 최대 4인까지 구성 가능합니다</li>
+          <li>팀원 추가 즉시 해당 수강생은 팀 소속으로 처리됩니다</li>
+        </ul>
+      </div>
+    </div>
+    <div class="apply-modal-footer hidden" id="am-footer2">
+      <button class="btn btn-secondary" onclick="amGoStep1()">이전</button>
+      <button class="btn btn-primary btn-lg" onclick="amSubmit()">신청 완료</button>
+    </div>
+
+    <!-- 완료 / 팀 관리 -->
+    <div class="apply-modal-body hidden" id="am-body-done">
+      <div class="apply-complete-header" id="am-success-msg">
+        <div class="apply-complete-icon">🎉</div>
+        <div class="apply-complete-title">참가 신청이 완료되었습니다!</div>
+        <div class="apply-complete-sub">2026 AI 해커톤에 오신 걸 환영합니다</div>
+      </div>
+      <div class="apply-team-summary">
+        <div class="apply-team-summary-top">
+          <div class="apply-team-summary-name" id="am-done-name">—</div>
+          <span class="tag tag-purple" id="am-done-type">아이디어톤</span>
+        </div>
+        <div class="apply-team-summary-topic" id="am-done-topic">—</div>
+      </div>
+      <div class="apply-section">
+        <div class="apply-section-title">
+          <span>팀원 관리</span>
+          <span id="am-manage-count" style="font-weight:700;color:var(--color-primary);font-size:13px;">1 / 4명</span>
+        </div>
+        <div class="team-cards-wrap" id="am-manage-cards"></div>
+        <div class="msearch-wrap" style="margin-top:12px;">
+          <div style="display:flex;gap:8px;">
+            <input type="text" class="apply-input" id="am-manage-search" style="padding-right:12px;" placeholder="팀원 추가 — 이름으로 검색..." oninput="amManageSearch()">
+            <button class="btn btn-outline" style="flex-shrink:0;" onclick="amManageAdd()">+ 추가</button>
+          </div>
+          <div class="msearch-dropdown" id="am-manage-dropdown"></div>
+        </div>
+      </div>
+      <div class="apply-warn-box">
+        <div style="font-size:12px;color:var(--color-point);font-weight:600;">수정 불가 항목</div>
+        <div style="font-size:12px;color:var(--text-subtle);margin-top:3px;">해커톤 유형(아이디어톤/MVP톤)은 신청 완료 후 변경할 수 없습니다</div>
+      </div>
+    </div>
+    <div class="apply-modal-footer hidden" id="am-footer-done">
+      <button class="btn btn-outline" style="color:var(--color-error);border-color:var(--color-error);" onclick="amCancelApply()">참가 취소</button>
+      <button class="btn btn-primary" onclick="closeApplyModal()">닫기</button>
+    </div>
+
+  </div>
+</div>
+
+<div id="am-cancel-dialog" class="apply-modal-overlay hidden" style="z-index:1100;">
+  <div class="apply-modal" style="max-width:400px;" onclick="event.stopPropagation()">
+    <div class="apply-modal-body" style="text-align:center;padding:32px 24px 24px;">
+      <div style="font-size:40px;margin-bottom:14px;">⚠️</div>
+      <div style="font-size:17px;font-weight:700;margin-bottom:8px;">참가를 취소하시겠습니까?</div>
+      <div style="font-size:14px;color:var(--text-subtle);line-height:1.7;">참가를 취소하면 팀 정보가 모두 삭제됩니다.<br>이 작업은 되돌릴 수 없습니다.</div>
+    </div>
+    <div class="apply-modal-footer" style="justify-content:center;gap:10px;">
+      <button class="btn btn-secondary" style="flex:1;" onclick="document.getElementById('am-cancel-dialog').classList.add('hidden')">아니요, 유지</button>
+      <button class="btn btn-primary" style="flex:1;background:var(--color-error);" onclick="amConfirmCancel()">네, 취소합니다</button>
+    </div>
+  </div>
+</div>
+
+<script src="./assets/js/common.js"></script>
+<script>
+/* ═══════════════════════════════════════
+   Apply Modal Logic
+═══════════════════════════════════════ */
+const AM_MEMBERS_POOL = [
+  { name:'이영희', dept:'마케팅팀', initial:'이', busy:false },
+  { name:'박민수', dept:'개발팀',   initial:'박', busy:true  },
+  { name:'최유진', dept:'인사팀',   initial:'최', busy:false },
+  { name:'정수현', dept:'기획팀',   initial:'정', busy:false },
+  { name:'한지은', dept:'전략팀',   initial:'한', busy:false },
+  { name:'오다은', dept:'교육팀',   initial:'오', busy:false },
+  { name:'김태양', dept:'IT팀',     initial:'김', busy:false },
+];
+
+let amState = { hackType:'', members:[] };
+let amPickedMember = null;
+let amManagePickedMember = null;
+
+function openApplyModal() {
+  document.getElementById('apply-modal').classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+  amGoStep1();
+}
+function closeApplyModal() {
+  document.getElementById('apply-modal').classList.add('hidden');
+  document.body.style.overflow = '';
+}
+function amShow(ids) {
+  ['am-body1','am-footer1','am-body2','am-footer2','am-body-done','am-footer-done','am-indicator'].forEach(id => {
+    document.getElementById(id)?.classList.add('hidden');
+  });
+  ids.forEach(id => document.getElementById(id)?.classList.remove('hidden'));
+}
+function amGoStep1() {
+  document.getElementById('am-step-label').textContent = 'STEP 1 / 2';
+  document.getElementById('am-title').textContent = '기본 정보 입력';
+  document.getElementById('am-ind1').className = 'apply-step-ind active';
+  document.getElementById('am-ind2').className = 'apply-step-ind';
+  document.getElementById('am-step-line').classList.remove('done');
+  amShow(['am-indicator','am-body1','am-footer1']);
+}
+function amGoStep2() {
+  document.getElementById('am-step-label').textContent = 'STEP 2 / 2';
+  document.getElementById('am-title').textContent = '팀 구성';
+  document.getElementById('am-ind1').className = 'apply-step-ind done';
+  document.getElementById('am-ind2').className = 'apply-step-ind active';
+  document.getElementById('am-step-line').classList.add('done');
+  amShow(['am-indicator','am-body2','am-footer2']);
+  amRenderTeamCards();
+}
+function amNameInput() {
+  const v = document.getElementById('am-team-name').value;
+  document.getElementById('am-name-len').textContent = `${v.length}/20`;
+  document.getElementById('am-name-hint').textContent = '';
+  document.getElementById('am-name-hint').className = 'apply-form-hint';
+  document.getElementById('am-team-name').className = 'apply-input';
+  amCheckNext();
+}
+function amCheckName() {
+  const v = document.getElementById('am-team-name').value.trim();
+  if (!v) return;
+  const taken = ['테스트팀','우승팀','AI챔피언'];
+  const hint = document.getElementById('am-name-hint');
+  const inp = document.getElementById('am-team-name');
+  if (taken.includes(v)) {
+    hint.textContent = '이미 사용 중인 팀 이름입니다.';
+    hint.className = 'apply-form-hint error';
+    inp.className = 'apply-input error';
+  } else {
+    hint.textContent = '사용 가능한 팀 이름입니다.';
+    hint.className = 'apply-form-hint success';
+    inp.className = 'apply-input success';
+  }
+  amCheckNext();
+}
+function amSelectType(t) {
+  amState.hackType = t;
+  ['idea','mvp'].forEach(x => document.getElementById(`am-type-${x}`).classList.toggle('selected', x===t));
+  document.querySelector(`input[value="${t}"]`).checked = true;
+  amCheckNext();
+}
+function amTopicInput() {
+  const v = document.getElementById('am-topic').value;
+  document.getElementById('am-topic-len').textContent = `${v.length} / 200`;
+  amCheckNext();
+}
+function amToggle(field) {
+  const sw = document.getElementById(`am-toggle-${field}`);
+  const ex = document.getElementById(`am-toggle-${field}-extra`);
+  sw.classList.toggle('on');
+  ex.classList.toggle('show', sw.classList.contains('on'));
+}
+function amCheckNext() {
+  const nameOk = document.getElementById('am-team-name').value.trim() &&
+                 !document.getElementById('am-team-name').classList.contains('error');
+  const typeOk = !!amState.hackType;
+  const topicOk = document.getElementById('am-topic').value.trim().length > 0;
+  document.getElementById('am-btn-next').disabled = !(nameOk && typeOk && topicOk);
+}
+function amSearch() {
+  const q = document.getElementById('am-search').value.trim().toLowerCase();
+  const dd = document.getElementById('am-dropdown');
+  if (!q) { dd.classList.remove('show'); amPickedMember = null; return; }
+  const filtered = AM_MEMBERS_POOL.filter(m =>
+    m.name.includes(q) && !amState.members.find(x => x.name === m.name)
+  );
+  if (!filtered.length) {
+    dd.innerHTML = '<div style="padding:14px;font-size:13px;color:var(--text-subtle);text-align:center;">같은 과정 수강생 중 검색 결과가 없습니다.</div>';
+  } else {
+    dd.innerHTML = filtered.map(m => `
+      <div class="msearch-item${m.busy?' disabled':''}" onclick="${m.busy?'':'amPickMember(\''+m.name+'\',\''+m.dept+'\',\''+m.initial+'\')'}">
+        <div><div class="msearch-name">${m.name}</div><div class="msearch-dept">${m.dept}</div></div>
+        ${m.busy ? '<span class="msearch-badge">참가 중</span>' : ''}
+      </div>`).join('');
+  }
+  dd.classList.add('show');
+}
+function amPickMember(name, dept, initial) {
+  amPickedMember = { name, dept, initial };
+  document.getElementById('am-search').value = name;
+  document.getElementById('am-dropdown').classList.remove('show');
+}
+function amAddMember() {
+  if (!amPickedMember) return;
+  if (amState.members.length >= 3) { amToast('팀 인원은 최대 4명입니다.'); return; }
+  if (amState.members.find(m => m.name === amPickedMember.name)) { amToast('이미 추가된 팀원입니다.'); return; }
+  amState.members.push(amPickedMember);
+  amPickedMember = null;
+  document.getElementById('am-search').value = '';
+  amRenderTeamCards();
+}
+function amRemoveMember(i) { amState.members.splice(i,1); amRenderTeamCards(); }
+function amRenderTeamCards() {
+  const count = 1 + amState.members.length;
+  document.getElementById('am-count-label').textContent = `${count} / 4명`;
+  let html = `<div class="tc leader"><div class="tc-avatar">김</div><div><div class="tc-name">김학습</div><div class="tc-role">팀장 · 기업사업교육2그룹</div></div></div>`;
+  amState.members.forEach((m,i) => {
+    html += `<div class="tc"><div class="tc-avatar">${m.initial}</div><div style="flex:1"><div class="tc-name">${m.name}</div><div class="tc-role">${m.dept}</div></div><button class="tc-remove" onclick="amRemoveMember(${i})">✕</button></div>`;
+  });
+  document.getElementById('am-team-cards').innerHTML = html;
+}
+function amSubmit() {
+  const name = document.getElementById('am-team-name').value;
+  const topic = document.getElementById('am-topic').value;
+  document.getElementById('am-step-label').textContent = '신청 완료';
+  document.getElementById('am-title').textContent = '팀 관리';
+  amShow(['am-body-done','am-footer-done']);
+  document.getElementById('am-done-name').textContent = name;
+  document.getElementById('am-done-type').textContent = amState.hackType === 'mvp' ? 'MVP톤' : '아이디어톤';
+  document.getElementById('am-done-topic').textContent = topic;
+  amRenderManageCards();
+  const msg = document.getElementById('am-success-msg');
+  msg.classList.remove('hidden');
+  setTimeout(() => msg.classList.add('hidden'), 3000);
+  amToast('참가 신청이 완료되었습니다.');
+}
+function amManageSearch() {
+  const q = document.getElementById('am-manage-search').value.trim().toLowerCase();
+  const dd = document.getElementById('am-manage-dropdown');
+  if (!q) { dd.classList.remove('show'); amManagePickedMember = null; return; }
+  const filtered = AM_MEMBERS_POOL.filter(m =>
+    m.name.includes(q) && !amState.members.find(x => x.name === m.name) && m.name !== '김학습'
+  );
+  if (!filtered.length) {
+    dd.innerHTML = '<div style="padding:14px;font-size:13px;color:var(--text-subtle);text-align:center;">검색 결과가 없습니다.</div>';
+  } else {
+    dd.innerHTML = filtered.map(m => `
+      <div class="msearch-item${m.busy?' disabled':''}" onclick="${m.busy?'':'amManagePick(\''+m.name+'\',\''+m.dept+'\',\''+m.initial+'\')'}">
+        <div><div class="msearch-name">${m.name}</div><div class="msearch-dept">${m.dept}</div></div>
+        ${m.busy ? '<span class="msearch-badge">참가 중</span>' : ''}
+      </div>`).join('');
+  }
+  dd.classList.add('show');
+}
+function amManagePick(name, dept, initial) {
+  amManagePickedMember = { name, dept, initial };
+  document.getElementById('am-manage-search').value = name;
+  document.getElementById('am-manage-dropdown').classList.remove('show');
+}
+function amManageAdd() {
+  if (!amManagePickedMember) return;
+  if (amState.members.length >= 3) { amToast('팀 인원은 최대 4명입니다.'); return; }
+  amState.members.push(amManagePickedMember);
+  amManagePickedMember = null;
+  document.getElementById('am-manage-search').value = '';
+  amRenderManageCards();
+}
+function amManageRemove(i) {
+  if (confirm('팀원을 삭제하면 해당 팀원에게 알림이 발송됩니다.\n삭제하시겠습니까?')) {
+    amState.members.splice(i,1);
+    amRenderManageCards();
+  }
+}
+function amRenderManageCards() {
+  const count = 1 + amState.members.length;
+  document.getElementById('am-manage-count').textContent = `${count} / 4명`;
+  let html = `<div class="tc leader"><div class="tc-avatar">김</div><div style="flex:1"><div class="tc-name">김학습</div><div class="tc-role">팀장 · 기업사업교육2그룹</div></div></div>`;
+  amState.members.forEach((m,i) => {
+    html += `<div class="tc"><div class="tc-avatar">${m.initial}</div><div style="flex:1"><div class="tc-name">${m.name}</div><div class="tc-role">${m.dept}</div></div><button class="tc-remove" onclick="amManageRemove(${i})">✕</button></div>`;
+  });
+  document.getElementById('am-manage-cards').innerHTML = html;
+}
+function amCancelApply() { document.getElementById('am-cancel-dialog').classList.remove('hidden'); }
+function amConfirmCancel() {
+  document.getElementById('am-cancel-dialog').classList.add('hidden');
+  closeApplyModal();
+  amState = { hackType:'', members:[] };
+  document.getElementById('am-team-name').value = '';
+  document.getElementById('am-topic').value = '';
+  ['idea','mvp'].forEach(x => document.getElementById(`am-type-${x}`)?.classList.remove('selected'));
+  document.getElementById('am-name-hint').textContent = '';
+  document.getElementById('am-name-len').textContent = '0/20';
+  document.getElementById('am-topic-len').textContent = '0 / 200';
+  document.getElementById('am-btn-next').disabled = true;
+}
+function amToast(msg) {
+  let t = document.getElementById('am-toast');
+  if (!t) { t = document.createElement('div'); t.id='am-toast'; t.style.cssText='position:fixed;bottom:32px;left:50%;transform:translateX(-50%);background:#131416;color:#fff;padding:12px 24px;border-radius:99px;font-size:14px;font-weight:500;z-index:2000;transition:opacity .3s;pointer-events:none;'; document.body.appendChild(t); }
+  t.textContent = msg; t.style.opacity = '1';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => { t.style.opacity = '0'; }, 2500);
+}
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.msearch-wrap')) {
+    document.querySelectorAll('.msearch-dropdown').forEach(d => d.classList.remove('show'));
+  }
+});
+
+/* ── State Toggle ── */
+function setState(state, btn) {
+  document.querySelectorAll('.state-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+
+  const isBefore = state === 'before';
+  document.getElementById('sub-before').classList.toggle('hidden', !isBefore);
+  document.getElementById('sub-during').classList.toggle('hidden', isBefore);
+  document.getElementById('hero-cta-btn').classList.toggle('hidden', !isBefore);
+  document.getElementById('myteam-bar').classList.toggle('hidden', isBefore);
+  document.getElementById('content-before').classList.toggle('hidden', !isBefore);
+  document.getElementById('content-during').classList.toggle('hidden', isBefore);
+  document.getElementById('right-panel').classList.toggle('hidden', isBefore);
+
+  document.querySelectorAll('.lnb-item').forEach(i => i.classList.remove('active'));
+  document.getElementById('lnb-home').classList.add('active');
+
+  if (!isBefore) {
+    const firstTab = document.querySelector('#content-during .tab');
+    if (firstTab) switchTab(firstTab, 'tab-submissions');
+  }
+}
+
+/* ── Tab Switch (진행 중) ── */
+const DURING_TABS = ['tab-submissions', 'tab-presentations', 'tab-notice'];
+function switchTab(el, targetId) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  DURING_TABS.forEach(id => document.getElementById(id)?.classList.add('hidden'));
+  document.getElementById(targetId)?.classList.remove('hidden');
+}
+</script>
+</body>
+</html>
