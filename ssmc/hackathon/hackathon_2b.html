@@ -114,37 +114,57 @@ body { background: var(--bg-base); font-family: var(--font-family); -webkit-font
 /* ── Body Area ── */
 .body-area { flex: 1; min-width: 0; background: var(--bg-surface); border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; position: relative; }
 
-/* ── Hero Banner (dark CSS) ── */
+/* ── Hero Banner (KV-C canvas) ── */
 .hero-banner-wrap {
   width: 100%; flex-shrink: 0; position: relative; overflow: hidden;
-  min-height: 260px; background: var(--bg-base);
-  display: flex; align-items: flex-end;
+  min-height: 320px; background: #06070D;
 }
-.hero-ambient-1 {
-  position: absolute; width: 560px; height: 560px; border-radius: 50%;
-  background: radial-gradient(circle, rgba(123,47,255,0.22) 0%, transparent 70%);
-  top: -200px; left: -120px; pointer-events: none;
+#hero-canvas {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  pointer-events: none;
 }
-.hero-ambient-2 {
-  position: absolute; width: 440px; height: 440px; border-radius: 50%;
-  background: radial-gradient(circle, rgba(0,212,255,0.13) 0%, transparent 70%);
-  bottom: -120px; right: -60px; pointer-events: none;
+.hero-overlay {
+  position: relative; z-index: 1;
+  display: flex; align-items: center; min-height: 320px;
 }
-.hero-content { position: relative; z-index: 1; padding: 44px 40px 36px; width: 100%; box-sizing: border-box; }
+.hero-left {
+  flex: 0 0 54%; max-width: 54%;
+  padding: 48px 0 44px 40px;
+}
+.hero-right { flex: 1; }
+.hero-badge {
+  display: inline-flex; align-items: center;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--neon-cyan); padding: 6px 16px; border-radius: 99px;
+  border: 1px solid rgba(0,212,255,0.35); background: rgba(0,212,255,0.06);
+  margin-bottom: 20px;
+  text-shadow: 0 0 10px rgba(0,212,255,0.5);
+}
 .hero-title {
-  font-size: 34px; font-weight: 800; line-height: 1.2; margin: 0 0 10px;
+  font-size: 56px; font-weight: 800; line-height: 1.1; margin: 0 0 14px;
   background: var(--grad-primary);
   -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  filter: drop-shadow(0 0 24px rgba(78,112,255,0.4));
 }
-.hero-sub { font-size: 15px; color: var(--text-sub); margin: 0 0 24px; line-height: 1.6; }
+.hero-sub { font-size: 15px; color: var(--text-sub); margin: 0 0 28px; line-height: 1.65; }
 .hero-cta {
   display: inline-flex; align-items: center; gap: 8px;
-  padding: 12px 28px; border-radius: 99px; border: none; cursor: pointer;
-  font-size: 15px; font-weight: 700; color: #fff; font-family: var(--font-family);
-  background: var(--grad-primary); box-shadow: 0 4px 20px rgba(123,47,255,0.4);
-  transition: transform .15s, box-shadow .15s;
+  padding: 14px 32px; border-radius: 8px; border: none; cursor: pointer;
+  font-size: 14px; font-weight: 700; letter-spacing: 0.08em; color: #fff;
+  font-family: var(--font-family);
+  background: linear-gradient(135deg, var(--neon-purple), var(--neon-blue));
+  box-shadow: 0 0 28px rgba(123,47,255,0.5), 0 0 56px rgba(123,47,255,0.2);
+  transition: transform .2s, box-shadow .2s;
+  position: relative; overflow: hidden;
 }
-.hero-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(123,47,255,0.55); }
+.hero-cta::before {
+  content: ''; position: absolute; top: 0; left: -100%;
+  width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+  transition: left .4s;
+}
+.hero-cta:hover::before { left: 100%; }
+.hero-cta:hover { transform: translateY(-2px); box-shadow: 0 0 36px rgba(123,47,255,0.7), 0 0 70px rgba(123,47,255,0.3); }
 
 /* ── Stat Wrap ── */
 .stat-wrap { padding: 20px 24px 16px; }
@@ -182,11 +202,13 @@ body { background: var(--bg-base); font-family: var(--font-family); -webkit-font
 /* ── Before Content ── */
 .before-content { display: flex; flex-direction: column; gap: 0; position: relative; z-index: 1; }
 
-/* ── My Team Card (dark) ── */
+/* ── My Team Card (dark, full-width) ── */
 .myteam-bar {
-  margin: 16px 24px 0; box-sizing: border-box;
-  background: var(--bg-surface); border: 1px solid rgba(123,47,255,0.3); border-radius: 16px;
-  padding: 20px 24px; display: flex; align-items: center; gap: 24px;
+  width: 100%; box-sizing: border-box;
+  background: var(--bg-elevated); border-top: 1px solid rgba(123,47,255,0.3);
+  border-bottom: 1px solid rgba(123,47,255,0.2); border-left: none; border-right: none;
+  border-radius: 0;
+  padding: 18px 24px; display: flex; align-items: center; gap: 24px;
 }
 .myteam-left { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 8px; }
 .myteam-top-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
@@ -487,15 +509,18 @@ textarea.apply-input { height:auto; padding:10px 12px; resize:none; line-height:
     <!-- ── BODY ── -->
     <div class="body-area">
 
-      <!-- 히어로 배너 (dark CSS, 이미지 없음) -->
+      <!-- 히어로 배너 (KV-C canvas) -->
       <div class="hero-banner-wrap">
-        <div class="hero-ambient-1"></div>
-        <div class="hero-ambient-2"></div>
-        <div class="hero-content">
-          <h1 class="hero-title">2026 AI 해커톤</h1>
-          <p id="sub-before" class="hero-sub">AI로 세상을 바꾸는 48시간의 여정. 아이디어에서 실전 AI 솔루션까지, 지금 도전하세요.</p>
-          <p id="sub-during" class="hero-sub hidden">2026.05.22(금) 18:00까지 결과물 제출 · 현재 62팀 제출 완료</p>
-          <button class="hero-cta" id="hero-cta-btn" onclick="openApplyModal()">참가 신청하기</button>
+        <canvas id="hero-canvas"></canvas>
+        <div class="hero-overlay">
+          <div class="hero-left">
+            <div class="hero-badge">2026 AI HACKATHON · SAMSUNG SDS MULTICAMPUS</div>
+            <h1 class="hero-title">2026 AI 해커톤</h1>
+            <p id="sub-before" class="hero-sub">AI로 세상을 바꾸는 48시간의 여정. 아이디어에서 실전 AI 솔루션까지, 지금 도전하세요.</p>
+            <p id="sub-during" class="hero-sub hidden"><span style="color:var(--neon-cyan);font-weight:600;">현재 62팀 제출 완료</span> · 마감까지 D-14</p>
+            <button class="hero-cta" id="hero-cta-btn" onclick="openApplyModal()">⚡ 참가 신청하기</button>
+          </div>
+          <div class="hero-right"></div>
         </div>
       </div>
 
@@ -517,10 +542,6 @@ textarea.apply-input { height:auto; padding:10px 12px; resize:none; line-height:
           <div class="myteam-stat">
             <div class="myteam-stat-label">현재순위</div>
             <div class="myteam-stat-rank">3위</div>
-          </div>
-          <div class="myteam-stat">
-            <div class="myteam-stat-label">동료평가</div>
-            <div class="myteam-stat-score">89.5</div>
           </div>
           <div class="myteam-stat">
             <div class="myteam-stat-label">제출횟수</div>
@@ -1304,6 +1325,157 @@ function switchTab(el, targetId) {
   DURING_TABS.forEach(id => document.getElementById(id)?.classList.add('hidden'));
   document.getElementById(targetId)?.classList.remove('hidden');
 }
+
+/* ── Hero Canvas — KV-C Data·Tech style ── */
+(function() {
+  const cvs = document.getElementById('hero-canvas');
+  if (!cvs) return;
+  const ctx = cvs.getContext('2d');
+  let W = 0, H = 0, animId;
+
+  const COLS = 18;
+  const streams = Array.from({length: COLS}, () => ({
+    x: 0, y: Math.random() * 600,
+    speed: 1 + Math.random() * 2.2,
+    len: 5 + Math.floor(Math.random() * 9),
+    chars: '01アイAIMLGPT<>{}[];λΩ∇◆'.split(''),
+    opacity: 0.05 + Math.random() * 0.11,
+    col: Math.random() < 0.4 ? '#7B2FFF' : '#4E70FF',
+  }));
+
+  const NODES = Array.from({length: 15}, () => ({
+    x: 0, y: Math.random() * 400,
+    vx: (Math.random() - 0.5) * 0.32, vy: (Math.random() - 0.5) * 0.32,
+    r: 1.5 + Math.random() * 2.2,
+    col: ['#7B2FFF','#4E70FF','#00D4FF','#FF2D9B','#FFD700'][Math.floor(Math.random()*5)],
+    pulse: Math.random() * Math.PI * 2,
+  }));
+
+  function reposition() {
+    streams.forEach((s, i) => {
+      s.x = W * 0.48 + (i % COLS) * (W * 0.52 / COLS) + (W * 0.52 / COLS / 2);
+    });
+    NODES.forEach(n => {
+      if (n.x < W * 0.46 || n.x === 0) n.x = W * 0.48 + Math.random() * W * 0.52;
+      if (n.y === 0) n.y = Math.random() * H;
+    });
+  }
+
+  function resize() {
+    const r = cvs.parentElement.getBoundingClientRect();
+    W = cvs.width  = Math.round(r.width  || 800);
+    H = cvs.height = Math.round(r.height || 320);
+    reposition();
+  }
+
+  function drawStream(s) {
+    ctx.save();
+    ctx.font = '600 11px "JetBrains Mono","Courier New",monospace';
+    ctx.textAlign = 'center';
+    for (let i = 0; i < s.len; i++) {
+      const cy = s.y - i * 16;
+      if (cy < -20 || cy > H + 20) continue;
+      const alpha = i === 0 ? s.opacity * 2.5 : s.opacity * (1 - i / s.len);
+      const char = s.chars[Math.floor(Math.random() * s.chars.length)];
+      ctx.fillStyle = i === 0
+        ? `rgba(0,212,255,${Math.min(alpha * 2, 0.6)})`
+        : `${s.col}${Math.floor(alpha * 255).toString(16).padStart(2,'0')}`;
+      ctx.fillText(char, s.x, cy);
+    }
+    ctx.restore();
+  }
+
+  let t = 0;
+  function drawFrame() {
+    t++;
+    ctx.fillStyle = '#06070D';
+    ctx.fillRect(0, 0, W, H);
+
+    /* Left ambient orb — purple */
+    const lg = ctx.createRadialGradient(W*0.12, H*0.5, 20, W*0.12, H*0.5, W*0.42);
+    lg.addColorStop(0, 'rgba(123,47,255,0.22)'); lg.addColorStop(0.55, 'rgba(78,112,255,0.07)'); lg.addColorStop(1, 'rgba(6,7,13,0)');
+    ctx.fillStyle = lg; ctx.fillRect(0, 0, W, H);
+
+    /* Right ambient orb — blue */
+    const rg = ctx.createRadialGradient(W*0.82, H*0.28, 10, W*0.82, H*0.28, W*0.38);
+    rg.addColorStop(0, 'rgba(78,112,255,0.18)'); rg.addColorStop(0.5, 'rgba(0,212,255,0.08)'); rg.addColorStop(1, 'rgba(6,7,13,0)');
+    ctx.fillStyle = rg; ctx.fillRect(0, 0, W, H);
+
+    /* Waveform data lines */
+    ctx.lineWidth = 1;
+    for (let i = 0; i < 4; i++) {
+      const ly = H * 0.14 + i * (H * 0.23);
+      const wg = ctx.createLinearGradient(0, ly, W, ly);
+      wg.addColorStop(0, 'rgba(123,47,255,0)');
+      wg.addColorStop(0.22, `rgba(123,47,255,${0.09 + i*0.03})`);
+      wg.addColorStop(0.78, `rgba(78,112,255,${0.11 + i*0.03})`);
+      wg.addColorStop(1, 'rgba(78,112,255,0)');
+      ctx.strokeStyle = wg;
+      ctx.beginPath();
+      ctx.moveTo(0, ly);
+      for (let x = 0; x < W; x += 8) ctx.lineTo(x, ly + Math.sin(x*0.013 + t*0.022 + i*1.4) * (3 + i*2));
+      ctx.stroke();
+    }
+
+    /* Perspective grid floor (lower right) */
+    ctx.save();
+    const gH = H * 0.58;
+    const vpX = W * 0.78;
+    ctx.lineWidth = 0.6;
+    for (let i = 0; i <= 8; i++) {
+      const prog = i / 8, y = gH + (H - gH) * prog, spread = (y - gH) * 1.9;
+      ctx.strokeStyle = `rgba(0,212,255,${prog * 0.2})`;
+      ctx.beginPath(); ctx.moveTo(vpX - spread, y); ctx.lineTo(vpX + spread, y); ctx.stroke();
+    }
+    for (let i = -6; i <= 6; i++) {
+      const angle = (i / 6) * Math.PI * 0.42;
+      ctx.strokeStyle = 'rgba(0,212,255,0.08)';
+      ctx.beginPath(); ctx.moveTo(vpX, gH); ctx.lineTo(vpX + Math.sin(angle)*(H-gH)*1.9, H); ctx.stroke();
+    }
+    ctx.restore();
+
+    /* Code streams — right half */
+    streams.forEach((s, idx) => {
+      s.y += s.speed;
+      if (s.y - s.len * 16 > H) {
+        s.y = -20;
+        s.x = W * 0.48 + (idx % COLS) * (W * 0.52 / COLS) + (W * 0.52 / COLS / 2);
+      }
+      drawStream(s);
+    });
+
+    /* Network nodes — right 54% */
+    NODES.forEach(n => {
+      n.x += n.vx; n.y += n.vy;
+      if (n.x < W*0.46) n.vx = Math.abs(n.vx)*1.1;
+      if (n.x > W - 4)  n.vx = -Math.abs(n.vx);
+      if (n.y < 4)      n.vy = Math.abs(n.vy);
+      if (n.y > H - 4)  n.vy = -Math.abs(n.vy);
+      n.pulse += 0.04;
+      const ps = Math.sin(n.pulse)*0.4 + 1.0;
+      ctx.beginPath(); ctx.arc(n.x, n.y, n.r*ps, 0, Math.PI*2);
+      ctx.fillStyle = n.col + '99'; ctx.shadowColor = n.col; ctx.shadowBlur = 10;
+      ctx.fill(); ctx.shadowBlur = 0;
+    });
+
+    /* Node edges */
+    ctx.lineWidth = 0.5;
+    for (let i = 0; i < NODES.length; i++) for (let j = i+1; j < NODES.length; j++) {
+      const dx = NODES[i].x - NODES[j].x, dy = NODES[i].y - NODES[j].y;
+      const d = Math.sqrt(dx*dx + dy*dy);
+      if (d < 120) {
+        ctx.strokeStyle = `rgba(78,112,255,${(1-d/120)*0.25})`;
+        ctx.beginPath(); ctx.moveTo(NODES[i].x, NODES[i].y); ctx.lineTo(NODES[j].x, NODES[j].y); ctx.stroke();
+      }
+    }
+
+    animId = requestAnimationFrame(drawFrame);
+  }
+
+  resize();
+  window.addEventListener('resize', () => { cancelAnimationFrame(animId); resize(); drawFrame(); });
+  drawFrame();
+})();
 </script>
 </body>
 </html>
